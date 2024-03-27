@@ -1,12 +1,17 @@
 package org.shareio.backend.infrastructure.controller;
 
 import lombok.AllArgsConstructor;
-import org.shareio.backend.core.model.UserSnapshot;
+import org.shareio.backend.Const;
+import org.shareio.backend.controller.responses.CorrectResponse;
+import org.shareio.backend.controller.responses.ErrorResponse;
+import org.shareio.backend.core.usecases.port.dto.UserProfileResponseDto;
 import org.shareio.backend.core.usecases.port.in.GetUserProfileUseCaseInterface;
+import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.infrastructure.dbadapter.entities.AddressEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.SecurityEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.UserEntity;
 import org.shareio.backend.infrastructure.dbadapter.repositories.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,9 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @AllArgsConstructor
@@ -25,14 +28,6 @@ public class UserRESTController {
 
     GetUserProfileUseCaseInterface getUserProfileUseCaseInterface;
     UserRepository userRepository;
-
-    @RequestMapping(value = "/employees", method = RequestMethod.GET, produces = "application/json")
-    public List<String> firstPage() {
-        List<String> strings = new ArrayList<>();
-        strings.add("a");
-        strings.add("b");
-        return strings;
-    }
 
     @RequestMapping(value = "/debug/createUser", method = RequestMethod.GET, produces = "text/plain")
     public ResponseEntity<String> debugCreateTestUser(@RequestParam UUID id) {
@@ -54,8 +49,16 @@ public class UserRESTController {
     }
 
     @RequestMapping(value = "/user", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<UserSnapshot> getUserById(@RequestParam UUID id) {
-        return new ResponseEntity<>(getUserProfileUseCaseInterface.getUserSnapshot(id), HttpStatusCode.valueOf(200));
+    public ResponseEntity<Object> getUserById(@RequestParam UUID id) {
+        try{
+            UserProfileResponseDto userProfileResponseDto = getUserProfileUseCaseInterface.getUserProfileResponseDto(id);
+            return new CorrectResponse(userProfileResponseDto, "Correct user", HttpStatus.OK);
+        } catch (MultipleValidationException e) {
+            return new ErrorResponse(e.getErrorMap(), e.getMessage(),HttpStatus.BAD_REQUEST);
+        } catch (NoSuchElementException noSuchElementException){
+            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.BAD_REQUEST);
+        }
+
     }
 }
 
