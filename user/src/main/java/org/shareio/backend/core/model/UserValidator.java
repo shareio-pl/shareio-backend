@@ -56,7 +56,7 @@ public class UserValidator {
 
     public static void validateEmail(String email) throws ValidationException {
         StringValidator.validateStringNotEmpty(email);
-//        StringValidator.validateEmail(email);
+        StringValidator.validateEmail(email);
     }
 
     public static void validateDate(LocalDateTime date) throws ValidationException {
