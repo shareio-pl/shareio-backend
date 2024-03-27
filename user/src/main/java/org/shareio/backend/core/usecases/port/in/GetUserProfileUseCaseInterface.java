@@ -1,9 +1,10 @@
 package org.shareio.backend.core.usecases.port.in;
 
-import org.shareio.backend.core.model.UserSnapshot;
+import org.shareio.backend.core.usecases.port.dto.UserProfileResponseDto;
+import org.shareio.backend.exceptions.MultipleValidationException;
 
 import java.util.UUID;
 
 public interface GetUserProfileUseCaseInterface {
-    UserSnapshot getUserSnapshot(UUID id);
+    UserProfileResponseDto getUserProfileResponseDto(UUID id) throws MultipleValidationException;
 }

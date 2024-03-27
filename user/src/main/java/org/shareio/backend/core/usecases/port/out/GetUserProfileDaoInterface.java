@@ -5,6 +5,6 @@ import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface GetUserProfileQueryInterface {
+public interface GetUserProfileDaoInterface {
     Optional<UserProfileGetDto> getUserDto(UUID id);
 }

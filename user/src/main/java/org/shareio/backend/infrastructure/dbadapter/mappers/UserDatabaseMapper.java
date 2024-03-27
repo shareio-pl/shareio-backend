@@ -6,7 +6,7 @@ import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
 import org.shareio.backend.infrastructure.dbadapter.entities.SecurityEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.UserEntity;
 
-public class UserMapper {
+public class UserDatabaseMapper {
 
     public static UserProfileGetDto toDto(UserEntity userEntity) {
         return new UserProfileGetDto(
@@ -23,7 +23,7 @@ public class UserMapper {
     public static UserEntity toEntity(UserSnapshot userSnapshot) {
         return new UserEntity(null, userSnapshot.userId().getId(), userSnapshot.email(),
                 userSnapshot.name(), userSnapshot.dateOfBirth(),
-                AddressMapper.map(userSnapshot.address()), UserMapper.toSecurityEntity(userSnapshot));
+                AddressMapper.map(userSnapshot.address()), UserDatabaseMapper.toSecurityEntity(userSnapshot));
     }
 
     private static SecurityEntity toSecurityEntity(UserSnapshot userSnapshot) {

@@ -1,9 +1,9 @@
 package org.shareio.backend.infrastructure.dbadapter.adapters;
 
 import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
-import org.shareio.backend.core.usecases.port.out.GetUserProfileQueryInterface;
+import org.shareio.backend.core.usecases.port.out.GetUserProfileDaoInterface;
 import org.shareio.backend.infrastructure.dbadapter.entities.UserEntity;
-import org.shareio.backend.infrastructure.dbadapter.mappers.UserMapper;
+import org.shareio.backend.infrastructure.dbadapter.mappers.UserDatabaseMapper;
 import org.shareio.backend.infrastructure.dbadapter.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +12,7 @@ import java.util.UUID;
 
 
 @Service
-public class UserAdapter implements GetUserProfileQueryInterface {
+public class UserAdapter implements GetUserProfileDaoInterface {
 
     final UserRepository userRepository;
 
@@ -28,6 +28,6 @@ public class UserAdapter implements GetUserProfileQueryInterface {
         if (userEntity.isEmpty()) {
             throw new RuntimeException();
         }
-        return userEntity.map(UserMapper::toDto);
+        return userEntity.map(UserDatabaseMapper::toDto);
     }
 }
