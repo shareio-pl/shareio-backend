@@ -2,7 +2,6 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -15,15 +14,22 @@
         <module name="user" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="offers" target="21" />
+      <module name="users" target="21" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="backend" options="" />
       <module name="bootstrap" options="-parameters" />
       <module name="lib" options="-parameters" />
       <module name="location" options="-parameters" />
       <module name="offer" options="-parameters" />
+      <module name="offers" options="-parameters" />
       <module name="score" options="-parameters" />
       <module name="user" options="-parameters" />
+      <module name="users" options="-parameters" />
     </option>
   </component>
 </project>
