@@ -33,7 +33,7 @@ public class UserRESTController {
     public ResponseEntity<String> debugCreateTestUser(@RequestParam UUID id) {
         UserEntity userEntity;
         try {
-            userEntity = new UserEntity(null, id, "A", "B", LocalDateTime.now(),
+            userEntity = new UserEntity(null, id, "username@domain.com", "BB", LocalDateTime.now(),
                     new AddressEntity(null, null, "A", "B", "C", "12", "21", "99999", 10.1, 22.1),
                     new SecurityEntity(null, "aa", LocalDateTime.now(), LocalDateTime.now()));
 
