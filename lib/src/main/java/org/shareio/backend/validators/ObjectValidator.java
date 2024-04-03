@@ -1,10 +1,12 @@
 package org.shareio.backend.validators;
 
+import org.shareio.backend.exceptions.ValidationException;
+
 import java.util.Objects;
 
 public class ObjectValidator {
 
-    public static void validateOptionalIsNotEmpty(Object object){
-        if(Objects.isNull(object)) throw new RuntimeException();
+    public static void validateObjectIsNotNull(Object object) throws ValidationException {
+        if(Objects.isNull(object)) throw new ValidationException("Object is null");
     }
 }
