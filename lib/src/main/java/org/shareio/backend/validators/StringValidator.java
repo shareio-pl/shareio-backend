@@ -13,6 +13,6 @@ public class StringValidator {
 
     public static void validateEmail(String email) throws ValidationException {
         if (!Const.emailRegex.matcher(email).find())
-            throw new ValidationException("Malformed email");
+            throw new ValidationException("Invalid email");
     }
 }
