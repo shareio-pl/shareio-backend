@@ -1,6 +1,7 @@
 package org.shareio.backend.infrastructure.dbadapter.mappers;
 
 import org.shareio.backend.core.model.UserSnapshot;
+import org.shareio.backend.core.model.vo.AddressId;
 import org.shareio.backend.core.model.vo.UserId;
 import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
 import org.shareio.backend.infrastructure.dbadapter.entities.SecurityEntity;
@@ -14,8 +15,7 @@ public class UserDatabaseMapper {
                 userEntity.getEmail(),
                 userEntity.getName(),
                 userEntity.getDateOfBirth(),
-                userEntity.getAddress().getCountry(),
-                userEntity.getAddress().getCity(),
+                new AddressId(userEntity.getAddress().getAddressId()),
                 userEntity.getSecurity().getLastLoginDate()
         );
     }

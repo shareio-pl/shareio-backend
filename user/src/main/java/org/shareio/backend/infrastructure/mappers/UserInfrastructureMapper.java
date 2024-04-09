@@ -5,14 +5,13 @@ import org.shareio.backend.core.usecases.port.dto.UserProfileResponseDto;
 
 public class UserInfrastructureMapper {
 
-    public static UserProfileResponseDto toDto(UserSnapshot userSnapshot){
+    public static UserProfileResponseDto toDto(UserSnapshot userSnapshot) {
         return new UserProfileResponseDto(
-                userSnapshot.userId().getId(),
+                userSnapshot.userId(),
                 userSnapshot.email(),
                 userSnapshot.name(),
                 userSnapshot.dateOfBirth(),
-                userSnapshot.address().getCountry(),
-                userSnapshot.address().getCity(),
+                userSnapshot.address().getAddressId(),
                 userSnapshot.security().getLastLoginDate()
         );
     }

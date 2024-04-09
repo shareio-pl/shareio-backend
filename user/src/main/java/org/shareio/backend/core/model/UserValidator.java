@@ -15,43 +15,33 @@ public class UserValidator {
 
     public static void validateUser(UserProfileGetDto userProfileGetDto) throws MultipleValidationException {
         Map<String, String> errorMap = new HashMap<>();
-        try{
+        try {
             validateName(userProfileGetDto.name());
-        } catch(ValidationException validationException){
+        } catch (ValidationException validationException) {
             errorMap.put("Name", validationException.getMessage());
         }
-        try{
+        try {
             validateEmail(userProfileGetDto.email());
-        } catch(ValidationException validationException){
+        } catch (ValidationException validationException) {
             errorMap.put("Email", validationException.getMessage());
         }
-        try{
+        try {
             validateDate(userProfileGetDto.dateOfBirth());
-        } catch(ValidationException validationException){
+        } catch (ValidationException validationException) {
             errorMap.put("DateOfBirth", "Malformed date of birth");
         }
-        try{
-            validateCountry(userProfileGetDto.country());
-        } catch(ValidationException validationException){
-            errorMap.put("Country", validationException.getMessage());
-        }
-        try{
-            validateCity(userProfileGetDto.city());
-        } catch(ValidationException validationException){
-            errorMap.put("City", validationException.getMessage());
-        }
-        try{
+        try {
             validateDate(userProfileGetDto.lastLoginDate());
-        } catch(ValidationException validationException){
+        } catch (ValidationException validationException) {
             errorMap.put("LastLoginDate", "Malformed last login date");
         }
-        if(!errorMap.isEmpty()) throw new MultipleValidationException(Const.multipleValidationErrorCode, errorMap);
+        if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.multipleValidationErrorCode, errorMap);
     }
 
     public static void validateName(String name) throws ValidationException {
         StringValidator.validateStringNotEmpty(name);
-        if (name.length()<Const.minNameLength) throw new ValidationException("Name is too short!");
-        if (name.length()>Const.maxNameLength) throw new ValidationException("Name is too long!");
+        if (name.length() < Const.minNameLength) throw new ValidationException("Name is too short!");
+        if (name.length() > Const.maxNameLength) throw new ValidationException("Name is too long!");
     }
 
     public static void validateEmail(String email) throws ValidationException {
@@ -61,13 +51,5 @@ public class UserValidator {
 
     public static void validateDate(LocalDateTime date) throws ValidationException {
         ObjectValidator.validateObjectIsNotNull(date);
-    }
-
-    public static void validateCountry(String country) throws ValidationException {
-        StringValidator.validateStringNotEmpty(country);
-    }
-
-    public static void validateCity(String city) throws ValidationException {
-        StringValidator.validateStringNotEmpty(city);
     }
 }

@@ -24,16 +24,15 @@ public class User {
     private Security security;
 
     public static User fromDto(UserProfileGetDto userProfileGetDto) {
-
         return new User(
                 userProfileGetDto.userId(),
                 userProfileGetDto.email(),
                 userProfileGetDto.name(),
                 userProfileGetDto.dateOfBirth(),
-                new Address(null,
-                        userProfileGetDto.country(),
+                new Address(userProfileGetDto.addressId(),
                         null,
-                        userProfileGetDto.city(),
+                        null,
+                        null,
                         null,
                         null,
                         null,
