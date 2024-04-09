@@ -1,7 +1,6 @@
 package org.shareio.backend.core.usecases.port.dto;
 
 import org.shareio.backend.core.model.vo.AddressId;
-import org.shareio.backend.core.model.vo.Location;
 
 public record AddressResponseDto(
         AddressId addressId,

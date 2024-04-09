@@ -18,7 +18,6 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 public class GetUserProfileUseCaseService implements GetUserProfileUseCaseInterface {
-
     GetUserProfileDaoInterface getUserDaoInterface;
 
 
