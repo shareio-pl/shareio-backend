@@ -5,7 +5,6 @@ import org.shareio.backend.core.model.vo.AddressId;
 import org.shareio.backend.core.model.vo.UserId;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 
 public record UserProfileResponseDto(

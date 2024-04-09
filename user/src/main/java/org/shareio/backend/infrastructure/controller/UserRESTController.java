@@ -29,14 +29,13 @@ public class UserRESTController {
     GetUserProfileUseCaseInterface getUserProfileUseCaseInterface;
     UserRepository userRepository;
 
-    @RequestMapping(value = "/debug/createUser", method = RequestMethod.GET, produces = "text/plain")
+    @RequestMapping(value = "/debug/createUserWithAddress", method = RequestMethod.GET, produces = "text/plain")
     public ResponseEntity<String> debugCreateTestUser(@RequestParam UUID id) {
         UserEntity userEntity;
         try {
             userEntity = new UserEntity(null, id, "username@domain.com", "BB", LocalDateTime.now(),
-                    new AddressEntity(null, null, "A", "B", "C", "12", "21", "99999", 10.1, 22.1),
+                    new AddressEntity(null, UUID.randomUUID(), "A", "B", "C", "12", "21", "99999", 10.1, 22.1),
                     new SecurityEntity(null, "aa", LocalDateTime.now(), LocalDateTime.now()));
-
         } catch (Exception e) {
             return new ResponseEntity<>("Could not create debug user: " + e, HttpStatusCode.valueOf(500));
         }
@@ -50,15 +49,14 @@ public class UserRESTController {
 
     @RequestMapping(value = "/user", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Object> getUserById(@RequestParam UUID id) {
-        try{
+        try {
             UserProfileResponseDto userProfileResponseDto = getUserProfileUseCaseInterface.getUserProfileResponseDto(id);
             return new CorrectResponse(userProfileResponseDto, "Correct user", HttpStatus.OK);
         } catch (MultipleValidationException e) {
-            return new ErrorResponse(e.getErrorMap(), e.getMessage(),HttpStatus.BAD_REQUEST);
-        } catch (NoSuchElementException noSuchElementException){
+            return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (NoSuchElementException noSuchElementException) {
             return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.BAD_REQUEST);
         }
-
     }
 }
 

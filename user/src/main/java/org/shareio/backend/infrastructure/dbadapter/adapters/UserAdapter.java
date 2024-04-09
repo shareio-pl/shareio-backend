@@ -14,12 +14,9 @@ import java.util.UUID;
 
 @Service
 public class UserAdapter implements GetUserProfileDaoInterface {
-
     final UserRepository userRepository;
 
-    public UserAdapter(
-            UserRepository userRepository
-    ) {
+    public UserAdapter(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

@@ -9,7 +9,7 @@ import org.shareio.backend.infrastructure.dbadapter.entities.UserEntity;
 
 public class UserDatabaseMapper {
 
-    public static UserProfileGetDto toDto(UserEntity userEntity) {
+    public static UserProfileGetDto toDto(final UserEntity userEntity) {
         return new UserProfileGetDto(
                 new UserId(userEntity.getUserId()),
                 userEntity.getEmail(),
@@ -20,13 +20,13 @@ public class UserDatabaseMapper {
         );
     }
 
-    public static UserEntity toEntity(UserSnapshot userSnapshot) {
+    public static UserEntity toEntity(final UserSnapshot userSnapshot) {
         return new UserEntity(null, userSnapshot.userId().getId(), userSnapshot.email(),
                 userSnapshot.name(), userSnapshot.dateOfBirth(),
-                AddressMapper.map(userSnapshot.address()), UserDatabaseMapper.toSecurityEntity(userSnapshot));
+                AddressDatabaseMapper.toEntity(userSnapshot.address()), UserDatabaseMapper.toSecurityEntity(userSnapshot));
     }
 
-    private static SecurityEntity toSecurityEntity(UserSnapshot userSnapshot) {
+    private static SecurityEntity toSecurityEntity(final UserSnapshot userSnapshot) {
         return new SecurityEntity(
                 null,
                 userSnapshot.security().getPwHash(),

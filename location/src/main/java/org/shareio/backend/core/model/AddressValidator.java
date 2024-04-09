@@ -2,8 +2,10 @@ package org.shareio.backend.core.model;
 
 import org.shareio.backend.Const;
 import org.shareio.backend.core.usecases.port.dto.AddressGetDto;
+import org.shareio.backend.core.usecases.port.dto.LocationGetDto;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.exceptions.ValidationException;
+import org.shareio.backend.validators.DoubleValidator;
 import org.shareio.backend.validators.StringValidator;
 
 import java.util.HashMap;
@@ -45,6 +47,21 @@ public class AddressValidator {
         if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.multipleValidationErrorCode, errorMap);
     }
 
+    public static void validateLocation(LocationGetDto locationGetDto) throws MultipleValidationException {
+        Map<String, String> errorMap = new HashMap<>();
+        try {
+            validateLatLon(locationGetDto.latitude());
+        } catch (ValidationException validationException) {
+            errorMap.put("Latitude", validationException.getMessage());
+        }
+        try {
+            validateLatLon(locationGetDto.longitude());
+        } catch (ValidationException validationException) {
+            errorMap.put("Longitude", validationException.getMessage());
+        }
+        if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.multipleValidationErrorCode, errorMap);
+    }
+
     public static void validateCountry(String country) throws ValidationException {
         StringValidator.validateStringNotEmpty(country);
         StringValidator.validateStringOnlyLettersOrNumbersOrSpacesOrSomeSpecialCharacters(country);
@@ -77,5 +94,9 @@ public class AddressValidator {
             return;
         }
         StringValidator.validatePolishPostCode(postCode);
+    }
+
+    public static void validateLatLon(Double latOrLon) throws ValidationException {
+        DoubleValidator.validateDoubleNotEmpty(latOrLon);
     }
 }
