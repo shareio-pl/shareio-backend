@@ -21,6 +21,11 @@ public class UserValidator {
             errorMap.put("Name", validationException.getMessage());
         }
         try {
+            validateName(userProfileGetDto.surname());
+        } catch (ValidationException validationException) {
+            errorMap.put("Surname", validationException.getMessage());
+        }
+        try {
             validateEmail(userProfileGetDto.email());
         } catch (ValidationException validationException) {
             errorMap.put("Email", validationException.getMessage());

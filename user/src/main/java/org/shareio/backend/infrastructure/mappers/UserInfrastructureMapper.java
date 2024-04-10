@@ -10,6 +10,7 @@ public class UserInfrastructureMapper {
                 userSnapshot.userId(),
                 userSnapshot.email(),
                 userSnapshot.name(),
+                userSnapshot.surname(),
                 userSnapshot.dateOfBirth(),
                 userSnapshot.address().getAddressId(),
                 userSnapshot.security().getLastLoginDate()

@@ -5,9 +5,9 @@ import org.shareio.backend.core.model.vo.UserId;
 
 import java.time.LocalDateTime;
 
-public record UserSnapshot(UserId userId, String email, String name, LocalDateTime dateOfBirth,
+public record UserSnapshot(UserId userId, String email, String name, String surname, LocalDateTime dateOfBirth,
                            Address address, Security security) {
     public UserSnapshot(User user) {
-        this(user.getUserId(), user.getEmail(), user.getName(), user.getDateOfBirth(), user.getAddress(), user.getSecurity());
+        this(user.getUserId(), user.getEmail(), user.getName(), user.getSurname(), user.getDateOfBirth(), user.getAddress(), user.getSecurity());
     }
 }

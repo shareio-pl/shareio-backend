@@ -11,6 +11,7 @@ public record UserProfileResponseDto(
         UserId userId,
         String email,
         String name,
+        String surname,
         LocalDateTime dateOfBirth,
         AddressId address,
         LocalDateTime lastLoginDate
