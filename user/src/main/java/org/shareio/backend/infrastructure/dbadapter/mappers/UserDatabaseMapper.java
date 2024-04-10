@@ -14,6 +14,7 @@ public class UserDatabaseMapper {
                 new UserId(userEntity.getUserId()),
                 userEntity.getEmail(),
                 userEntity.getName(),
+                userEntity.getSurname(),
                 userEntity.getDateOfBirth(),
                 new AddressId(userEntity.getAddress().getAddressId()),
                 userEntity.getSecurity().getLastLoginDate()
@@ -22,7 +23,7 @@ public class UserDatabaseMapper {
 
     public static UserEntity toEntity(final UserSnapshot userSnapshot) {
         return new UserEntity(null, userSnapshot.userId().getId(), userSnapshot.email(),
-                userSnapshot.name(), userSnapshot.dateOfBirth(),
+                userSnapshot.name(), userSnapshot.surname(), userSnapshot.dateOfBirth(),
                 AddressDatabaseMapper.toEntity(userSnapshot.address()), UserDatabaseMapper.toSecurityEntity(userSnapshot));
     }
 

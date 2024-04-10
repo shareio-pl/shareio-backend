@@ -21,6 +21,7 @@ public class UserEntity {
     private UUID userId;
     private String email;
     private String name;
+    private String surname;
     private LocalDateTime dateOfBirth;
     @OneToOne(cascade = CascadeType.ALL)
     private AddressEntity address;

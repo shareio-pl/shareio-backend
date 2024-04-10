@@ -19,6 +19,7 @@ public class User {
     private UserId userId;
     private String email;
     private String name;
+    private String surname;
     private LocalDateTime dateOfBirth;
     private Address address;
     private Security security;
@@ -28,6 +29,7 @@ public class User {
                 userProfileGetDto.userId(),
                 userProfileGetDto.email(),
                 userProfileGetDto.name(),
+                userProfileGetDto.surname(),
                 userProfileGetDto.dateOfBirth(),
                 new Address(userProfileGetDto.addressId(),
                         null,
