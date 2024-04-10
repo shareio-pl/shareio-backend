@@ -17,6 +17,7 @@ public class Address {
     private String country;
     private String region;
     private String city;
+    private String street;
     private String houseNumber;
     private String flatNumber;
     private String postCode;
@@ -27,6 +28,7 @@ public class Address {
                 addressGetDto.country(),
                 addressGetDto.region(),
                 addressGetDto.city(),
+                addressGetDto.street(),
                 addressGetDto.houseNumber(),
                 addressGetDto.flatNumber(),
                 addressGetDto.postCode(),

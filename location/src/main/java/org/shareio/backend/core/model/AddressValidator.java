@@ -30,6 +30,11 @@ public class AddressValidator {
             errorMap.put("City", validationException.getMessage());
         }
         try {
+            validateStreet(addressGetDto.street());
+        } catch (ValidationException validationException) {
+            errorMap.put("Street", validationException.getMessage());
+        }
+        try {
             validateHouseNumber(addressGetDto.houseNumber());
         } catch (ValidationException validationException) {
             errorMap.put("HouseNumber", validationException.getMessage());
@@ -75,6 +80,11 @@ public class AddressValidator {
     public static void validateCity(String city) throws ValidationException {
         StringValidator.validateStringNotEmpty(city);
         StringValidator.validateStringOnlyLettersOrNumbersOrSpacesOrSomeSpecialCharacters(city);
+    }
+
+    public static void validateStreet(String street) throws ValidationException {
+        StringValidator.validateStringNotEmpty(street);
+        StringValidator.validateStringOnlyLettersOrNumbersOrSpacesOrSomeSpecialCharacters(street);
     }
 
     public static void validateHouseNumber(String houseNumber) throws ValidationException {

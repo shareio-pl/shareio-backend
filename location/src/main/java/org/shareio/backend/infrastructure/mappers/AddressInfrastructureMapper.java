@@ -12,6 +12,7 @@ public class AddressInfrastructureMapper {
                 addressSnapshot.country(),
                 addressSnapshot.region(),
                 addressSnapshot.city(),
+                addressSnapshot.street(),
                 addressSnapshot.houseNumber(),
                 addressSnapshot.flatNumber(),
                 addressSnapshot.postCode()
