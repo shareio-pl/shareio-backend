@@ -9,6 +9,7 @@ import org.shareio.backend.infrastructure.dbadapter.entities.UserEntity;
 import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
 import org.shareio.backend.infrastructure.dbadapter.repositories.UserRepository;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,19 +17,24 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @AllArgsConstructor
 public class DebugRESTController {
+    /*
+    ENDPOINTS:
+    localhost:8081/debug/createUser
+    localhost:8081/debug/createOffers?userId=
+    */
     UserRepository userRepository;
     OfferRepository offerRepository;
 
-    @RequestMapping(value = "/debug/createUser", method = RequestMethod.GET, produces = "text/plain")
-    public ResponseEntity<String> debugCreateUser() {
+    @RequestMapping(value = "/debug/createUser", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> debugCreateUser() {
         UUID userId = UUID.randomUUID();
         UserEntity userEntity;
+        Map<String, Object> response = new HashMap<>();
         try {
             userEntity = new UserEntity(null, userId, "jan.kowalski@poczta.pl", "Jan", "Kowalski",
                     LocalDateTime.of(2000, 12, 31, 12, 0, 0),
@@ -38,45 +44,68 @@ public class DebugRESTController {
                     new SecurityEntity(null,
                             "$2a$12$6PNuiENyG0f/NQIPyqvc3.eUbPUdsmDoxSnoSTp4DCnoQctc3TPCC",
                             LocalDateTime.now(), LocalDateTime.now()));
-        } catch (Exception e) {
-            return new ResponseEntity<>("Could not create debug user: " + e, HttpStatusCode.valueOf(500));
-        }
-        try {
             userRepository.save(userEntity);
         } catch (Exception e) {
-            return new ResponseEntity<>("Could not save debug user: " + e, HttpStatusCode.valueOf(500));
+            response.put("error", e.toString());
+            return new ResponseEntity<>(response, HttpStatusCode.valueOf(500));
         }
-        return new ResponseEntity<>("Created debug user with id: " + userId + " and password: 1234", HttpStatusCode.valueOf(200));
+        response.put("id", userId.toString());
+        response.put("password", "1234");
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
     }
 
-    @RequestMapping(value = "/debug/createOffer", method = RequestMethod.GET, produces = "text/plain")
-    public ResponseEntity<String> debugCreateOffer(@RequestParam UUID userId) {
+    @RequestMapping(value = "/debug/createOffers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> debugCreateOffer(@RequestParam UUID userId) {
         UserEntity userEntity;
+        Map<String, Object> response = new HashMap<>();
         try {
             userEntity = userRepository.findByUserId(userId).orElseThrow();
         } catch (NoSuchElementException e) {
-            return new ResponseEntity<>("Could not find user with given id: " + e, HttpStatusCode.valueOf(404));
+            response.put("error", e.toString());
+            return new ResponseEntity<>(response, HttpStatusCode.valueOf(400));
         }
 
-        UUID offerId = UUID.randomUUID();
+        List<UUID> offerIds = new ArrayList<>(3);
+        offerIds.add(UUID.randomUUID());
+        offerIds.add(UUID.randomUUID());
+        offerIds.add(UUID.randomUUID());
+
         OfferEntity offerEntity;
         try {
-            offerEntity = new OfferEntity(null, offerId, userEntity,
+            offerEntity = new OfferEntity(null, offerIds.getFirst(), userEntity,
+                    new AddressEntity(null, UUID.randomUUID(), "Polska", "Łódzkie", "Łódź",
+                            "Drewnowska", "58", "1", "91-002",
+                            51.7792315, 19.4428693),
+                    LocalDateTime.now(), null, null,
+                    "Dorodne krzyczące dziecko", "W pełni zdrowe (no może lekko otyłe) krzyczące dziecko. Nie moje, ale chcę się go pozbyć",
+                    null);
+            offerRepository.save(offerEntity);
+
+            offerEntity = new OfferEntity(null, offerIds.get(1), userEntity,
                     new AddressEntity(null, UUID.randomUUID(), "Polska", "Łódzkie", "Łódź",
                             "Wólczańska", "215", "1", "91-001",
                             51.7467613, 19.4530878),
                     LocalDateTime.now(), null, null,
                     "Ładny szop", "Oddam bardzo ładnego szopa. Prawie nie gryzie i chyba nie ma wścieklizny. Za darmo, bo to uczciwa cena.",
                     null);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Could not create debug offer: " + e, HttpStatusCode.valueOf(500));
-        }
-        try {
             offerRepository.save(offerEntity);
+
+            offerEntity = new OfferEntity(null, offerIds.get(2), userEntity,
+                    new AddressEntity(null, UUID.randomUUID(), "Polska", "Łódzkie", "Łódź",
+                            "Kołodziejska", "18", "3", "91-001",
+                            51.7467613, 19.4530878),
+                    LocalDateTime.now(), null, null,
+                    "Mieszkanie w centrum", "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
+                    null);
+            offerRepository.save(offerEntity);
+
         } catch (Exception e) {
-            return new ResponseEntity<>("Could not save debug offer: " + e, HttpStatusCode.valueOf(500));
+            response.put("error", e.toString());
+            return new ResponseEntity<>(response, HttpStatusCode.valueOf(500));
         }
-        return new ResponseEntity<>("Created debug offer with id: " + offerId, HttpStatusCode.valueOf(200));
+
+        response.put("ids", offerIds);
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
     }
 
 
