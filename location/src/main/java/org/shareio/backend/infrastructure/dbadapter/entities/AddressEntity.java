@@ -20,6 +20,7 @@ public class AddressEntity {
     private String country;
     private String region;
     private String city;
+    private String street;
     private String houseNumber;
     private String flatNumber;
     private String postCode;

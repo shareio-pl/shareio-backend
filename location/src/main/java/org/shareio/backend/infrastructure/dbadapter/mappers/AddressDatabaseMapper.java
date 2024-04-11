@@ -13,6 +13,7 @@ public class AddressDatabaseMapper {
                 address.getCountry(),
                 address.getRegion(),
                 address.getCity(),
+                address.getStreet(),
                 address.getHouseNumber(),
                 address.getFlatNumber(),
                 address.getPostCode());
@@ -31,6 +32,7 @@ public class AddressDatabaseMapper {
                 address.getCountry(),
                 address.getRegion(),
                 address.getCity(),
+                address.getStreet(),
                 address.getHouseNumber(),
                 address.getFlatNumber(),
                 address.getPostCode(),

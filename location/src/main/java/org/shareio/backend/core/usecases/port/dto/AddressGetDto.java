@@ -8,6 +8,7 @@ public record AddressGetDto(
         String country,
         String region,
         String city,
+        String street,
         String houseNumber,
         String flatNumber,
         String postCode
