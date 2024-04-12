@@ -18,12 +18,12 @@ public class OfferEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dbId;
     private UUID offerId;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     private UserEntity owner;
     @OneToOne(cascade = CascadeType.ALL)
     private AddressEntity address;
     private LocalDateTime creationDate;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     private UserEntity receiver;
     private LocalDateTime reservationDate;
 
