@@ -11,10 +11,6 @@
 
     <packaging>jar</packaging>
     <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
     </dependencies>
     <artifactId>lib</artifactId>
 
