@@ -11,6 +11,7 @@ import org.shareio.backend.infrastructure.dbadapter.repositories.UserRepository;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +22,7 @@ import java.util.*;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/debug")
 public class DebugRESTController {
     /*
     ENDPOINTS:
@@ -30,8 +32,9 @@ public class DebugRESTController {
     UserRepository userRepository;
     OfferRepository offerRepository;
 
-    @RequestMapping(value = "/debug/createUser", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/createUser", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> debugCreateUser() {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         UUID userId = UUID.randomUUID();
         UserEntity userEntity;
         Map<String, Object> response = new HashMap<>();
@@ -42,7 +45,7 @@ public class DebugRESTController {
                             "Wólczańska", "215", "1", "91-001",
                             51.7467613, 19.4530878),
                     new SecurityEntity(null,
-                            "$2a$12$6PNuiENyG0f/NQIPyqvc3.eUbPUdsmDoxSnoSTp4DCnoQctc3TPCC",
+                            bCryptPasswordEncoder.encode("aa"),
                             LocalDateTime.now(), LocalDateTime.now()));
             userRepository.save(userEntity);
         } catch (Exception e) {
@@ -50,11 +53,11 @@ public class DebugRESTController {
             return new ResponseEntity<>(response, HttpStatusCode.valueOf(500));
         }
         response.put("id", userId.toString());
-        response.put("password", "1234");
+        response.put("password", "aa");
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
     }
 
-    @RequestMapping(value = "/debug/createOffers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/createOffers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> debugCreateOffer(@RequestParam UUID userId) {
         UserEntity userEntity;
         Map<String, Object> response = new HashMap<>();
