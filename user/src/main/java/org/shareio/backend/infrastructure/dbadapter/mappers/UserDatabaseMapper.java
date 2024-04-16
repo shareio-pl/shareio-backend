@@ -31,6 +31,7 @@ public class UserDatabaseMapper {
         return new SecurityEntity(
                 null,
                 userSnapshot.security().getPwHash(),
+                userSnapshot.security().getAccountType(),
                 userSnapshot.security().getRegistrationDate(),
                 userSnapshot.security().getLastLoginDate());
     }
