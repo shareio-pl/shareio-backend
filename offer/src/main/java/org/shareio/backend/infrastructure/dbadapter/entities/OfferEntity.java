@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.shareio.backend.core.model.vo.Condition;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -28,6 +29,8 @@ public class OfferEntity {
     private LocalDateTime reservationDate;
 
     private String title;
+    @Enumerated(EnumType.STRING)
+    private Condition condition;
     private String description;
     private UUID photoId;
 }

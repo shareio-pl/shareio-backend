@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.core.model.vo.OfferId;
 import org.shareio.backend.core.model.vo.PhotoId;
 
@@ -22,6 +23,7 @@ public class Offer {
     private LocalDateTime reservationDate;
 
     private String title;
+    private Condition condition;
     private String description;
     private PhotoId photoId;
 
