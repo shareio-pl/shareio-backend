@@ -12,6 +12,7 @@ public class OfferMapper {
                 UserDatabaseMapper.toEntity(offerSnapshot.receiver()),
                 offerSnapshot.reservationDate(),
                 offerSnapshot.title(),
+                offerSnapshot.condition(),
                 offerSnapshot.description(),
                 offerSnapshot.photoId().getId()
         );

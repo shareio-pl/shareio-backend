@@ -3,6 +3,7 @@ package org.shareio.backend.infrastructure.controller;
 
 import lombok.AllArgsConstructor;
 import org.shareio.backend.core.model.vo.AccountType;
+import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.infrastructure.dbadapter.entities.AddressEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.SecurityEntity;
@@ -27,8 +28,8 @@ import java.util.*;
 public class DebugRESTController {
     /*
     ENDPOINTS:
-    localhost:8081/debug/createUser
-    localhost:8081/debug/createOffers?userId=
+    localhost:8082/debug/createUser
+    localhost:8082/debug/createOffers?userId=
     */
     UserRepository userRepository;
     OfferRepository offerRepository;
@@ -81,7 +82,7 @@ public class DebugRESTController {
                             "Drewnowska", "58", "1", "91-002",
                             51.7792315, 19.4428693),
                     LocalDateTime.now(), null, null,
-                    "Dorodne krzyczące dziecko", "W pełni zdrowe (no może lekko otyłe) krzyczące dziecko. Nie moje, ale chcę się go pozbyć",
+                    "Dorodne krzyczące dziecko", Condition.LIGHTLY_USED, "W pełni zdrowe (no może lekko otyłe) krzyczące dziecko. Nie moje, ale chcę się go pozbyć",
                     null);
             offerRepository.save(offerEntity);
 
@@ -90,7 +91,7 @@ public class DebugRESTController {
                             "Wólczańska", "215", "1", "91-001",
                             51.7467613, 19.4530878),
                     LocalDateTime.now(), null, null,
-                    "Ładny szop", "Oddam bardzo ładnego szopa. Prawie nie gryzie i chyba nie ma wścieklizny. Za darmo, bo to uczciwa cena.",
+                    "Ładny szop", Condition.ALMOST_NEW, "Oddam bardzo ładnego szopa. Prawie nie gryzie i chyba nie ma wścieklizny. Za darmo, bo to uczciwa cena.",
                     null);
             offerRepository.save(offerEntity);
 
@@ -99,7 +100,7 @@ public class DebugRESTController {
                             "Kołodziejska", "18", "3", "91-001",
                             51.7467613, 19.4530878),
                     LocalDateTime.now(), null, null,
-                    "Mieszkanie w centrum", "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
+                    "Mieszkanie w centrum", Condition.BROKEN, "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
                     null);
             offerRepository.save(offerEntity);
 
