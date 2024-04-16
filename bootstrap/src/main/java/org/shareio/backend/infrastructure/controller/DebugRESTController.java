@@ -2,6 +2,7 @@ package org.shareio.backend.infrastructure.controller;
 
 
 import lombok.AllArgsConstructor;
+import org.shareio.backend.core.model.vo.AccountType;
 import org.shareio.backend.infrastructure.dbadapter.entities.AddressEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.SecurityEntity;
@@ -45,7 +46,7 @@ public class DebugRESTController {
                             "Wólczańska", "215", "1", "91-001",
                             51.7467613, 19.4530878),
                     new SecurityEntity(null,
-                            bCryptPasswordEncoder.encode("aa"),
+                            bCryptPasswordEncoder.encode("aa"), AccountType.USER,
                             LocalDateTime.now(), LocalDateTime.now()));
             userRepository.save(userEntity);
         } catch (Exception e) {

@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Security {
     private String pwHash;
+    private AccountType accountType;
     private LocalDateTime registrationDate;
     private LocalDateTime lastLoginDate;
 }

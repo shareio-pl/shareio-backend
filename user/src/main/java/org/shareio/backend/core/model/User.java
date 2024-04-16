@@ -44,6 +44,7 @@ public class User {
                 new Security(
                         null,
                         null,
+                        null,
                         userProfileGetDto.lastLoginDate()
                 )
         );
