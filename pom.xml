@@ -12,7 +12,7 @@
     <artifactId>backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>shareio-backend</name>
+    <name>backend</name>
     <description>Shareio backend</description>
 
     <modules>
