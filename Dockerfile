@@ -28,6 +28,6 @@ WORKDIR /app
 
 COPY --from=build /app/bootstrap/target/bootstrap-0.0.1-SNAPSHOT.war .
 
-EXPOSE 8085
+EXPOSE 8082
 
 CMD ["java", "-jar", "bootstrap-0.0.1-SNAPSHOT.war"]
