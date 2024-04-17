@@ -29,8 +29,7 @@ public class AddressRESTController {
     GetLocationUseCaseInterface getLocationUseCaseInterface;
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getAddressById(@PathVariable(value = "id") String requested_id) {
-        UUID id = UUID.fromString(requested_id);
+    public ResponseEntity<Object> getAddress(@PathVariable(value = "id") UUID id) {
         try {
             AddressResponseDto addressResponseDto = getAddressUseCaseInterface.getAddressResponseDto(id);
             return new CorrectResponse(addressResponseDto, Const.successErrorCode, HttpStatus.OK);
