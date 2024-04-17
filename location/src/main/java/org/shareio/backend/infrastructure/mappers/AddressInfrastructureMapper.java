@@ -8,7 +8,6 @@ import org.shareio.backend.core.usecases.port.dto.LocationResponseDto;
 public class AddressInfrastructureMapper {
     public static AddressResponseDto toDto(AddressSnapshot addressSnapshot) {
         return new AddressResponseDto(
-                addressSnapshot.addressId(),
                 addressSnapshot.country(),
                 addressSnapshot.region(),
                 addressSnapshot.city(),
