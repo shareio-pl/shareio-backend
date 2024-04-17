@@ -1,0 +1,33 @@
+# NOT FOR END-USER CONSUMPTION! DO NOT USE FOR RELEASE!
+services:
+  db:
+    image: 'postgres:16-alpine'
+    container_name: postgres_backend_dev
+    environment:
+      - POSTGRES_USER=test_db_user
+      - POSTGRES_PASSWORD=HE5KwffKKahxOsWnUa9J5Kdu6NtbYb8SUNNkD15F
+      - POSTGRES_DB=test_db
+    volumes:
+      - db_data:/data/postgres
+    ports:
+      - 5432:5432
+
+  backend:
+    build: .
+    container_name: shareio-backend_dev
+    environment:
+      - SPRING_APPLICATION_NAME=BACKEND
+      - SERVER_PORT=8082
+      - JWT_SECRET=qg3cZ26DmklMSmB3GXUBn2ouXsjVOVkWqaMqT4U5
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/test_db
+      - SPRING_DATASOURCE_USERNAME=test_db_user
+      - SPRING_DATASOURCE_PASSWORD=HE5KwffKKahxOsWnUa9J5Kdu6NtbYb8SUNNkD15F
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    ports:
+      - 8082:8082
+    depends_on:
+      db:
+        condition: service_started
+
+volumes:
+  db_data:

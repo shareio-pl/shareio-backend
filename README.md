@@ -1,6 +1,13 @@
 # Shareio backend
 
 ## Running app
+
+### Development
+
 ```console
-no
+docker compose up
 ```
+
+### Release
+
+https://github.com/shareio-pl/shareio-integrate
