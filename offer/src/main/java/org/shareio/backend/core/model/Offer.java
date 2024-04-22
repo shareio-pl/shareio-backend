@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.core.model.vo.OfferId;
 import org.shareio.backend.core.model.vo.PhotoId;
+import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 
 import java.time.LocalDateTime;
 
@@ -26,6 +27,21 @@ public class Offer {
     private Condition condition;
     private String description;
     private PhotoId photoId;
+
+    public static Offer fromDto(OfferGetDto offerGetDto) {
+        return new Offer(
+                offerGetDto.offerId(),
+                new User(offerGetDto.ownerId(), null, null, null, null, null, null),
+                new Address(offerGetDto.addressId(), null, null, null, null, null, null, null, null),
+                offerGetDto.creationDate(),
+                new User(offerGetDto.receiverId(), null, null, null, null, null, null),
+                offerGetDto.reservationDate(),
+                offerGetDto.title(),
+                offerGetDto.condition(),
+                offerGetDto.description(),
+                offerGetDto.photoId()
+        );
+    }
 
     public OfferSnapshot toSnapshot() {
         return new OfferSnapshot(this);
