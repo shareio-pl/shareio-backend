@@ -33,20 +33,19 @@ public class UserValidator {
         try {
             validateDate(userProfileGetDto.dateOfBirth());
         } catch (ValidationException validationException) {
-            errorMap.put("DateOfBirth", "Malformed date of birth");
+            errorMap.put("DateOfBirth", validationException.getMessage());
         }
         try {
             validateDate(userProfileGetDto.lastLoginDate());
         } catch (ValidationException validationException) {
-            errorMap.put("LastLoginDate", "Malformed last login date");
+            errorMap.put("LastLoginDate", validationException.getMessage());
         }
         if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.multipleValidationErrorCode, errorMap);
     }
 
     public static void validateName(String name) throws ValidationException {
         StringValidator.validateStringNotEmpty(name);
-        if (name.length() < Const.minNameLength) throw new ValidationException("Name is too short!");
-        if (name.length() > Const.maxNameLength) throw new ValidationException("Name is too long!");
+        StringValidator.validateStringLength(name, Const.minNameLength, Const.maxNameLength);
     }
 
     public static void validateEmail(String email) throws ValidationException {
