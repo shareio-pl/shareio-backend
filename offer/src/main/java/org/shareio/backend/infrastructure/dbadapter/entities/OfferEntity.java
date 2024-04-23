@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.shareio.backend.core.model.vo.Condition;
+import org.shareio.backend.core.model.vo.Status;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -24,6 +25,7 @@ public class OfferEntity {
     @OneToOne(cascade = CascadeType.ALL)
     private AddressEntity address;
     private LocalDateTime creationDate;
+    private Status status;
     @ManyToOne(cascade = CascadeType.ALL)
     private UserEntity receiver;
     private LocalDateTime reservationDate;

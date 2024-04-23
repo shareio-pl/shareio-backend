@@ -1,8 +1,10 @@
 package org.shareio.backend;
 
+import java.time.Duration;
 import java.util.regex.Pattern;
 
 public class Const {
+    public static final Duration offerReservationDuration = Duration.ofDays(1);
     public static final Integer minNameLength = 2;
     public static final Integer maxNameLength = 20;
     public static final String successErrorCode = "Ok";

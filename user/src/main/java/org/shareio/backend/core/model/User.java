@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.shareio.backend.core.model.vo.PhotoId;
 import org.shareio.backend.core.model.vo.Security;
 import org.shareio.backend.core.model.vo.UserId;
 import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class User {
     @Setter(AccessLevel.NONE)
     private UserId userId;
@@ -21,6 +22,7 @@ public class User {
     private String name;
     private String surname;
     private LocalDateTime dateOfBirth;
+    private PhotoId photoId;
     private Address address;
     private Security security;
 
@@ -31,6 +33,8 @@ public class User {
                 userProfileGetDto.name(),
                 userProfileGetDto.surname(),
                 userProfileGetDto.dateOfBirth(),
+                userProfileGetDto.photoId(),
+
                 new Address(userProfileGetDto.addressId(),
                         null,
                         null,

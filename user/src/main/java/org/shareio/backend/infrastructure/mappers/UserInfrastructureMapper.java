@@ -12,6 +12,7 @@ public class UserInfrastructureMapper {
                 userSnapshot.name(),
                 userSnapshot.surname(),
                 userSnapshot.dateOfBirth(),
+                userSnapshot.photoId(),
                 userSnapshot.address().getAddressId(),
                 userSnapshot.security().getLastLoginDate()
         );

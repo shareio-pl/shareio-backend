@@ -4,6 +4,7 @@ package org.shareio.backend.infrastructure.controller;
 import lombok.AllArgsConstructor;
 import org.shareio.backend.core.model.vo.AccountType;
 import org.shareio.backend.core.model.vo.Condition;
+import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.infrastructure.dbadapter.entities.AddressEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.SecurityEntity;
@@ -14,10 +15,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -29,7 +27,7 @@ public class DebugRESTController {
     /*
     ENDPOINTS:
     localhost:8082/debug/createUser
-    localhost:8082/debug/createOffers?userId=
+    localhost:8082/debug/createOffers/{userId}
     */
     UserRepository userRepository;
     OfferRepository offerRepository;
@@ -43,6 +41,7 @@ public class DebugRESTController {
         try {
             userEntity = new UserEntity(null, userId, "jan.kowalski@poczta.pl", "Jan", "Kowalski",
                     LocalDateTime.of(2000, 12, 31, 12, 0, 0),
+                    UUID.randomUUID(),
                     new AddressEntity(null, UUID.randomUUID(), "Polska", "Łódzkie", "Łódź",
                             "Wólczańska", "215", "1", "91-001",
                             51.7467613, 19.4530878),
@@ -59,8 +58,8 @@ public class DebugRESTController {
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
     }
 
-    @RequestMapping(value = "/createOffers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> debugCreateOffer(@RequestParam UUID userId) {
+    @RequestMapping(value = "/createOffers/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> debugCreateOffer(@PathVariable(value = "userId") UUID userId) {
         UserEntity userEntity;
         Map<String, Object> response = new HashMap<>();
         try {
@@ -81,7 +80,7 @@ public class DebugRESTController {
                     new AddressEntity(null, UUID.randomUUID(), "Polska", "Łódzkie", "Łódź",
                             "Drewnowska", "58", "1", "91-002",
                             51.7792315, 19.4428693),
-                    LocalDateTime.now(), null, null,
+                    LocalDateTime.now(), Status.CREATED, null, null,
                     "Dorodne krzyczące dziecko", Condition.LIGHTLY_USED, "W pełni zdrowe (no może lekko otyłe) krzyczące dziecko. Nie moje, ale chcę się go pozbyć",
                     null);
             offerRepository.save(offerEntity);
@@ -90,7 +89,7 @@ public class DebugRESTController {
                     new AddressEntity(null, UUID.randomUUID(), "Polska", "Łódzkie", "Łódź",
                             "Wólczańska", "215", "1", "91-001",
                             51.7467613, 19.4530878),
-                    LocalDateTime.now(), null, null,
+                    LocalDateTime.now(), Status.CREATED, null, null,
                     "Ładny szop", Condition.ALMOST_NEW, "Oddam bardzo ładnego szopa. Prawie nie gryzie i chyba nie ma wścieklizny. Za darmo, bo to uczciwa cena.",
                     null);
             offerRepository.save(offerEntity);
@@ -99,7 +98,7 @@ public class DebugRESTController {
                     new AddressEntity(null, UUID.randomUUID(), "Polska", "Łódzkie", "Łódź",
                             "Kołodziejska", "18", "3", "91-001",
                             51.7467613, 19.4530878),
-                    LocalDateTime.now(), null, null,
+                    LocalDateTime.now(), Status.CREATED, null, null,
                     "Mieszkanie w centrum", Condition.BROKEN, "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
                     null);
             offerRepository.save(offerEntity);
