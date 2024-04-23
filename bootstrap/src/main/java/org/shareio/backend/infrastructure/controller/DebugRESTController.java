@@ -28,6 +28,7 @@ public class DebugRESTController {
     ENDPOINTS:
     localhost:8082/debug/createUser
     localhost:8082/debug/createOffers/{userId}
+    localhost:8082/debug/getOfferIds
     */
     UserRepository userRepository;
     OfferRepository offerRepository;
@@ -112,5 +113,22 @@ public class DebugRESTController {
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
     }
 
-
+    @RequestMapping(value = "/getOfferIds", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> debugGetOfferIds() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<UUID> offerIds = new ArrayList<>();
+            for (OfferEntity offer : offerRepository.findAll()) {
+                offerIds.add(offer.getOfferId());
+            }
+            response.put("offerIds", offerIds);
+            return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
+        } catch (NoSuchElementException e) {
+            response.put("error", e.toString());
+            return new ResponseEntity<>(response, HttpStatusCode.valueOf(400));
+        } catch (Exception e) {
+            response.put("error", e.toString());
+            return new ResponseEntity<>(response, HttpStatusCode.valueOf(500));
+        }
+    }
 }
