@@ -5,6 +5,7 @@ import org.shareio.backend.Const;
 import org.shareio.backend.controller.responses.CorrectResponse;
 import org.shareio.backend.controller.responses.ErrorResponse;
 import org.shareio.backend.core.model.vo.Condition;
+import org.shareio.backend.core.usecases.port.dto.ConditionWithDisplayName;
 import org.shareio.backend.core.usecases.port.dto.ConditionsResponseDto;
 import org.shareio.backend.core.usecases.port.dto.OfferResponseDto;
 import org.shareio.backend.core.usecases.port.in.GetOfferUseCaseInterface;
@@ -41,8 +42,11 @@ public class OfferRESTController {
 
     @RequestMapping(value = "/getConditions", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getConditions() {
-        List<Condition> conditions = Arrays.asList(Condition.values());
-        return new CorrectResponse(new ConditionsResponseDto(conditions), Const.successErrorCode, HttpStatus.OK);
+        List<ConditionWithDisplayName> conditionsWithDisplayNames = new ArrayList<>();
+        for (Condition condition : Condition.values()) {
+            conditionsWithDisplayNames.add(new ConditionWithDisplayName(condition));
+        }
+        return new CorrectResponse(new ConditionsResponseDto(conditionsWithDisplayNames), Const.successErrorCode, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

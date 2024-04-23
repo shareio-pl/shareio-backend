@@ -1,34 +1,38 @@
 package org.shareio.backend.infrastructure.dbadapter.mappers;
 
 import org.shareio.backend.core.model.OfferSnapshot;
-import org.shareio.backend.core.model.vo.AddressId;
-import org.shareio.backend.core.model.vo.OfferId;
-import org.shareio.backend.core.model.vo.PhotoId;
-import org.shareio.backend.core.model.vo.UserId;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
 
-import java.util.Objects;
-
 public class OfferDatabaseMapper {
     public static OfferGetDto toDto(final OfferEntity offerEntity) {
-        UserId receiverId;
-        if (Objects.isNull(offerEntity.getReceiver())) {
-            receiverId = null;
-        } else {
-            receiverId = new UserId(offerEntity.getReceiver().getUserId());
-        }
         return new OfferGetDto(
-                new OfferId(offerEntity.getOfferId()),
-                new UserId(offerEntity.getOwner().getUserId()),
-                new AddressId(offerEntity.getAddress().getAddressId()),
+                offerEntity.getOfferId(),
                 offerEntity.getCreationDate(),
-                receiverId,
-                offerEntity.getReservationDate(),
+                offerEntity.getStatus().toString(),
+
+                offerEntity.getAddress().getCity(),
+                offerEntity.getAddress().getStreet(),
+                offerEntity.getAddress().getHouseNumber(),
+                offerEntity.getAddress().getLatitude(),
+                offerEntity.getAddress().getLongitude(),
+
                 offerEntity.getTitle(),
-                offerEntity.getCondition(),
+                offerEntity.getCondition().toString(),
                 offerEntity.getDescription(),
-                new PhotoId(offerEntity.getPhotoId())
+                offerEntity.getPhotoId(),
+
+                offerEntity.getOwner().getUserId(),
+                offerEntity.getOwner().getName(),
+                offerEntity.getOwner().getSurname(),
+                offerEntity.getOwner().getPhotoId(),
+
+                0.0,// TODO: offerEntity.getOwner().getRating()
+                0, // TODO: offerEntity.getOwner().getReviewCount()
+
+                offerEntity.getReservationDate()
+
+
         );
     }
 
@@ -37,6 +41,7 @@ public class OfferDatabaseMapper {
                 UserDatabaseMapper.toEntity(offerSnapshot.owner()),
                 AddressDatabaseMapper.toEntity(offerSnapshot.address()),
                 offerSnapshot.creationDate(),
+                offerSnapshot.status(),
                 UserDatabaseMapper.toEntity(offerSnapshot.receiver()),
                 offerSnapshot.reservationDate(),
                 offerSnapshot.title(),

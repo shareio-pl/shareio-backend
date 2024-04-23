@@ -4,9 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.shareio.backend.core.model.vo.Condition;
-import org.shareio.backend.core.model.vo.OfferId;
-import org.shareio.backend.core.model.vo.PhotoId;
+import org.shareio.backend.core.model.vo.*;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 
 import java.time.LocalDateTime;
@@ -20,6 +18,7 @@ public class Offer {
     private User owner;
     private Address address;
     private LocalDateTime creationDate;
+    private Status status;
     private User receiver;
     private LocalDateTime reservationDate;
 
@@ -29,21 +28,30 @@ public class Offer {
     private PhotoId photoId;
 
     public static Offer fromDto(OfferGetDto offerGetDto) {
+        User receiver = null;
+        if (Status.valueOf(offerGetDto.status()).equals(Status.RESERVED)) {
+            receiver = new User(null, null, null, null, null, null, null, null);
+        }
         return new Offer(
-                offerGetDto.offerId(),
-                new User(offerGetDto.ownerId(), null, null, null, null, null, null),
-                new Address(offerGetDto.addressId(), null, null, null, null, null, null, null, null),
+                new OfferId(offerGetDto.offerId()),
+                new User(new UserId(offerGetDto.ownerId()), null, offerGetDto.ownerName(), offerGetDto.ownerSurname(), null, new PhotoId(offerGetDto.ownerPhotoId()), null, null),
+                new Address(null, null, null, offerGetDto.city(), offerGetDto.street(), offerGetDto.houseNumber(), null, null, new Location(offerGetDto.latitude(), offerGetDto.longitude())),
                 offerGetDto.creationDate(),
-                new User(offerGetDto.receiverId(), null, null, null, null, null, null),
+                Status.valueOf(offerGetDto.status()),
+                receiver,
                 offerGetDto.reservationDate(),
                 offerGetDto.title(),
-                offerGetDto.condition(),
+                Condition.valueOf(offerGetDto.condition()),
                 offerGetDto.description(),
-                offerGetDto.photoId()
+                new PhotoId(offerGetDto.photoId())
         );
     }
 
     public OfferSnapshot toSnapshot() {
-        return new OfferSnapshot(this);
+        UserSnapshot receiverSnapshot = null;
+        if (this.status.equals(Status.RESERVED) && this.receiver != null) {
+            receiverSnapshot = new UserSnapshot(this.receiver);
+        }
+        return new OfferSnapshot(this, receiverSnapshot);
     }
 }

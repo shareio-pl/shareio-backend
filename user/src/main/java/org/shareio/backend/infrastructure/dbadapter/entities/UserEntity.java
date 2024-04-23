@@ -23,6 +23,7 @@ public class UserEntity {
     private String name;
     private String surname;
     private LocalDateTime dateOfBirth;
+    private UUID photoId;
     @OneToOne(cascade = CascadeType.ALL)
     private AddressEntity address;
     @OneToOne(cascade = CascadeType.ALL)

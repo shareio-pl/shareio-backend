@@ -1,21 +1,31 @@
 package org.shareio.backend.core.usecases.port.dto;
 
-import org.shareio.backend.core.model.vo.Condition;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record OfferResponseDto(
         UUID offerId,
-        UUID ownerId,
-        UUID addressId,
         LocalDateTime creationDate,
-        UUID receiverId,
-        LocalDateTime reservationDate,
+        String status,
+
+        String city,
+        String street,
+        String distance,
+        Double latitude,
+        Double longitude,
 
         String title,
-        Condition condition,
+        String condition,
         String description,
-        String photoId
+        UUID photoId,
+
+        UUID ownerId,
+        String ownerName,
+        String ownerSurname,
+        UUID ownerPhotoId,
+        Double ownerRating,
+        Integer ownerReviewCount,
+
+        LocalDateTime unreservationDate
 ) {
 }
