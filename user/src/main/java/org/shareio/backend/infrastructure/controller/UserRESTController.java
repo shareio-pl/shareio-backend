@@ -17,7 +17,7 @@ import java.util.*;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping(value = "/user/*")
+@RequestMapping(value = "/user")
 public class UserRESTController {
     GetUserProfileUseCaseInterface getUserProfileUseCaseInterface;
     UserRepository userRepository;
