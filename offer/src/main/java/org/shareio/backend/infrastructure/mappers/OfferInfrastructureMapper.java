@@ -21,7 +21,7 @@ public class OfferInfrastructureMapper {
 
                 offerSnapshot.address().getCity(),
                 offerSnapshot.address().getStreet(),
-                "21,37 km", // TODO: distance calculation
+                "1,5 km", // TODO: distance calculation
                 offerSnapshot.address().getLocation().getLatitude(),
                 offerSnapshot.address().getLocation().getLongitude(),
 
