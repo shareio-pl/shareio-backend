@@ -4,7 +4,8 @@ import org.shareio.backend.core.usecases.port.dto.OfferResponseDto;
 import org.shareio.backend.exceptions.MultipleValidationException;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface GetOffersByNameUseCaseInterface {
-    List<OfferResponseDto> getOfferResponseDtoListByName(String name) throws MultipleValidationException;
+    List<UUID> getOfferResponseDtoListByName(String name) throws MultipleValidationException;
 }

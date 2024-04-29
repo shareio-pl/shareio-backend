@@ -12,12 +12,13 @@ import org.shareio.backend.infrastructure.mappers.OfferInfrastructureMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class GetOffersByNameUseCaseService implements GetOffersByNameUseCaseInterface {
     GetOffersByNameDaoInterface getOffersByNameDaoInterface;
 
     @Override
-    public List<OfferResponseDto> getOfferResponseDtoListByName(String name) throws MultipleValidationException {
+    public List<UUID> getOfferResponseDtoListByName(String name) throws MultipleValidationException {
         List<OfferGetDto> getOfferDtoList = getOffersByNameDaoInterface.getOffersByName(name);
         getOfferDtoList.forEach(offer -> {
             try {
@@ -27,6 +28,8 @@ public class GetOffersByNameUseCaseService implements GetOffersByNameUseCaseInte
             }
         });
         List<OfferSnapshot> offerSnapshotList = getOfferDtoList.stream().map(Offer::fromDto).map(Offer::toSnapshot).toList();
-        return offerSnapshotList.stream().map(OfferInfrastructureMapper::toDto).toList();
+        List<UUID> offerUUIDList = new ArrayList<>();
+        offerSnapshotList.forEach(offer -> offerUUIDList.add(offer.getOfferId()));
+        return offerUUIDList;
     }
 }
