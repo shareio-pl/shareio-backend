@@ -2,9 +2,14 @@ package org.shareio.backend.infrastructure.controller;
 
 
 import lombok.AllArgsConstructor;
+import org.shareio.backend.core.model.OfferSnapshot;
 import org.shareio.backend.core.model.vo.AccountType;
 import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.core.model.vo.Status;
+import org.shareio.backend.core.usecases.port.dto.OfferResponseDto;
+import org.shareio.backend.core.usecases.port.in.GetOffersByNameUseCaseInterface;
+import org.shareio.backend.core.usecases.service.GetOffersByNameUseCaseService;
+import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.infrastructure.dbadapter.entities.AddressEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.SecurityEntity;
@@ -29,9 +34,11 @@ public class DebugRESTController {
     localhost:8082/debug/createUser
     localhost:8082/debug/createOffers/{userId}
     localhost:8082/debug/getOfferIds
+    localhost:8082/debug/getOffersByName
     */
     UserRepository userRepository;
     OfferRepository offerRepository;
+    GetOffersByNameUseCaseInterface offersByNameUseCaseInterface;
 
     @RequestMapping(value = "/createUser", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> debugCreateUser() {
@@ -130,5 +137,10 @@ public class DebugRESTController {
             response.put("error", e.toString());
             return new ResponseEntity<>(response, HttpStatusCode.valueOf(500));
         }
+    }
+
+    @RequestMapping(value = "/getOffersByName", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> debugGetOffersByName(@RequestParam String name) throws MultipleValidationException {
+        return new ResponseEntity<>(offersByNameUseCaseInterface.getOfferResponseDtoListByName(name), HttpStatusCode.valueOf(200));
     }
 }

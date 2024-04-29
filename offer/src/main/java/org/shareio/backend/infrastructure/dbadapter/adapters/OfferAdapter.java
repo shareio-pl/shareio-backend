@@ -2,17 +2,16 @@ package org.shareio.backend.infrastructure.dbadapter.adapters;
 
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.core.usecases.port.out.GetOfferDaoInterface;
+import org.shareio.backend.core.usecases.port.out.GetOffersByNameDaoInterface;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
 import org.shareio.backend.infrastructure.dbadapter.mappers.OfferDatabaseMapper;
 import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
-public class OfferAdapter implements GetOfferDaoInterface {
+public class OfferAdapter implements GetOfferDaoInterface, GetOffersByNameDaoInterface {
     final OfferRepository offerRepository;
 
     public OfferAdapter(OfferRepository offerRepository) {
@@ -27,5 +26,11 @@ public class OfferAdapter implements GetOfferDaoInterface {
             throw new NoSuchElementException();
         }
         return offerEntity.map(OfferDatabaseMapper::toDto);
+    }
+
+    @Override
+    public List<OfferGetDto> getOffersByName(String name) {
+        ArrayList<OfferEntity> offerList = (ArrayList<OfferEntity>) offerRepository.findAll();
+        return offerList.stream().filter(offer -> Objects.equals(offer.getName(), name)).map(OfferDatabaseMapper::toDto);
     }
 }
