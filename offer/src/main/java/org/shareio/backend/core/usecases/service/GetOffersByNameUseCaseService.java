@@ -18,7 +18,7 @@ public class GetOffersByNameUseCaseService implements GetOffersByNameUseCaseInte
     GetOffersByNameDaoInterface getOffersByNameDaoInterface;
 
     @Override
-    public List<UUID> getOfferResponseDtoListByName(String name) throws MultipleValidationException {
+    public List<UUID> getOfferResponseDtoListByName(String name) {
         List<OfferGetDto> getOfferDtoList = getOffersByNameDaoInterface.getOffersByName(name);
         getOfferDtoList.forEach(offer -> {
             try {
@@ -29,7 +29,7 @@ public class GetOffersByNameUseCaseService implements GetOffersByNameUseCaseInte
         });
         List<OfferSnapshot> offerSnapshotList = getOfferDtoList.stream().map(Offer::fromDto).map(Offer::toSnapshot).toList();
         List<UUID> offerUUIDList = new ArrayList<>();
-        offerSnapshotList.forEach(offer -> offerUUIDList.add(offer.getOfferId()));
+        offerSnapshotList.forEach(offer -> offerUUIDList.add(offer.offerId().getId()));
         return offerUUIDList;
     }
 }

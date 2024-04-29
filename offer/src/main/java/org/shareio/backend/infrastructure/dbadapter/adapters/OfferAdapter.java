@@ -31,6 +31,6 @@ public class OfferAdapter implements GetOfferDaoInterface, GetOffersByNameDaoInt
     @Override
     public List<OfferGetDto> getOffersByName(String name) {
         ArrayList<OfferEntity> offerList = (ArrayList<OfferEntity>) offerRepository.findAll();
-        return offerList.stream().filter(offer -> Objects.equals(offer.getName(), name)).map(OfferDatabaseMapper::toDto);
+        return offerList.stream().filter(offer -> Objects.equals(offer.getTitle(), name)).map(OfferDatabaseMapper::toDto);
     }
 }

@@ -1,5 +1,6 @@
 package org.shareio.backend.core.model;
 
+import lombok.Getter;
 import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.core.model.vo.OfferId;
 import org.shareio.backend.core.model.vo.PhotoId;
