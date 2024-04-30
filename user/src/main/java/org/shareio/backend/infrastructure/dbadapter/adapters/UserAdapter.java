@@ -22,10 +22,10 @@ public class UserAdapter implements GetUserProfileDaoInterface {
 
     @Override
     public Optional<UserProfileGetDto> getUserDto(UUID id) {
-        Optional<UserEntity> userEntity = userRepository.findByUserId(id);
-        if (userEntity.isEmpty()) {
+        Optional<UserEntity> userEntityOptional = userRepository.findByUserId(id);
+        if (userEntityOptional.isEmpty()) {
             throw new NoSuchElementException();
         }
-        return userEntity.map(UserDatabaseMapper::toDto);
+        return userEntityOptional.map(UserDatabaseMapper::toDto);
     }
 }

@@ -24,7 +24,8 @@ public class Address {
     private Location location;
 
     public static Address fromDto(AddressGetDto addressGetDto) {
-        return new Address(addressGetDto.addressId(),
+        return new Address(
+                new AddressId(addressGetDto.addressId()),
                 addressGetDto.country(),
                 addressGetDto.region(),
                 addressGetDto.city(),
