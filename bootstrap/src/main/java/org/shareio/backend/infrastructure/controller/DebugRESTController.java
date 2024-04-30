@@ -107,7 +107,7 @@ public class DebugRESTController {
                             "Kołodziejska", "18", "3", "91-001",
                             51.7467613, 19.4530878),
                     LocalDateTime.now(), Status.CREATED, null, null,
-                    "Mieszkanie w centrum", Condition.BROKEN, "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
+                    "Mieszkanie", Condition.BROKEN, "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
                     null);
             offerRepository.save(offerEntity);
 
@@ -141,6 +141,8 @@ public class DebugRESTController {
 
     @RequestMapping(value = "/getOffersByName", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> debugGetOffersByName(@RequestParam String name) throws MultipleValidationException {
-        return new ResponseEntity<>(offersByNameUseCaseInterface.getOfferResponseDtoListByName(name), HttpStatusCode.valueOf(200));
+        Map<String, Object> response = new HashMap<>();
+        response.put("offerIds", offersByNameUseCaseInterface.getOfferResponseDtoListByName(name));
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
     }
 }
