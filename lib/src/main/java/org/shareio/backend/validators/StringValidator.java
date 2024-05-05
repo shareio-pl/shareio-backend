@@ -11,6 +11,11 @@ public class StringValidator {
             throw new ValidationException("String is empty");
     }
 
+    public static void validateStringLength(String string, Integer min, Integer max) throws ValidationException {
+        if (string.length() < min) throw new ValidationException("String too short");
+        if (max > 0 && string.length() > max) throw new ValidationException("String too long");
+    }
+
     public static void validateStringOnlyLetters(String string) throws ValidationException {
         char[] chars = string.toCharArray();
 
