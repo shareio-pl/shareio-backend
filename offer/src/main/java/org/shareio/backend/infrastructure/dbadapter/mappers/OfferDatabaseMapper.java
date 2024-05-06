@@ -32,8 +32,6 @@ public class OfferDatabaseMapper {
                 0, // TODO: offerEntity.getOwner().getReviewCount()
 
                 offerEntity.getReservationDate()
-
-
         );
     }
 
@@ -66,8 +64,6 @@ public class OfferDatabaseMapper {
                 0, // TODO: offerEntity.getOwner().getReviewCount()
 
                 offerEntity.getReservationDate()
-
-
         );
     }
 
