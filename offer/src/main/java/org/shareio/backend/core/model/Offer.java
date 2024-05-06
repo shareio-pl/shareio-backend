@@ -5,9 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.shareio.backend.core.model.vo.*;
+import org.shareio.backend.core.usecases.port.dto.OfferFullGetDto;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
+import org.shareio.backend.core.usecases.port.dto.OfferSaveDto;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -44,6 +47,42 @@ public class Offer {
                 Condition.valueOf(offerGetDto.condition()),
                 offerGetDto.description(),
                 new PhotoId(offerGetDto.photoId())
+        );
+    }
+
+    public static Offer fromDto(OfferFullGetDto offerFullGetDto) {
+        User receiver = null;
+        if (Status.valueOf(offerFullGetDto.status()).equals(Status.RESERVED)) {
+            receiver = new User(null, null, null, null, null, null, null, null);
+        }
+        return new Offer(
+                new OfferId(offerFullGetDto.offerId()),
+                new User(new UserId(offerFullGetDto.ownerId()), null, offerFullGetDto.ownerName(), offerFullGetDto.ownerSurname(), null, new PhotoId(offerFullGetDto.ownerPhotoId()), null, null),
+                new Address(new AddressId(offerFullGetDto.addressId()), offerFullGetDto.country(), offerFullGetDto.region(), offerFullGetDto.city(), offerFullGetDto.street(), offerFullGetDto.houseNumber(), null, null, new Location(offerFullGetDto.latitude(), offerFullGetDto.longitude())),
+                offerFullGetDto.creationDate(),
+                Status.valueOf(offerFullGetDto.status()),
+                receiver,
+                offerFullGetDto.reservationDate(),
+                offerFullGetDto.title(),
+                Condition.valueOf(offerFullGetDto.condition()),
+                offerFullGetDto.description(),
+                new PhotoId(offerFullGetDto.photoId())
+        );
+    }
+
+    public static Offer fromDto(OfferSaveDto offerSaveDto) {
+        return new Offer(
+                new OfferId(UUID.randomUUID()),
+                null,
+                new Address(new AddressId(UUID.randomUUID()), offerSaveDto.addressSaveDto().country(), offerSaveDto.addressSaveDto().region(), offerSaveDto.addressSaveDto().city(), offerSaveDto.addressSaveDto().street(), offerSaveDto.addressSaveDto().houseNumber(), offerSaveDto.addressSaveDto().flatNumber(), offerSaveDto.addressSaveDto().postCode(), new Location(offerSaveDto.addressSaveDto().latitude(), offerSaveDto.addressSaveDto().longitude())),
+                offerSaveDto.creationDate(),
+                Status.valueOf(offerSaveDto.status()),
+                null,
+                null,
+                offerSaveDto.title(),
+                Condition.valueOf(offerSaveDto.condition()),
+                offerSaveDto.description(),
+                new PhotoId(offerSaveDto.photoId())
         );
     }
 

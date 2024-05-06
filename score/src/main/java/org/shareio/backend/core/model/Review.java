@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.shareio.backend.core.model.vo.ReviewId;
+import org.shareio.backend.core.usecases.port.dto.ReviewGetDto;
 
 import java.time.LocalDateTime;
 
@@ -15,10 +16,19 @@ public class Review {
     @Setter(AccessLevel.NONE)
     private ReviewId reviewId;
     private Offer offer;
-    private Integer value; // 1-5 stars
+    private Float value; // 1-5 stars
     private LocalDateTime date;
 
     public ReviewSnapshot toSnapshot() {
         return new ReviewSnapshot(this);
+    }
+
+    public static Review fromDto(ReviewGetDto reviewGetDto){
+        return new Review(
+                new ReviewId(reviewGetDto.reviewId()),
+                Offer.fromDto(reviewGetDto.offerGetDto()),
+                reviewGetDto.value(),
+                reviewGetDto.date()
+        );
     }
 }

@@ -27,5 +27,6 @@ public class Const {
     public static final String notImplementedErrorCode = "NoImplErr";
     public static final String multipleValidationErrorCode = "MulValErr";
     public static final String noSuchElementErrorCode = "NoElemErr";
+    public static final String toDoErrorCode = "TODOErr";
 
 }

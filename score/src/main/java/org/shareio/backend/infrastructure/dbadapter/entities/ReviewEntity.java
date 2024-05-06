@@ -19,8 +19,8 @@ public class ReviewEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dbId;
     private UUID reviewId;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne()
     private OfferEntity offer;
-    private Integer reviewValue;
+    private Float reviewValue;
     private LocalDateTime reviewDate;
 }
