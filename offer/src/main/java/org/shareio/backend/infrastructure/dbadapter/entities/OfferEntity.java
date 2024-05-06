@@ -20,13 +20,13 @@ public class OfferEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dbId;
     private UUID offerId;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE})
     private UserEntity owner;
     @OneToOne(cascade = CascadeType.ALL)
     private AddressEntity address;
     private LocalDateTime creationDate;
     private Status status;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE})
     private UserEntity receiver;
     private LocalDateTime reservationDate;
 

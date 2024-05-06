@@ -6,6 +6,7 @@ import org.shareio.backend.controller.responses.CorrectResponse;
 import org.shareio.backend.controller.responses.ErrorResponse;
 import org.shareio.backend.core.usecases.port.dto.UserProfileResponseDto;
 import org.shareio.backend.core.usecases.port.in.GetUserProfileUseCaseInterface;
+import org.shareio.backend.core.usecases.port.in.RemoveUserUseCaseInterface;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.infrastructure.dbadapter.repositories.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import java.util.*;
 @RequestMapping(value = "/user")
 public class UserRESTController {
     GetUserProfileUseCaseInterface getUserProfileUseCaseInterface;
+    RemoveUserUseCaseInterface removeUserUseCaseInterface;
     UserRepository userRepository;
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -44,9 +46,5 @@ public class UserRESTController {
         return new ErrorResponse(Const.notImplementedErrorCode, HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> deleteUser(@PathVariable(value = "id") UUID id) {
-        return new ErrorResponse(Const.notImplementedErrorCode, HttpStatus.NOT_IMPLEMENTED);
-    }
 }
 

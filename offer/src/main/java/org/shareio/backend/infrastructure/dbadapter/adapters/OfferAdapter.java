@@ -33,4 +33,10 @@ public class OfferAdapter implements GetOfferDaoInterface, GetOffersByNameDaoInt
         ArrayList<OfferEntity> offerList = (ArrayList<OfferEntity>) offerRepository.findAll();
         return offerList.stream().filter(offer -> Objects.equals(offer.getTitle(), name)).map(OfferDatabaseMapper::toDto).toList();
     }
+
+    @Override
+    @Transactional
+    public void removeOffer(UUID offerId) {
+        offerRepository.delete(offerRepository.findByOfferId(offerId).orElseThrow(NoSuchElementException::new));
+    }
 }

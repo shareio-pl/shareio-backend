@@ -1,6 +1,7 @@
 package org.shareio.backend.infrastructure.dbadapter.mappers;
 
 import org.shareio.backend.core.model.OfferSnapshot;
+import org.shareio.backend.core.usecases.port.dto.OfferFullGetDto;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
 
@@ -38,11 +39,11 @@ public class OfferDatabaseMapper {
 
     public static OfferEntity toEntity(OfferSnapshot offerSnapshot) {
         return new OfferEntity(null, offerSnapshot.offerId().getId(),
-                UserDatabaseMapper.toEntity(offerSnapshot.owner()),
+                null,
                 AddressDatabaseMapper.toEntity(offerSnapshot.address()),
                 offerSnapshot.creationDate(),
                 offerSnapshot.status(),
-                UserDatabaseMapper.toEntity(offerSnapshot.receiver()),
+               null,
                 offerSnapshot.reservationDate(),
                 offerSnapshot.title(),
                 offerSnapshot.condition(),
