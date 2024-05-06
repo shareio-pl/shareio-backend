@@ -7,5 +7,4 @@ import java.util.UUID;
 
 public interface GetOfferFullDaoInterface {
     Optional<OfferFullGetDto> getOfferFullDto(UUID id);
-
 }
