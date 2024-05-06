@@ -40,6 +40,13 @@ public class DebugRESTController {
     OfferRepository offerRepository;
     GetOffersByNameUseCaseInterface offersByNameUseCaseInterface;
 
+    private final Map<String, UUID> imageUUIDs = new HashMap<>() {{
+        put("user", UUID.fromString("6829fcfa-2773-498e-a339-f87e9b14a5ee"));
+        put("offer1", UUID.fromString("8988b046-7994-4d63-bbaa-3cf4a78b1d1b"));
+        put("offer2", UUID.fromString("24e2ccf3-70fe-406a-aa9a-4efa6202c6f7"));
+        put("offer3", UUID.fromString("838d9dd8-9880-472f-8e34-0fb3b57db359"));
+    }};
+
     @RequestMapping(value = "/createUser", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> debugCreateUser() {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -49,7 +56,7 @@ public class DebugRESTController {
         try {
             userEntity = new UserEntity(null, userId, "jan.kowalski@poczta.pl", "Jan", "Kowalski",
                     LocalDateTime.of(2000, 12, 31, 12, 0, 0),
-                    UUID.randomUUID(),
+                    imageUUIDs.get("user"),
                     new AddressEntity(null, UUID.randomUUID(), "Polska", "Łódzkie", "Łódź",
                             "Wólczańska", "215", "1", "91-001",
                             51.7467613, 19.4530878),
@@ -90,7 +97,7 @@ public class DebugRESTController {
                             51.7792315, 19.4428693),
                     LocalDateTime.now(), Status.CREATED, null, null,
                     "Dorodne krzyczące dziecko", Condition.LIGHTLY_USED, "W pełni zdrowe (no może lekko otyłe) krzyczące dziecko. Nie moje, ale chcę się go pozbyć",
-                    null);
+                    imageUUIDs.get("offer1"));
             offerRepository.save(offerEntity);
 
             offerEntity = new OfferEntity(null, offerIds.get(1), userEntity,
@@ -99,7 +106,7 @@ public class DebugRESTController {
                             51.7467613, 19.4530878),
                     LocalDateTime.now(), Status.CREATED, null, null,
                     "Ładny szop", Condition.ALMOST_NEW, "Oddam bardzo ładnego szopa. Prawie nie gryzie i chyba nie ma wścieklizny. Za darmo, bo to uczciwa cena.",
-                    null);
+                    imageUUIDs.get("offer2"));
             offerRepository.save(offerEntity);
 
             offerEntity = new OfferEntity(null, offerIds.get(2), userEntity,
@@ -108,7 +115,7 @@ public class DebugRESTController {
                             51.7467613, 19.4530878),
                     LocalDateTime.now(), Status.CREATED, null, null,
                     "Mieszkanie", Condition.BROKEN, "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
-                    null);
+                    imageUUIDs.get("offer3"));
             offerRepository.save(offerEntity);
 
         } catch (Exception e) {
