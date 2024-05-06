@@ -1,19 +1,16 @@
 package org.shareio.backend.core.usecases.port.dto;
 
-import org.shareio.backend.core.model.vo.AddressId;
-import org.shareio.backend.core.model.vo.PhotoId;
-import org.shareio.backend.core.model.vo.UserId;
-
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 public record UserProfileGetDto(
-        UserId userId,
+        UUID userId,
         String email,
         String name,
         String surname,
         LocalDateTime dateOfBirth,
-        PhotoId photoId,
-        AddressId addressId,
+        UUID photoId,
+        UUID addressId,
         LocalDateTime lastLoginDate) {
 }

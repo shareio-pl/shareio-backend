@@ -21,6 +21,6 @@ public class ReviewEntity {
     private UUID reviewId;
     @OneToOne(cascade = CascadeType.ALL)
     private OfferEntity offer;
-    private Integer value;
-    private LocalDateTime date;
+    private Integer reviewValue;
+    private LocalDateTime reviewDate;
 }

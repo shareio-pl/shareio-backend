@@ -1,10 +1,10 @@
 package org.shareio.backend.core.usecases.port.dto;
 
-import org.shareio.backend.core.model.vo.AddressId;
+import java.util.UUID;
 
 
 public record AddressGetDto(
-        AddressId addressId,
+        UUID addressId,
         String country,
         String region,
         String city,

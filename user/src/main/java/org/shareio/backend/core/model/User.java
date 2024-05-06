@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.shareio.backend.core.model.vo.AddressId;
 import org.shareio.backend.core.model.vo.PhotoId;
 import org.shareio.backend.core.model.vo.Security;
 import org.shareio.backend.core.model.vo.UserId;
@@ -28,14 +29,14 @@ public class User {
 
     public static User fromDto(UserProfileGetDto userProfileGetDto) {
         return new User(
-                userProfileGetDto.userId(),
+                new UserId(userProfileGetDto.userId()),
                 userProfileGetDto.email(),
                 userProfileGetDto.name(),
                 userProfileGetDto.surname(),
                 userProfileGetDto.dateOfBirth(),
-                userProfileGetDto.photoId(),
+                new PhotoId(userProfileGetDto.photoId()),
 
-                new Address(userProfileGetDto.addressId(),
+                new Address(new AddressId(userProfileGetDto.addressId()),
                         null,
                         null,
                         null,
