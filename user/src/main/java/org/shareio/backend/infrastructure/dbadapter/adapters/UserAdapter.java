@@ -36,5 +36,4 @@ public class UserAdapter implements GetUserProfileDaoInterface, RemoveUserComman
     public void removeUser(UUID userId) {
         userRepository.delete(userRepository.findByUserId(userId).orElseThrow(NoSuchElementException::new));
     }
-
 }
