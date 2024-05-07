@@ -106,4 +106,10 @@ public class OfferRESTController {
         }
 
     }
+
+    @RequestMapping(value = "/getOffersByUser/{id", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getOffersByUser(@PathVariable(value = "id") UUID id)
+    {
+
+    }
 }

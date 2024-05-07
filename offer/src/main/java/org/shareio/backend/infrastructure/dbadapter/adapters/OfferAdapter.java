@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterface, GetOffersByNameDaoInterface, RemoveOfferCommandInterface, SaveOfferCommandInterface, GetOfferFullDaoInterface, UpdateOfferDaoInterface {
+public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterface, GetOffersByNameDaoInterface, RemoveOfferCommandInterface, SaveOfferCommandInterface, GetOfferFullDaoInterface, UpdateOfferDaoInterface, GetOffersByUserDaoInterface {
     final OfferRepository offerRepository;
 
     public OfferAdapter(OfferRepository offerRepository) {
@@ -75,5 +75,11 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
         offerEntity1.setCondition(offer.getCondition());
         offerEntity1.setPhotoId(offer.getPhotoId().getId());
         offerRepository.save(offerEntity1);
+    }
+
+    @Override
+    public List<OfferGetDto> getOffersByUser(UUID id) {
+        ArrayList<OfferEntity> offerList = (ArrayList<OfferEntity>) offerRepository.findAll();
+        return offerList.stream().filter(offer -> Objects.equals(offer.getOwner().getUserId(), id)).map(OfferDatabaseMapper::toDto).toList();
     }
 }
