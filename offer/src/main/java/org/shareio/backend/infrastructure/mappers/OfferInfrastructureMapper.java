@@ -21,7 +21,7 @@ public class OfferInfrastructureMapper {
 
                 offerSnapshot.address().getCity(),
                 offerSnapshot.address().getStreet(),
-                "1,5 km", // TODO: distance calculation
+                "1,5 km", // TODO: distance calculation when getting user from sessions will be ready
                 offerSnapshot.address().getLocation().getLatitude(),
                 offerSnapshot.address().getLocation().getLongitude(),
 

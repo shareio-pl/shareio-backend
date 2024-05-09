@@ -103,7 +103,7 @@ public class DebugRESTController {
             offerEntity = new OfferEntity(null, offerIds.get(1), userEntity,
                     new AddressEntity(null, UUID.randomUUID(), "Polska", "Łódzkie", "Łódź",
                             "Wólczańska", "215", "1", "91-001",
-                            51.7467613, 19.4530878),
+                            50.7467613, 19.4530878),
                     LocalDateTime.now(), Status.CREATED, null, null,
                     "Ładny szop", Condition.ALMOST_NEW, "Oddam bardzo ładnego szopa. Prawie nie gryzie i chyba nie ma wścieklizny. Za darmo, bo to uczciwa cena.",
                     imageUUIDs.get("offer2"));
@@ -112,7 +112,7 @@ public class DebugRESTController {
             offerEntity = new OfferEntity(null, offerIds.get(2), userEntity,
                     new AddressEntity(null, UUID.randomUUID(), "Polska", "Łódzkie", "Łódź",
                             "Kołodziejska", "18", "3", "91-001",
-                            51.7467613, 19.4530878),
+                            51.7467613, 18.4530878),
                     LocalDateTime.now(), Status.CREATED, null, null,
                     "Mieszkanie", Condition.BROKEN, "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
                     imageUUIDs.get("offer3"));
