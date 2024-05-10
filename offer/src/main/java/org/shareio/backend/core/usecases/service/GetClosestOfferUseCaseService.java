@@ -40,7 +40,6 @@ public class GetClosestOfferUseCaseService implements GetClosestOfferUseCaseInte
             throw new NoSuchElementException("No valid offers found!");
         }
         List<Offer> offerList = allOfferList.stream().map(Offer::fromDto).toList();
-        //TODO: Degree distance to KM
         offerList.forEach(offer -> {
             Double possibleDistance = DistanceCalculator.calculateDistance(location, offer.getAddress().getLocation());
             if (possibleDistance < distance.get()) {
