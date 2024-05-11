@@ -27,6 +27,7 @@ public class OfferRESTController {
     GetLocationDaoInterface getLocationDaoInterface;
     GetOfferUseCaseInterface getOfferUseCaseInterface;
     GetClosestOfferUseCaseInterface getClosestOfferUseCaseInterface;
+    GetOffersByUserUseCaseInterface getOffersByUserUseCaseInterface;
     ReserveOfferUseCaseInterface reserveOfferUseCaseInterface;
     OfferRepository offerRepository;
 
@@ -105,5 +106,23 @@ public class OfferRESTController {
             return new ErrorResponse(Const.toDoErrorCode, HttpStatus.FAILED_DEPENDENCY);
         }
 
+    }
+
+    @RequestMapping(value = "/getOffersByUser/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getOffersByUser(@PathVariable(value = "id") UUID id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            response.put("offerIds", getOffersByUserUseCaseInterface.getOfferResponseDtoListByUser(id));
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (MultipleValidationException e) {
+            response.put("error", e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.FAILED_DEPENDENCY);
+        } catch (NoSuchElementException e) {
+            response.put("error", e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            response.put("error", e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
