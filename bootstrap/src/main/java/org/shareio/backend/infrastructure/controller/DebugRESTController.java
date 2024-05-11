@@ -145,11 +145,4 @@ public class DebugRESTController {
             return new ResponseEntity<>(response, HttpStatusCode.valueOf(500));
         }
     }
-
-    @RequestMapping(value = "/getOffersByName", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> debugGetOffersByName(@RequestParam String name) throws MultipleValidationException {
-        Map<String, Object> response = new HashMap<>();
-        response.put("offerIds", offersByNameUseCaseInterface.getOfferResponseDtoListByName(name));
-        return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
-    }
 }
