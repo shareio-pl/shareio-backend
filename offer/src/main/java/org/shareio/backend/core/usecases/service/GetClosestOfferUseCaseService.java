@@ -1,6 +1,7 @@
 package org.shareio.backend.core.usecases.service;
 
 import lombok.AllArgsConstructor;
+import org.shareio.backend.core.DistanceCalculator;
 import org.shareio.backend.core.model.Offer;
 import org.shareio.backend.core.model.OfferValidator;
 import org.shareio.backend.core.model.vo.Location;
@@ -39,22 +40,13 @@ public class GetClosestOfferUseCaseService implements GetClosestOfferUseCaseInte
             throw new NoSuchElementException("No valid offers found!");
         }
         List<Offer> offerList = allOfferList.stream().map(Offer::fromDto).toList();
-        //TODO: Degree distance to KM
         offerList.forEach(offer -> {
-            Double possibleDistance = calculateDistance(location, offer.getAddress().getLocation());
+            Double possibleDistance = DistanceCalculator.calculateDistance(location, offer.getAddress().getLocation());
             if (possibleDistance < distance.get()) {
                 distance.set(possibleDistance);
                 closestOfferId.set(offer.getOfferId().getId());
             }
         });
         return closestOfferId.get();
-    }
-
-    private Double calculateDistance(Location l1, Location l2) {
-        return Math.sqrt(
-                Math.pow((l1.getLatitude() - l2.getLatitude()), 2)
-                        +
-                        Math.pow((l1.getLongitude() - l2.getLongitude()), 2)
-        );
     }
 }
