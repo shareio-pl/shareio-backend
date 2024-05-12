@@ -73,6 +73,7 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
         offerEntity1.setAddress(AddressDatabaseMapper.toEntity(offer.getAddress()));
         offerEntity1.setStatus(offer.getStatus());
         offerEntity1.setCondition(offer.getCondition());
+        offerEntity1.setCategory(offer.getCategory());
         offerEntity1.setPhotoId(offer.getPhotoId().getId());
         offerRepository.save(offerEntity1);
     }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.shareio.backend.Const;
 import org.shareio.backend.controller.responses.CorrectResponse;
 import org.shareio.backend.controller.responses.ErrorResponse;
+import org.shareio.backend.core.model.vo.Category;
 import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.core.model.vo.Location;
 import org.shareio.backend.core.usecases.port.dto.*;
@@ -49,6 +50,13 @@ public class OfferRESTController {
             conditionsWithDisplayNames.add(new ConditionWithDisplayName(condition));
         }
         return new CorrectResponse(new ConditionsResponseDto(conditionsWithDisplayNames), Const.successErrorCode, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/getCategories", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getCategories() {
+        List<Category> categories = new ArrayList<>();
+        Collections.addAll(categories, Category.values());
+        return new CorrectResponse(new CategoriesResponseDto(categories), Const.successErrorCode, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

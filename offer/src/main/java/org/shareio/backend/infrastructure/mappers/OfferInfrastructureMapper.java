@@ -27,6 +27,7 @@ public class OfferInfrastructureMapper {
 
                 offerSnapshot.title(),
                 offerSnapshot.condition().polishName(),
+                offerSnapshot.category().toString(),
                 offerSnapshot.description(),
                 offerSnapshot.photoId().getId(),
 
