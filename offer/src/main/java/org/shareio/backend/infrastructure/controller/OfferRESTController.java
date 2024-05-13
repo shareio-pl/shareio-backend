@@ -75,7 +75,7 @@ public class OfferRESTController {
     }
 
     @RequestMapping(value = "/getOffersByName", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> debugGetOffersByName(@RequestParam String name) {
+    public ResponseEntity<Object> getOffersByName(@RequestParam String name) {
         Map<String, Object> response = new HashMap<>();
         try {
             response.put("offerIds", getOffersByNameUseCaseInterface.getOfferResponseDtoListByName(name));
