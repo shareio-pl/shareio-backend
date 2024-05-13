@@ -104,7 +104,7 @@ public class DebugRESTController {
                             "Wólczańska", "215", "1", "91-001",
                             51.7467613, 19.4530878),
                     LocalDateTime.now(), Status.CREATED, null, null,
-                    "Ładny szop", Condition.ALMOST_NEW, Category.INFRASTRUKTURA_KOLEJOWA,
+                    "Ładny szop", Condition.ALMOST_NEW, Category.RAILWAY,
                     "Oddam bardzo ładnego szopa. Prawie nie gryzie i chyba nie ma wścieklizny. Za darmo, bo to uczciwa cena.",
                     imageUUIDs.get("offer2"));
             offerRepository.save(offerEntity);
@@ -114,7 +114,7 @@ public class DebugRESTController {
                             "Kołodziejska", "18", "3", "91-001",
                             51.7467613, 19.4530878),
                     LocalDateTime.now(), Status.CREATED, null, null,
-                    "Mieszkanie", Condition.BROKEN, Category.INNE,
+                    "Mieszkanie", Condition.BROKEN, Category.OTHER,
                     "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
                     imageUUIDs.get("offer3"));
             offerRepository.save(offerEntity);

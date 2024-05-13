@@ -53,7 +53,7 @@ public class OfferAdapterTests {
                 null,
                 "testOffer",
                 Condition.ALMOST_NEW,
-                Category.INNE,
+                Category.OTHER,
                 "testing purposes",
                 UUID.randomUUID()
         );

@@ -34,6 +34,7 @@ public class OfferEntity {
     private String title;
     @Enumerated(EnumType.STRING)
     private Condition condition;
+    @Enumerated(EnumType.STRING)
     private Category category;
     private String description;
     private UUID photoId;

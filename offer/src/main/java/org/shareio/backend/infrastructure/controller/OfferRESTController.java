@@ -54,8 +54,10 @@ public class OfferRESTController {
 
     @RequestMapping(value = "/getCategories", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getCategories() {
-        List<Category> categories = new ArrayList<>();
-        Collections.addAll(categories, Category.values());
+        List<CategoryWithDisplayName> categories = new ArrayList<>();
+        for (Category category : Category.values()) {
+            categories.add(new CategoryWithDisplayName(category));
+        }
         return new CorrectResponse(new CategoriesResponseDto(categories), Const.successErrorCode, HttpStatus.OK);
     }
 
