@@ -30,6 +30,7 @@ public class OfferRESTController {
     GetClosestOfferUseCaseInterface getClosestOfferUseCaseInterface;
     GetOffersByUserUseCaseInterface getOffersByUserUseCaseInterface;
     ReserveOfferUseCaseInterface reserveOfferUseCaseInterface;
+    GetOffersByNameUseCaseInterface getOffersByNameUseCaseInterface;
     OfferRepository offerRepository;
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -51,6 +52,43 @@ public class OfferRESTController {
             conditionsWithDisplayNames.add(new ConditionWithDisplayName(condition));
         }
         return new CorrectResponse(new ConditionsResponseDto(conditionsWithDisplayNames), Const.successErrorCode, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/getClosestOfferForUser/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getClosestOfferForUser(@PathVariable(value = "userId") UUID userId) {
+        UserProfileResponseDto userProfileResponseDto;
+        try {
+            userProfileResponseDto = getUserProfileUseCaseInterface.getUserProfileResponseDto(userId);
+        } catch (MultipleValidationException e) {
+            return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
+        } catch (NoSuchElementException noSuchElementException) {
+            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+        }
+
+        //TODO Move location validation to UserValidator
+        Optional<LocationGetDto> locationGetDto = getLocationDaoInterface.getLocationDto(userProfileResponseDto.address().getId());
+        if (locationGetDto.map(Location::fromDto).isPresent()) {
+            UUID closestOfferId = getClosestOfferUseCaseInterface.getOfferResponseDto(locationGetDto.map(Location::fromDto).get());
+            return new CorrectResponse(closestOfferId, Const.successErrorCode, HttpStatus.OK);
+        } else {
+            return new ErrorResponse(Const.toDoErrorCode, HttpStatus.FAILED_DEPENDENCY);
+        }
+
+    }
+
+    @RequestMapping(value = "/getOffersByName", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getOffersByName(@RequestParam String name) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            response.put("offerIds", getOffersByNameUseCaseInterface.getOfferResponseDtoListByName(name));
+            return new CorrectResponse(response, Const.successErrorCode, HttpStatus.OK);
+        } catch (MultipleValidationException e) {
+            return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
+        } catch (NoSuchElementException noSuchElementException) {
+            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @RequestMapping(value = "/getCategories", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -94,45 +132,5 @@ public class OfferRESTController {
     public ResponseEntity<Object> reserveOffer(@PathVariable(value = "id") UUID id, @PathVariable(value = "userId") UUID userId) {
         UUID offerId = reserveOfferUseCaseInterface.reserveOffer(id, userId);
         return new CorrectResponse(offerId, Const.successErrorCode, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/getClosestOfferForUser/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getClosestOfferForUser(@PathVariable(value = "userId") UUID userId) {
-        UserProfileResponseDto userProfileResponseDto;
-        try {
-            userProfileResponseDto = getUserProfileUseCaseInterface.getUserProfileResponseDto(userId);
-        } catch (MultipleValidationException e) {
-            return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
-        } catch (NoSuchElementException noSuchElementException) {
-            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
-        }
-
-        //TODO Move location validation to UserValidator
-        Optional<LocationGetDto> locationGetDto = getLocationDaoInterface.getLocationDto(userProfileResponseDto.address().getId());
-        if (locationGetDto.map(Location::fromDto).isPresent()) {
-            UUID closestOfferId = getClosestOfferUseCaseInterface.getOfferResponseDto(locationGetDto.map(Location::fromDto).get());
-            return new CorrectResponse(closestOfferId, Const.successErrorCode, HttpStatus.OK);
-        } else {
-            return new ErrorResponse(Const.toDoErrorCode, HttpStatus.FAILED_DEPENDENCY);
-        }
-
-    }
-
-    @RequestMapping(value = "/getOffersByUser/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getOffersByUser(@PathVariable(value = "id") UUID id) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            response.put("offerIds", getOffersByUserUseCaseInterface.getOfferResponseDtoListByUser(id));
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (MultipleValidationException e) {
-            response.put("error", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.FAILED_DEPENDENCY);
-        } catch (NoSuchElementException e) {
-            response.put("error", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            response.put("error", e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 }
