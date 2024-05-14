@@ -26,12 +26,13 @@ public class ReserveOfferUseCaseService implements ReserveOfferUseCaseInterface 
     public UUID reserveOffer(UUID offerId, UUID userId) {
         //TODO validate users reserved offer count
         //TODO validate offer status
+        //TODO refactor this method entirely
         OfferEntity offerEntity = offerRepository.findByOfferId(offerId).get();
         offerEntity.setReservationDate(LocalDateTime.now());
         UserEntity recieverEntity = userRepository.findByUserId(userId).get();
         offerEntity.setReceiver(recieverEntity);
         offerEntity.setStatus(Status.RESERVED);
-        saveOfferCommandInterface.saveOffer(offerEntity);
+        saveOfferCommandInterface.saveOffer(null);
         return offerEntity.getOfferId();
     }
 }
