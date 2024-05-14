@@ -1,4 +1,4 @@
-package org.shareio.backend.core;
+package org.shareio.backend.core.usecases.util;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.shareio.backend.core.model.vo.Location;

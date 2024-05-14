@@ -1,7 +1,7 @@
 package org.shareio.backend.core.usecases.service;
 
 import lombok.AllArgsConstructor;
-import org.shareio.backend.core.DistanceCalculator;
+import org.shareio.backend.core.usecases.util.DistanceCalculator;
 import org.shareio.backend.core.model.Offer;
 import org.shareio.backend.core.model.OfferValidator;
 import org.shareio.backend.core.model.vo.Location;

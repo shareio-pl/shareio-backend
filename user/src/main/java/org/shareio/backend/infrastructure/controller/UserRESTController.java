@@ -8,7 +8,6 @@ import org.shareio.backend.core.usecases.port.dto.UserProfileResponseDto;
 import org.shareio.backend.core.usecases.port.in.GetUserProfileUseCaseInterface;
 import org.shareio.backend.core.usecases.port.in.RemoveUserUseCaseInterface;
 import org.shareio.backend.exceptions.MultipleValidationException;
-import org.shareio.backend.infrastructure.dbadapter.repositories.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +21,6 @@ import java.util.*;
 public class UserRESTController {
     GetUserProfileUseCaseInterface getUserProfileUseCaseInterface;
     RemoveUserUseCaseInterface removeUserUseCaseInterface;
-    UserRepository userRepository;
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getUser(@PathVariable(value = "id") UUID id) {
