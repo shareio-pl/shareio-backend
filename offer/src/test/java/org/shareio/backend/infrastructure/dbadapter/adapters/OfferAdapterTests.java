@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.shareio.backend.core.model.vo.Category;
 import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
@@ -52,6 +53,7 @@ public class OfferAdapterTests {
                 null,
                 "testOffer",
                 Condition.ALMOST_NEW,
+                Category.OTHER,
                 "testing purposes",
                 UUID.randomUUID()
         );

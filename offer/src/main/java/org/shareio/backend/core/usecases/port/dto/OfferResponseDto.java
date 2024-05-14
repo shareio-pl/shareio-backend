@@ -16,6 +16,7 @@ public record OfferResponseDto(
 
         String title,
         String condition,
+        String category,
         String description,
         UUID photoId,
 

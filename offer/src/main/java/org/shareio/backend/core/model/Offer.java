@@ -27,6 +27,7 @@ public class Offer {
 
     private String title;
     private Condition condition;
+    private Category category;
     private String description;
     private PhotoId photoId;
 
@@ -45,6 +46,7 @@ public class Offer {
                 offerGetDto.reservationDate(),
                 offerGetDto.title(),
                 Condition.valueOf(offerGetDto.condition()),
+                Category.valueOf(offerGetDto.category()),
                 offerGetDto.description(),
                 new PhotoId(offerGetDto.photoId())
         );
@@ -65,6 +67,7 @@ public class Offer {
                 offerFullGetDto.reservationDate(),
                 offerFullGetDto.title(),
                 Condition.valueOf(offerFullGetDto.condition()),
+                Category.valueOf(offerFullGetDto.category()),
                 offerFullGetDto.description(),
                 new PhotoId(offerFullGetDto.photoId())
         );
@@ -81,6 +84,7 @@ public class Offer {
                 null,
                 offerSaveDto.title(),
                 Condition.valueOf(offerSaveDto.condition()),
+                Category.valueOf(offerSaveDto.category()),
                 offerSaveDto.description(),
                 new PhotoId(offerSaveDto.photoId())
         );

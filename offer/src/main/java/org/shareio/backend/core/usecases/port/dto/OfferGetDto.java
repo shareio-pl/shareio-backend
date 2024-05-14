@@ -17,6 +17,7 @@ public record OfferGetDto(
 
         String title,
         String condition,
+        String category,
         String description,
         UUID photoId,
 

@@ -2,13 +2,11 @@ package org.shareio.backend.infrastructure.controller;
 
 
 import lombok.AllArgsConstructor;
-import org.shareio.backend.core.model.OfferSnapshot;
 import org.shareio.backend.core.model.vo.AccountType;
+import org.shareio.backend.core.model.vo.Category;
 import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.core.model.vo.Status;
-import org.shareio.backend.core.usecases.port.dto.OfferResponseDto;
 import org.shareio.backend.core.usecases.port.in.GetOffersByNameUseCaseInterface;
-import org.shareio.backend.core.usecases.service.GetOffersByNameUseCaseService;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.infrastructure.dbadapter.entities.AddressEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
@@ -96,25 +94,28 @@ public class DebugRESTController {
                             "Drewnowska", "58", "1", "91-002",
                             51.7792315, 19.4428693),
                     LocalDateTime.now(), Status.CREATED, null, null,
-                    "Dorodne krzyczące dziecko", Condition.LIGHTLY_USED, "W pełni zdrowe (no może lekko otyłe) krzyczące dziecko. Nie moje, ale chcę się go pozbyć",
+                    "Dorodne krzyczące dziecko", Condition.LIGHTLY_USED, Category.HOBBY,
+                    "W pełni zdrowe (no może lekko otyłe) krzyczące dziecko. Nie moje, ale chcę się go pozbyć",
                     imageUUIDs.get("offer1"));
             offerRepository.save(offerEntity);
 
             offerEntity = new OfferEntity(null, offerIds.get(1), userEntity,
                     new AddressEntity(null, UUID.randomUUID(), "Polska", "Łódzkie", "Łódź",
                             "Wólczańska", "215", "1", "91-001",
-                            51.7467613, 19.4530878),
+                            50.7467613, 19.4530878),
                     LocalDateTime.now(), Status.CREATED, null, null,
-                    "Ładny szop", Condition.ALMOST_NEW, "Oddam bardzo ładnego szopa. Prawie nie gryzie i chyba nie ma wścieklizny. Za darmo, bo to uczciwa cena.",
+                    "Ładny szop", Condition.ALMOST_NEW, Category.RAILWAY,
+                    "Oddam bardzo ładnego szopa. Prawie nie gryzie i chyba nie ma wścieklizny. Za darmo, bo to uczciwa cena.",
                     imageUUIDs.get("offer2"));
             offerRepository.save(offerEntity);
 
             offerEntity = new OfferEntity(null, offerIds.get(2), userEntity,
                     new AddressEntity(null, UUID.randomUUID(), "Polska", "Łódzkie", "Łódź",
                             "Kołodziejska", "18", "3", "91-001",
-                            51.7467613, 19.4530878),
+                            51.7467613, 18.4530878),
                     LocalDateTime.now(), Status.CREATED, null, null,
-                    "Mieszkanie", Condition.BROKEN, "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
+                    "Mieszkanie", Condition.BROKEN, Category.OTHER,
+                    "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
                     imageUUIDs.get("offer3"));
             offerRepository.save(offerEntity);
 
