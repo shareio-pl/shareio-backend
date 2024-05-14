@@ -1,6 +1,7 @@
 package org.shareio.backend.core.model;
 
 import org.shareio.backend.Const;
+import org.shareio.backend.core.model.vo.Category;
 import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
@@ -68,6 +69,11 @@ public class OfferValidator {
             errorMap.put("Condition", validationException.getMessage());
         }
         try {
+            validateCategory(offerGetDto.category());
+        } catch (ValidationException validationException) {
+            errorMap.put("Category", validationException.getMessage());
+        }
+        try {
             validateDescription(offerGetDto.description());
         } catch (ValidationException validationException) {
             errorMap.put("Description", validationException.getMessage());
@@ -121,6 +127,15 @@ public class OfferValidator {
             Condition.valueOf(condition);
         } catch (IllegalArgumentException e) {
             throw new ValidationException("Bad condition");
+        }
+    }
+
+    public static void validateCategory(String category) throws ValidationException {
+        ObjectValidator.validateObjectIsNotNull(category);
+        try {
+            Category.valueOf(category);
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Bad category!");
         }
     }
 

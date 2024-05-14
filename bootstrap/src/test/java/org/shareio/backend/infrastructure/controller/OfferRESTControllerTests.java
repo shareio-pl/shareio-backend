@@ -3,6 +3,7 @@ package org.shareio.backend.infrastructure.controller;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.shareio.backend.core.model.vo.AccountType;
+import org.shareio.backend.core.model.vo.Category;
 import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.infrastructure.dbadapter.entities.AddressEntity;
@@ -82,6 +83,7 @@ public class OfferRESTControllerTests {
                 null,
                 "testOffer",
                 Condition.ALMOST_NEW,
+                Category.OTHER,
                 "testing purposes",
                 UUID.randomUUID()
         ));

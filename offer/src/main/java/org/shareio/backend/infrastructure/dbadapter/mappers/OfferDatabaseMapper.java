@@ -20,6 +20,7 @@ public class OfferDatabaseMapper {
 
                 offerEntity.getTitle(),
                 offerEntity.getCondition().toString(),
+                offerEntity.getCategory().toString(),
                 offerEntity.getDescription(),
                 offerEntity.getPhotoId(),
 
@@ -52,6 +53,7 @@ public class OfferDatabaseMapper {
 
                 offerEntity.getTitle(),
                 offerEntity.getCondition().toString(),
+                offerEntity.getCategory().toString(),
                 offerEntity.getDescription(),
                 offerEntity.getPhotoId(),
 
@@ -77,6 +79,7 @@ public class OfferDatabaseMapper {
                 offerSnapshot.reservationDate(),
                 offerSnapshot.title(),
                 offerSnapshot.condition(),
+                offerSnapshot.category(),
                 offerSnapshot.description(),
                 offerSnapshot.photoId().getId()
         );
