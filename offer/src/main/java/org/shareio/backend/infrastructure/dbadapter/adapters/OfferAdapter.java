@@ -2,26 +2,31 @@ package org.shareio.backend.infrastructure.dbadapter.adapters;
 
 import jakarta.transaction.Transactional;
 import org.shareio.backend.core.model.Offer;
+import org.shareio.backend.core.model.OfferSnapshot;
 import org.shareio.backend.core.usecases.port.dto.OfferFullGetDto;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.core.usecases.port.out.*;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
+import org.shareio.backend.infrastructure.dbadapter.entities.UserEntity;
 import org.shareio.backend.infrastructure.dbadapter.mappers.AddressDatabaseMapper;
 import org.shareio.backend.infrastructure.dbadapter.mappers.OfferDatabaseMapper;
 import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
+import org.shareio.backend.infrastructure.dbadapter.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
-public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterface, GetOffersByNameDaoInterface, RemoveOfferCommandInterface, SaveOfferCommandInterface, GetOfferFullDaoInterface, UpdateOfferDaoInterface, GetOffersByUserDaoInterface {
+public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterface, GetOffersByNameDaoInterface, RemoveOfferCommandInterface, SaveOfferCommandInterface, GetOfferFullDaoInterface, UpdateOfferCommandInterface, GetOffersByUserDaoInterface {
     final OfferRepository offerRepository;
+    final UserRepository userRepository;
 
-    public OfferAdapter(OfferRepository offerRepository) {
+    public OfferAdapter(OfferRepository offerRepository, UserRepository userRepository) {
         this.offerRepository = offerRepository;
+        this.userRepository = userRepository;
     }
 
-
+    // GET
     @Override
     public Optional<OfferGetDto> getOfferDto(UUID id) {
         Optional<OfferEntity> offerEntity = offerRepository.findByOfferId(id);
@@ -46,18 +51,6 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
     }
 
     @Override
-    @Transactional
-    public void removeOffer(UUID offerId) {
-        offerRepository.delete(offerRepository.findByOfferId(offerId).orElseThrow(NoSuchElementException::new));
-    }
-
-    @Override
-    public void saveOffer(OfferEntity offerEntity) {
-
-        offerRepository.save(offerEntity);
-    }
-
-    @Override
     public Optional<OfferFullGetDto> getOfferFullDto(UUID id) {
         Optional<OfferEntity> offerEntity = offerRepository.findByOfferId(id);
         if (offerEntity.isEmpty()) {
@@ -67,22 +60,47 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
     }
 
     @Override
-    public void updateOffer(Offer offer) {
-        Optional<OfferEntity> offerEntity = offerRepository.findByOfferId(offer.getOfferId().getId());
-        OfferEntity offerEntity1 = offerEntity.orElseThrow(NoSuchElementException::new);
-        offerEntity1.setTitle(offer.getTitle());
-        offerEntity1.setDescription(offer.getDescription());
-        offerEntity1.setAddress(AddressDatabaseMapper.toEntity(offer.getAddress()));
-        offerEntity1.setStatus(offer.getStatus());
-        offerEntity1.setCondition(offer.getCondition());
-        offerEntity1.setCategory(offer.getCategory());
-        offerEntity1.setPhotoId(offer.getPhotoId().getId());
-        offerRepository.save(offerEntity1);
-    }
-
-    @Override
     public List<OfferGetDto> getOffersByUser(UUID id) {
         ArrayList<OfferEntity> offerList = (ArrayList<OfferEntity>) offerRepository.findAll();
         return offerList.stream().filter(offer -> Objects.equals(offer.getOwner().getUserId(), id)).map(OfferDatabaseMapper::toDto).toList();
     }
+
+    // SAVE
+
+    @Override
+    public void saveOffer(OfferSnapshot offerSnapshot) {
+
+        OfferEntity offerEntity = Optional.of(offerSnapshot).map(OfferDatabaseMapper::toEntity).get();
+        UserEntity ownerEntity = userRepository.findByUserId(offerSnapshot.owner().userId().getId()).orElseThrow(NoSuchElementException::new);
+        offerEntity.setOwner(ownerEntity);
+
+        offerRepository.save(offerEntity);
+    }
+
+    // UPDATE
+
+    @Override
+    public void updateOffer(Offer offer) {
+        Optional<OfferEntity> offerEntity = offerRepository.findByOfferId(offer.getOfferId().getId());
+        OfferEntity offerEntityFromDb = offerEntity.orElseThrow(NoSuchElementException::new);
+        offerEntityFromDb.setTitle(offer.getTitle());
+        offerEntityFromDb.setDescription(offer.getDescription());
+        offerEntityFromDb.setAddress(AddressDatabaseMapper.toEntity(offer.getAddress()));
+        offerEntityFromDb.setStatus(offer.getStatus());
+        offerEntityFromDb.setCondition(offer.getCondition());
+        offerEntityFromDb.setCategory(offer.getCategory());
+        offerEntityFromDb.setPhotoId(offer.getPhotoId().getId());
+        offerRepository.save(offerEntityFromDb);
+    }
+
+    // DELETE
+
+    @Override
+    @Transactional
+    public void removeOffer(UUID offerId) {
+        offerRepository.delete(offerRepository.findByOfferId(offerId).orElseThrow(NoSuchElementException::new));
+    }
+
+
+
 }
