@@ -30,6 +30,6 @@ jobs:
         update-comment: true
         pass-emoji: ':green_heart:'
         fail-emoji: ':broken_heart:'
-        debug-mode: true
+        debug-mode: false
 #        min-coverage-overall: 75
 #        min-coverage-changed-files: 80
