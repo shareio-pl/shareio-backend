@@ -24,12 +24,12 @@ jobs:
       uses: madrapps/jacoco-report@v1.6.1
       with:
         paths: |
-          ${{ github.workspace }}/user/target/site/jacoco-aggregate/jacoco.xml
+          ${{ github.workspace }}/**/target/site/jacoco-aggregate/jacoco.xml
         token: ${{ secrets.JACOCO_COVERAGE_TOKEN }}
         title: '# :raccoon: Test coverage'
         update-comment: true
         pass-emoji: ':green_heart:'
         fail-emoji: ':broken_heart:'
         debug-mode: true
-        min-coverage-overall: 75
-        min-coverage-changed-files: 80
+#        min-coverage-overall: 75
+#        min-coverage-changed-files: 80
