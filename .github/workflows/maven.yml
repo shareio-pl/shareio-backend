@@ -24,7 +24,7 @@ jobs:
       uses: madrapps/jacoco-report@v1.6.1
       with:
         paths: |
-          ${{ github.workspace }}/**/target/site/jacoco-aggregate/jacoco.xml
+          ${{ github.workspace }}/user/target/site/jacoco-aggregate/jacoco.xml
         token: ${{ secrets.JACOCO_COVERAGE_TOKEN }}
         title: '# :raccoon: Test coverage'
         update-comment: true
