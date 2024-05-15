@@ -24,11 +24,16 @@ jobs:
       uses: madrapps/jacoco-report@v1.6.1
       with:
         paths: |
-          ${{ github.workspace }}/**/target/site/jacoco-aggregate/jacoco.xml
+          ${{ github.workspace }}/bootstrap/target/site/jacoco-aggregate/jacoco.xml,
+#          ${{ github.workspace }}/lib/target/site/jacoco-aggregate/jacoco.xml, TODO: Uncomment after adding tests to lib
+          ${{ github.workspace }}/location/target/site/jacoco-aggregate/jacoco.xml,
+          ${{ github.workspace }}/offer/target/site/jacoco-aggregate/jacoco.xml,
+#          ${{ github.workspace }}/score/target/site/jacoco-aggregate/jacoco.xml, TODO: Uncomment after adding tests to score
+          ${{ github.workspace }}/user/target/site/jacoco-aggregate/jacoco.xml
         token: ${{ secrets.JACOCO_COVERAGE_TOKEN }}
         title: '# :raccoon: Test coverage'
         update-comment: true
         pass-emoji: ':green_heart:'
         fail-emoji: ':broken_heart:'
-#       min-coverage-overall: 75
+#       min-coverage-overall: 75 TODO: Uncomment after adding more tests
 #       min-coverage-changed-files: 80
