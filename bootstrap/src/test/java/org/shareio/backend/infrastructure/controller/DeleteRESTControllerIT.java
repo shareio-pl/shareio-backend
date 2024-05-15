@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -30,9 +31,9 @@ public class DeleteRESTControllerIT {
     @Autowired
     private MockMvc mvc;
 
-    private UserEntity generateUserEntity(UUID userId){
+    private UserEntity generateUserEntity(UUID userId) {
         return new UserEntity(null, userId, "jan.kowalski@poczta.pl", "Jan", "Kowal",
-                LocalDateTime.of(2000, 12, 31, 12, 0, 0),
+                LocalDate.of(2000, 12, 31),
                 UUID.randomUUID(),
                 new AddressEntity(null, UUID.randomUUID(), "Polska", "Łódzkie", "Łódź",
                         "Wólczańska", "215", "1", "91-001",

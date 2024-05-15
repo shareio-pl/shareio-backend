@@ -7,7 +7,6 @@ import org.shareio.backend.core.model.vo.Category;
 import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.in.GetOffersByNameUseCaseInterface;
-import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.infrastructure.dbadapter.entities.AddressEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.SecurityEntity;
@@ -20,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -53,7 +53,7 @@ public class DebugRESTController {
         Map<String, Object> response = new HashMap<>();
         try {
             userEntity = new UserEntity(null, userId, "jan.kowalski@poczta.pl", "Jan", "Kowalski",
-                    LocalDateTime.of(2000, 12, 31, 12, 0, 0),
+                    LocalDate.of(2000, 12, 31),
                     imageUUIDs.get("user"),
                     new AddressEntity(null, UUID.randomUUID(), "Polska", "Łódzkie", "Łódź",
                             "Wólczańska", "215", "1", "91-001",
