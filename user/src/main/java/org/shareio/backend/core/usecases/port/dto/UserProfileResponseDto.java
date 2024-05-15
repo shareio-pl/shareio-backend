@@ -5,6 +5,7 @@ import org.shareio.backend.core.model.vo.AddressId;
 import org.shareio.backend.core.model.vo.PhotoId;
 import org.shareio.backend.core.model.vo.UserId;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -13,7 +14,7 @@ public record UserProfileResponseDto(
         String email,
         String name,
         String surname,
-        LocalDateTime dateOfBirth,
+        LocalDate dateOfBirth,
         PhotoId photoId,
         AddressId address,
         LocalDateTime lastLoginDate

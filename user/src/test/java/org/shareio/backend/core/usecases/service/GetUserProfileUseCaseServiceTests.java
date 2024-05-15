@@ -14,6 +14,7 @@ import org.shareio.backend.core.usecases.port.dto.UserProfileResponseDto;
 import org.shareio.backend.core.usecases.port.out.GetUserProfileDaoInterface;
 import org.shareio.backend.exceptions.MultipleValidationException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import java.util.UUID;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+
 public class GetUserProfileUseCaseServiceTests {
 
     private UUID userId = null;
@@ -49,7 +51,7 @@ public class GetUserProfileUseCaseServiceTests {
                 "test@gmail.com",
                 "John",
                 "Doe",
-                LocalDateTime.of(2020, 5, 13, 6, 30),
+                LocalDate.of(2020, 5, 13),
                 photoId,
                 addressId,
                 LocalDateTime.of(2020, 5, 13, 6, 30)
@@ -60,7 +62,7 @@ public class GetUserProfileUseCaseServiceTests {
                 "test@gmail.com",
                 "John",
                 "Doe",
-                LocalDateTime.of(2020, 5, 13, 6, 30),
+                LocalDate.of(2020, 5, 13),
                 new PhotoId(photoId),
                 new AddressId(addressId),
                 LocalDateTime.of(2020, 5, 13, 6, 30)
@@ -87,7 +89,7 @@ public class GetUserProfileUseCaseServiceTests {
                 " ",
                 " ",
                 " ",
-                LocalDateTime.now(),
+                LocalDate.now(),
                 photoId,
                 addressId,
                 LocalDateTime.now()
@@ -108,7 +110,7 @@ public class GetUserProfileUseCaseServiceTests {
                 "test@gmail.com",
                 "a",
                 "a",
-                LocalDateTime.now(),
+                LocalDate.now(),
                 photoId,
                 addressId,
                 LocalDateTime.now()
@@ -128,7 +130,7 @@ public class GetUserProfileUseCaseServiceTests {
                 "test@gmail.com",
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                LocalDateTime.now(),
+                LocalDate.now(),
                 photoId,
                 addressId,
                 LocalDateTime.now()
@@ -148,7 +150,7 @@ public class GetUserProfileUseCaseServiceTests {
                 "test",
                 "John",
                 "Doe",
-                LocalDateTime.now(),
+                LocalDate.now(),
                 photoId,
                 addressId,
                 LocalDateTime.now()

@@ -1,6 +1,7 @@
 package org.shareio.backend;
 
 import java.time.Duration;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class Const {
@@ -28,5 +29,10 @@ public class Const {
     public static final String multipleValidationErrorCode = "MulValErr";
     public static final String noSuchElementErrorCode = "NoElemErr";
     public static final String toDoErrorCode = "TODOErr";
+    public static final String illegalArgumentErrorCode = "IllArgErr";
+
+    // ----------------- DEFAULTS ------------------
+
+    public static final UUID defaultPhotoId = UUID.fromString("94416390-3990-48f3-b9be-de29fa446c04");
 
 }

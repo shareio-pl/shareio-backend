@@ -13,6 +13,7 @@ import org.shareio.backend.infrastructure.dbadapter.entities.UserEntity;
 import org.shareio.backend.infrastructure.dbadapter.mappers.UserDatabaseMapper;
 import org.shareio.backend.infrastructure.dbadapter.repositories.UserRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -32,15 +33,18 @@ public class UserAdapterTests {
     private SecurityEntity securityEntity;
     private AutoCloseable closeable;
     private UserAdapter userAdapter;
-    private UUID userId = null;
+    private UUID userId;
+    String userEmail;
     private UserProfileGetDto userProfileGetDto;
+
 
     @BeforeEach
     public void setUp() {
         userId = UUID.randomUUID();
+        userEmail = "jan.kowalski@poczta.pl";
         closeable = openMocks(this);
-        UserEntity userEntity = new UserEntity(null, userId, "jan.kowalski@poczta.pl", "Jan", "Kowalski",
-                LocalDateTime.of(2000, 12, 31, 12, 0, 0),
+        UserEntity userEntity = new UserEntity(null, userId, userEmail, "Jan", "Kowalski",
+                LocalDate.of(2020, 5, 13),
                 UUID.randomUUID(),
                 addressEntity,
                 securityEntity);
@@ -48,6 +52,7 @@ public class UserAdapterTests {
         userProfileGetDto = Optional.of(userEntity).map(UserDatabaseMapper::toDto).get();
         userAdapter = new UserAdapter(userRepository);
         when(userRepository.findByUserId(userId)).thenReturn(Optional.of(userEntity));
+        when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(userEntity));
     }
 
     @AfterEach
@@ -58,7 +63,7 @@ public class UserAdapterTests {
     @Test
     public void testGetUserDtoThrows() {
         UUID userIdWrong = UUID.randomUUID();
-        Assert.assertThrows(NoSuchElementException.class, ()-> userAdapter.getUserDto(userIdWrong));
+        Assert.assertThrows(NoSuchElementException.class, () -> userAdapter.getUserDto(userIdWrong));
     }
 
     @Test
@@ -72,5 +77,10 @@ public class UserAdapterTests {
         Assertions.assertEquals(userProfileGetDto.dateOfBirth(), actual.dateOfBirth());
         Assertions.assertEquals(userProfileGetDto.photoId(), actual.photoId());
         Assertions.assertEquals(userProfileGetDto.lastLoginDate(), actual.lastLoginDate());
+    }
+
+    @Test
+    public void remove_nonexistent_user_and_throw_NoSuchElementException() {
+        Assertions.assertThrows(NoSuchElementException.class, () -> userAdapter.removeUser(UUID.randomUUID()));
     }
 }
