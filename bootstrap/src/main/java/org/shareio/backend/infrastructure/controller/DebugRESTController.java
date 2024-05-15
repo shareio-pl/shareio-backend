@@ -11,8 +11,7 @@ import org.shareio.backend.infrastructure.dbadapter.entities.AddressEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.SecurityEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.UserEntity;
-import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
-import org.shareio.backend.infrastructure.dbadapter.repositories.UserRepository;
+import org.shareio.backend.infrastructure.dbadapter.repositories.*;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +26,7 @@ import java.util.*;
 @AllArgsConstructor
 @RequestMapping("/debug")
 public class DebugRESTController {
+
     /*
     ENDPOINTS:
     localhost:8082/debug/createUser
@@ -34,8 +34,13 @@ public class DebugRESTController {
     localhost:8082/debug/getOfferIds
     localhost:8082/debug/getOffersByName
     */
-    UserRepository userRepository;
+
+    AddressRepository addressRepository;
     OfferRepository offerRepository;
+    SecurityRepository securityRepository;
+    UserRepository userRepository;
+
+
     GetOffersByNameUseCaseInterface offersByNameUseCaseInterface;
 
     private final Map<String, UUID> imageUUIDs = new HashMap<>() {{
@@ -145,5 +150,22 @@ public class DebugRESTController {
             response.put("error", e.toString());
             return new ResponseEntity<>(response, HttpStatusCode.valueOf(500));
         }
+    }
+
+    @RequestMapping(value = "/nuke", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> debugPurifyTheUnclean() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            userRepository.truncateTable();
+            addressRepository.truncateTable();
+            securityRepository.truncateTable();
+        }
+        catch (Exception e) {
+            response.put("error", e.toString());
+        }
+
+        response.put("effect", "\uD83D\uDCA3\uD83D\uDCA2\uD83E\uDD0C");
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
+
     }
 }
