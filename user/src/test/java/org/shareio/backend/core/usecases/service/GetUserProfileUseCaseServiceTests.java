@@ -116,8 +116,8 @@ public class GetUserProfileUseCaseServiceTests {
         when(getUserDaoInterface.getUserDto(incorrectStringId)).thenReturn(Optional.of(expectedIncorrectNameUserProfileGetDto));
         MultipleValidationException multipleValidationException = Assertions.assertThrows(MultipleValidationException.class, () -> getUserProfileUseCaseService.getUserProfileResponseDto(incorrectStringId));
         Assertions.assertEquals(2, multipleValidationException.getErrorMap().size());
-        Assertions.assertEquals("Name is too short!", multipleValidationException.getErrorMap().get("Name"));
-        Assertions.assertEquals("Name is too short!", multipleValidationException.getErrorMap().get("Surname"));
+        Assertions.assertEquals("String too short", multipleValidationException.getErrorMap().get("Name"));
+        Assertions.assertEquals("String too short", multipleValidationException.getErrorMap().get("Surname"));
     }
 
     @Test
@@ -136,8 +136,8 @@ public class GetUserProfileUseCaseServiceTests {
         when(getUserDaoInterface.getUserDto(incorrectStringId)).thenReturn(Optional.of(expectedIncorrectNameUserProfileGetDto));
         MultipleValidationException multipleValidationException = Assertions.assertThrows(MultipleValidationException.class, () -> getUserProfileUseCaseService.getUserProfileResponseDto(incorrectStringId));
         Assertions.assertEquals(2, multipleValidationException.getErrorMap().size());
-        Assertions.assertEquals("Name is too long!", multipleValidationException.getErrorMap().get("Name"));
-        Assertions.assertEquals("Name is too long!", multipleValidationException.getErrorMap().get("Surname"));
+        Assertions.assertEquals("String too long", multipleValidationException.getErrorMap().get("Name"));
+        Assertions.assertEquals("String too long", multipleValidationException.getErrorMap().get("Surname"));
     }
 
     @Test
@@ -175,8 +175,8 @@ public class GetUserProfileUseCaseServiceTests {
         when(getUserDaoInterface.getUserDto(incorrectDateId)).thenReturn(Optional.of(expectedIncorrectNameUserProfileGetDto));
         MultipleValidationException multipleValidationException = Assertions.assertThrows(MultipleValidationException.class, () -> getUserProfileUseCaseService.getUserProfileResponseDto(incorrectDateId));
         Assertions.assertEquals(multipleValidationException.getErrorMap().size(), 2);
-        Assertions.assertEquals("Malformed date of birth", multipleValidationException.getErrorMap().get("DateOfBirth"));
-        Assertions.assertEquals("Malformed last login date", multipleValidationException.getErrorMap().get("LastLoginDate"));
+        Assertions.assertEquals("Object is null", multipleValidationException.getErrorMap().get("DateOfBirth"));
+        Assertions.assertEquals("Object is null", multipleValidationException.getErrorMap().get("LastLoginDate"));
     }
 
     @Test
