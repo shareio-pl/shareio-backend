@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.shareio.backend.Const;
 import org.shareio.backend.core.model.vo.*;
 import org.shareio.backend.core.usecases.port.dto.OfferFullGetDto;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
@@ -77,7 +78,7 @@ public class Offer {
         return new Offer(
                 new OfferId(UUID.randomUUID()),
                 null,
-                new Address(new AddressId(UUID.randomUUID()), offerSaveDto.addressSaveDto().country(), offerSaveDto.addressSaveDto().region(), offerSaveDto.addressSaveDto().city(), offerSaveDto.addressSaveDto().street(), offerSaveDto.addressSaveDto().houseNumber(), offerSaveDto.addressSaveDto().flatNumber(), offerSaveDto.addressSaveDto().postCode(), new Location(offerSaveDto.addressSaveDto().latitude(), offerSaveDto.addressSaveDto().longitude())),
+                new Address(new AddressId(UUID.randomUUID()), offerSaveDto.addressSaveDto().country(), offerSaveDto.addressSaveDto().region(), offerSaveDto.addressSaveDto().city(), offerSaveDto.addressSaveDto().street(), offerSaveDto.addressSaveDto().houseNumber(), offerSaveDto.addressSaveDto().flatNumber(), offerSaveDto.addressSaveDto().postCode(), new Location(Const.defaultAddressCenterLat, Const.defaultAddressCenterLon)), // Poland's center
                 offerSaveDto.creationDate(),
                 Status.valueOf(offerSaveDto.status()),
                 null,

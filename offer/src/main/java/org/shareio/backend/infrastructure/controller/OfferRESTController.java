@@ -10,6 +10,7 @@ import org.shareio.backend.core.model.vo.Location;
 import org.shareio.backend.core.usecases.port.dto.*;
 import org.shareio.backend.core.usecases.port.in.*;
 import org.shareio.backend.core.usecases.port.out.GetLocationDaoInterface;
+import org.shareio.backend.exceptions.LocationCalculationException;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
 import org.springframework.http.HttpStatus;
@@ -118,8 +119,10 @@ public class OfferRESTController {
             return new CorrectResponse(offerSaveResponseDto, Const.successErrorCode, HttpStatus.OK);
         } catch (MultipleValidationException e) {
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (NoSuchElementException noSuchElementException) {
-            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+        } catch (LocationCalculationException e) {
+            return new ErrorResponse(Const.cannotDetermineAddressErrorCode, HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ErrorResponse(Const.APINotRespondingErrorCode, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
