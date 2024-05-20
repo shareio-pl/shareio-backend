@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 public class Const {
     // -------------- CONFIGURATION ---------------
     public static final Duration offerReservationDuration = Duration.ofDays(1);
-    public static final Double defaultAddressCenterLat = 52.06;
-    public static final Double defaultAddressCenterLon = 19.46;
+    public static final Double defaultAddressCenterLat = 0.0;
+    public static final Double defaultAddressCenterLon = 0.0;
 
     // ---------------- VALIDATION ----------------
     public static final Integer minNameLength = 2;
