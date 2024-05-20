@@ -7,8 +7,6 @@ public record AddressSaveDto(
         String street,
         String houseNumber,
         String flatNumber,
-        String postCode,
-        Double latitude,
-        Double longitude
+        String postCode
 ) {
 }

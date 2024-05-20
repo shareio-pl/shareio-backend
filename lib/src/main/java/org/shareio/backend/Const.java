@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 public class Const {
     // -------------- CONFIGURATION ---------------
     public static final Duration offerReservationDuration = Duration.ofDays(1);
+    public static final Double defaultAddressCenterLat = 0.0;
+    public static final Double defaultAddressCenterLon = 0.0;
 
     // ---------------- VALIDATION ----------------
     public static final Integer minNameLength = 2;
@@ -30,6 +32,8 @@ public class Const {
     public static final String noSuchElementErrorCode = "NoElemErr";
     public static final String toDoErrorCode = "TODOErr";
     public static final String illegalArgumentErrorCode = "IllArgErr";
+    public static final String cannotDetermineAddressErrorCode = "CantDetAddrErr";
+    public static final String APINotRespondingErrorCode = "ApiNotResp";
 
     // ----------------- DEFAULTS ------------------
 
