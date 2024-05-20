@@ -33,7 +33,7 @@ public class Const {
     public static final String toDoErrorCode = "TODOErr";
     public static final String illegalArgumentErrorCode = "IllArgErr";
     public static final String cannotDetermineAddressErrorCode = "CantDetAddrErr";
-    public static final String APINotRespondingErrorCode = "ApiSięWyjebałoNaGupiRyj";
+    public static final String APINotRespondingErrorCode = "ApiNotResp";
 
     // ----------------- DEFAULTS ------------------
 
