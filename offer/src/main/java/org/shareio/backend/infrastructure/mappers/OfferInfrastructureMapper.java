@@ -38,7 +38,10 @@ public class OfferInfrastructureMapper {
                 0.0, // TODO: offerSnapshot.owner().rating()
                 0, // TODO: offerSnapshot.owner().reviewCount()
 
-                unreservationDate
+                unreservationDate,
+                offerSnapshot.reviewSnapshot().reviewId().getId(),
+                offerSnapshot.reviewSnapshot().value(),
+                offerSnapshot.reviewSnapshot().date()
         );
     }
 }

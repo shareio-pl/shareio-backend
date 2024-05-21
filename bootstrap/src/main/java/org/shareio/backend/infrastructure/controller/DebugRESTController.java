@@ -7,10 +7,7 @@ import org.shareio.backend.core.model.vo.Category;
 import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.in.GetOffersByNameUseCaseInterface;
-import org.shareio.backend.infrastructure.dbadapter.entities.AddressEntity;
-import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
-import org.shareio.backend.infrastructure.dbadapter.entities.SecurityEntity;
-import org.shareio.backend.infrastructure.dbadapter.entities.UserEntity;
+import org.shareio.backend.infrastructure.dbadapter.entities.*;
 import org.shareio.backend.infrastructure.dbadapter.repositories.*;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -101,7 +98,7 @@ public class DebugRESTController {
                     LocalDateTime.now(), Status.CREATED, null, null,
                     "Dorodne krzyczące dziecko", Condition.LIGHTLY_USED, Category.HOBBY,
                     "W pełni zdrowe (no może lekko otyłe) krzyczące dziecko. Nie moje, ale chcę się go pozbyć",
-                    imageUUIDs.get("offer1"));
+                    imageUUIDs.get("offer1"), null);
             offerRepository.save(offerEntity);
 
             offerEntity = new OfferEntity(null, offerIds.get(1), userEntity,
@@ -111,7 +108,7 @@ public class DebugRESTController {
                     LocalDateTime.now(), Status.CREATED, null, null,
                     "Ładny szop", Condition.ALMOST_NEW, Category.RAILWAY,
                     "Oddam bardzo ładnego szopa. Prawie nie gryzie i chyba nie ma wścieklizny. Za darmo, bo to uczciwa cena.",
-                    imageUUIDs.get("offer2"));
+                    imageUUIDs.get("offer2"), null);
             offerRepository.save(offerEntity);
 
             offerEntity = new OfferEntity(null, offerIds.get(2), userEntity,
@@ -121,7 +118,7 @@ public class DebugRESTController {
                     LocalDateTime.now(), Status.CREATED, null, null,
                     "Mieszkanie", Condition.BROKEN, Category.OTHER,
                     "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
-                    imageUUIDs.get("offer3"));
+                    imageUUIDs.get("offer3"), null);
             offerRepository.save(offerEntity);
 
         } catch (Exception e) {
@@ -150,6 +147,25 @@ public class DebugRESTController {
             response.put("error", e.toString());
             return new ResponseEntity<>(response, HttpStatusCode.valueOf(500));
         }
+    }
+
+    @RequestMapping(value = "/addReview/{offerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> debugAddReview(@PathVariable(value = "offerId") UUID offerId) {
+        Map<String, Object> response = new HashMap<>();
+        UUID reviewId = UUID.randomUUID();
+        OfferEntity offerEntity;
+        try {
+            offerEntity  = offerRepository.findByOfferId(offerId).get();
+        } catch (NoSuchElementException e) {
+            response.put("error", e.toString());
+            return new ResponseEntity<>(response, HttpStatusCode.valueOf(400));
+        }
+        ReviewEntity reviewEntity = new ReviewEntity(null,reviewId,
+                20.0F, LocalDateTime.now());
+        offerEntity.setReview(reviewEntity);
+        offerRepository.save(offerEntity);
+        response.put("id", reviewId);
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
     }
 
     @RequestMapping(value = "/nuke", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

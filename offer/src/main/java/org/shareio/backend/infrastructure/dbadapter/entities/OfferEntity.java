@@ -38,4 +38,6 @@ public class OfferEntity {
     private Category category;
     private String description;
     private UUID photoId;
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE})
+    private ReviewEntity review;
 }

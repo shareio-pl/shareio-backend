@@ -3,7 +3,6 @@ package org.shareio.backend.infrastructure.dbadapter.adapters;
 import jakarta.transaction.Transactional;
 import org.shareio.backend.core.model.Offer;
 import org.shareio.backend.core.model.OfferSnapshot;
-import org.shareio.backend.core.usecases.port.dto.OfferFullGetDto;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.core.usecases.port.out.*;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterface, GetOffersByNameDaoInterface, RemoveOfferCommandInterface, SaveOfferCommandInterface, GetOfferFullDaoInterface, UpdateOfferCommandInterface, GetOffersByUserDaoInterface {
+public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterface, GetOffersByNameDaoInterface, RemoveOfferCommandInterface, SaveOfferCommandInterface, UpdateOfferCommandInterface, GetOffersByUserDaoInterface {
     final OfferRepository offerRepository;
     final UserRepository userRepository;
 
@@ -50,14 +49,6 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
                 .map(OfferDatabaseMapper::toDto).toList();
     }
 
-    @Override
-    public Optional<OfferFullGetDto> getOfferFullDto(UUID id) {
-        Optional<OfferEntity> offerEntity = offerRepository.findByOfferId(id);
-        if (offerEntity.isEmpty()) {
-            throw new NoSuchElementException();
-        }
-        return offerEntity.map(OfferDatabaseMapper::toFullDto);
-    }
 
     @Override
     public List<OfferGetDto> getOffersByUser(UUID id) {

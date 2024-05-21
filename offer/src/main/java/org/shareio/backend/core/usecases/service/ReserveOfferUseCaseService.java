@@ -3,7 +3,6 @@ package org.shareio.backend.core.usecases.service;
 import lombok.AllArgsConstructor;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.in.ReserveOfferUseCaseInterface;
-import org.shareio.backend.core.usecases.port.out.GetOfferFullDaoInterface;
 import org.shareio.backend.core.usecases.port.out.SaveOfferCommandInterface;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.UserEntity;
@@ -19,7 +18,6 @@ import java.util.UUID;
 public class ReserveOfferUseCaseService implements ReserveOfferUseCaseInterface {
     private final UserRepository userRepository;
     private final OfferRepository offerRepository;
-    GetOfferFullDaoInterface getOfferFullDaoInterface;
     SaveOfferCommandInterface saveOfferCommandInterface;
 
     @Override

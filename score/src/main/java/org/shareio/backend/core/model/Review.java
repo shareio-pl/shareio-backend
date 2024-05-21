@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 public class Review {
     @Setter(AccessLevel.NONE)
     private ReviewId reviewId;
-    private Offer offer;
     private Float value; // 1-5 stars
     private LocalDateTime date;
 
@@ -26,7 +25,6 @@ public class Review {
     public static Review fromDto(ReviewGetDto reviewGetDto){
         return new Review(
                 new ReviewId(reviewGetDto.reviewId()),
-                Offer.fromDto(reviewGetDto.offerGetDto()),
                 reviewGetDto.value(),
                 reviewGetDto.date()
         );

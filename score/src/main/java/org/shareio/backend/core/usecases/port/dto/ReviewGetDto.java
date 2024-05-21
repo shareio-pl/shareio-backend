@@ -5,7 +5,6 @@ import java.util.UUID;
 
 public record ReviewGetDto(
         UUID reviewId,
-        OfferGetDto offerGetDto,
         Float value,
         LocalDateTime date
 )

@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.shareio.backend.Const;
 import org.shareio.backend.core.model.vo.*;
-import org.shareio.backend.core.usecases.port.dto.OfferFullGetDto;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.core.usecases.port.dto.OfferSaveDto;
 
@@ -31,6 +30,7 @@ public class Offer {
     private Category category;
     private String description;
     private PhotoId photoId;
+    private Review review;
 
     public static Offer fromDto(OfferGetDto offerGetDto) {
         User receiver = null;
@@ -49,28 +49,8 @@ public class Offer {
                 Condition.valueOf(offerGetDto.condition()),
                 Category.valueOf(offerGetDto.category()),
                 offerGetDto.description(),
-                new PhotoId(offerGetDto.photoId())
-        );
-    }
-
-    public static Offer fromDto(OfferFullGetDto offerFullGetDto) {
-        User receiver = null;
-        if (Status.valueOf(offerFullGetDto.status()).equals(Status.RESERVED)) {
-            receiver = new User(null, null, null, null, null, null, null, null);
-        }
-        return new Offer(
-                new OfferId(offerFullGetDto.offerId()),
-                new User(new UserId(offerFullGetDto.ownerId()), null, offerFullGetDto.ownerName(), offerFullGetDto.ownerSurname(), null, new PhotoId(offerFullGetDto.ownerPhotoId()), null, null),
-                new Address(new AddressId(offerFullGetDto.addressId()), offerFullGetDto.country(), offerFullGetDto.region(), offerFullGetDto.city(), offerFullGetDto.street(), offerFullGetDto.houseNumber(), null, null, new Location(offerFullGetDto.latitude(), offerFullGetDto.longitude())),
-                offerFullGetDto.creationDate(),
-                Status.valueOf(offerFullGetDto.status()),
-                receiver,
-                offerFullGetDto.reservationDate(),
-                offerFullGetDto.title(),
-                Condition.valueOf(offerFullGetDto.condition()),
-                Category.valueOf(offerFullGetDto.category()),
-                offerFullGetDto.description(),
-                new PhotoId(offerFullGetDto.photoId())
+                new PhotoId(offerGetDto.photoId()),
+                new Review(new ReviewId(offerGetDto.reviewId()), offerGetDto.revievValue(), offerGetDto.reviewDate())
         );
     }
 
@@ -80,14 +60,15 @@ public class Offer {
                 null,
                 new Address(new AddressId(UUID.randomUUID()), offerSaveDto.addressSaveDto().country(), offerSaveDto.addressSaveDto().region(), offerSaveDto.addressSaveDto().city(), offerSaveDto.addressSaveDto().street(), offerSaveDto.addressSaveDto().houseNumber(), offerSaveDto.addressSaveDto().flatNumber(), offerSaveDto.addressSaveDto().postCode(), new Location(Const.defaultAddressCenterLat, Const.defaultAddressCenterLon)),
                 offerSaveDto.creationDate(),
-                Status.valueOf(offerSaveDto.status()),
+                Status.CREATED,
                 null,
                 null,
                 offerSaveDto.title(),
                 Condition.valueOf(offerSaveDto.condition()),
                 Category.valueOf(offerSaveDto.category()),
                 offerSaveDto.description(),
-                new PhotoId(offerSaveDto.photoId())
+                new PhotoId(UUID.randomUUID()),
+                null
         );
     }
 

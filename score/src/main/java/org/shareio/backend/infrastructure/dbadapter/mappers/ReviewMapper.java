@@ -7,7 +7,6 @@ public class ReviewMapper {
     public static ReviewGetDto toDto(final ReviewEntity reviewEntity) {
         return new ReviewGetDto(
                 reviewEntity.getReviewId(),
-                OfferDatabaseMapper.toDto(reviewEntity.getOffer()),
                 reviewEntity.getReviewValue(),
                 reviewEntity.getReviewDate()
         );
