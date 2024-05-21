@@ -149,8 +149,8 @@ public class DebugRESTController {
         }
     }
 
-    @RequestMapping(value = "/addReview/{offerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> debugAddReview(@PathVariable(value = "offerId") UUID offerId) {
+    @RequestMapping(value = "/createReview/{offerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> debugCreateReview(@PathVariable(value = "offerId") UUID offerId) {
         Map<String, Object> response = new HashMap<>();
         UUID reviewId = UUID.randomUUID();
         OfferEntity offerEntity;

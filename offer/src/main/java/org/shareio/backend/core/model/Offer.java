@@ -34,13 +34,18 @@ public class Offer {
 
     public static Offer fromDto(OfferGetDto offerGetDto) {
         User receiver = null;
+        Review review = null;
         if (Status.valueOf(offerGetDto.status()).equals(Status.RESERVED)) {
             receiver = new User(null, null, null, null, null, null, null, null);
+        }
+        if(offerGetDto.reviewId() != null){
+            review = new Review(new ReviewId(offerGetDto.reviewId()), offerGetDto.revievValue(), offerGetDto.reviewDate());
+
         }
         return new Offer(
                 new OfferId(offerGetDto.offerId()),
                 new User(new UserId(offerGetDto.ownerId()), null, offerGetDto.ownerName(), offerGetDto.ownerSurname(), null, new PhotoId(offerGetDto.ownerPhotoId()), null, null),
-                new Address(null, null, null, offerGetDto.city(), offerGetDto.street(), offerGetDto.houseNumber(), null, null, new Location(offerGetDto.latitude(), offerGetDto.longitude())),
+                new Address(new AddressId(offerGetDto.addressId()), offerGetDto.country(), offerGetDto.region(), offerGetDto.city(), offerGetDto.street(), offerGetDto.houseNumber(), offerGetDto.flatNumber(), offerGetDto.postCode(), new Location(offerGetDto.latitude(), offerGetDto.longitude())),
                 offerGetDto.creationDate(),
                 Status.valueOf(offerGetDto.status()),
                 receiver,
@@ -50,7 +55,7 @@ public class Offer {
                 Category.valueOf(offerGetDto.category()),
                 offerGetDto.description(),
                 new PhotoId(offerGetDto.photoId()),
-                new Review(new ReviewId(offerGetDto.reviewId()), offerGetDto.revievValue(), offerGetDto.reviewDate())
+                review
         );
     }
 
@@ -74,9 +79,13 @@ public class Offer {
 
     public OfferSnapshot toSnapshot() {
         UserSnapshot receiverSnapshot = null;
+        ReviewSnapshot reviewSnapshot = null;
         if (this.status.equals(Status.RESERVED) && this.receiver != null) {
             receiverSnapshot = new UserSnapshot(this.receiver);
         }
-        return new OfferSnapshot(this, receiverSnapshot);
+        if(this.review != null){
+            reviewSnapshot = new ReviewSnapshot(this.review);
+        }
+        return new OfferSnapshot(this, receiverSnapshot, reviewSnapshot);
     }
 }

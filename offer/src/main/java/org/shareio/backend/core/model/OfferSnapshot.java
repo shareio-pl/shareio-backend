@@ -12,9 +12,9 @@ public record OfferSnapshot(OfferId offerId, UserSnapshot owner, Address address
                             String description,
                             PhotoId photoId,
                             ReviewSnapshot reviewSnapshot) {
-    public OfferSnapshot(Offer offer, UserSnapshot receiver) {
+    public OfferSnapshot(Offer offer, UserSnapshot receiver, ReviewSnapshot reviewSnapshot) {
         this(offer.getOfferId(), offer.getOwner().toSnapshot(), offer.getAddress(), offer.getCreationDate(),
                 offer.getStatus(), receiver, offer.getReservationDate(), offer.getTitle(),
-                offer.getCondition(), offer.getCategory(), offer.getDescription(), offer.getPhotoId(), offer.getReview().toSnapshot());
+                offer.getCondition(), offer.getCategory(), offer.getDescription(), offer.getPhotoId(), reviewSnapshot);
     }
 }

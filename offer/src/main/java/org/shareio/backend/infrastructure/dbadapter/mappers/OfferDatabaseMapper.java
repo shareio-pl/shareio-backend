@@ -6,36 +6,81 @@ import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
 
 public class OfferDatabaseMapper {
     public static OfferGetDto toDto(final OfferEntity offerEntity) {
-        return new OfferGetDto(
-                offerEntity.getOfferId(),
-                offerEntity.getCreationDate(),
-                offerEntity.getStatus().toString(),
+        if(offerEntity.getReview() != null){
+            return new OfferGetDto(
+                    offerEntity.getOfferId(),
+                    offerEntity.getCreationDate(),
+                    offerEntity.getStatus().toString(),
 
-                offerEntity.getAddress().getCity(),
-                offerEntity.getAddress().getStreet(),
-                offerEntity.getAddress().getHouseNumber(),
-                offerEntity.getAddress().getLatitude(),
-                offerEntity.getAddress().getLongitude(),
+                    offerEntity.getAddress().getAddressId(),
+                    offerEntity.getAddress().getCountry(),
+                    offerEntity.getAddress().getRegion(),
+                    offerEntity.getAddress().getCity(),
+                    offerEntity.getAddress().getStreet(),
+                    offerEntity.getAddress().getHouseNumber(),
+                    offerEntity.getAddress().getFlatNumber(),
+                    offerEntity.getAddress().getPostCode(),
+                    offerEntity.getAddress().getLatitude(),
+                    offerEntity.getAddress().getLongitude(),
 
-                offerEntity.getTitle(),
-                offerEntity.getCondition().toString(),
-                offerEntity.getCategory().toString(),
-                offerEntity.getDescription(),
-                offerEntity.getPhotoId(),
+                    offerEntity.getTitle(),
+                    offerEntity.getCondition().toString(),
+                    offerEntity.getCategory().toString(),
+                    offerEntity.getDescription(),
+                    offerEntity.getPhotoId(),
 
-                offerEntity.getOwner().getUserId(),
-                offerEntity.getOwner().getName(),
-                offerEntity.getOwner().getSurname(),
-                offerEntity.getOwner().getPhotoId(),
+                    offerEntity.getOwner().getUserId(),
+                    offerEntity.getOwner().getName(),
+                    offerEntity.getOwner().getSurname(),
+                    offerEntity.getOwner().getPhotoId(),
 
-                0.0,// TODO: offerEntity.getOwner().getRating()
-                0, // TODO: offerEntity.getOwner().getReviewCount()
+                    0.0,// TODO: offerEntity.getOwner().getRating()
+                    0, // TODO: offerEntity.getOwner().getReviewCount()
 
-                offerEntity.getReservationDate(),
-                offerEntity.getReview().getReviewId(),
-                offerEntity.getReview().getReviewValue(),
-                offerEntity.getReview().getReviewDate()
-        );
+                    offerEntity.getReservationDate(),
+                    offerEntity.getReview().getReviewId(),
+                    offerEntity.getReview().getReviewValue(),
+                    offerEntity.getReview().getReviewDate()
+            );
+        }
+        else {
+            return new OfferGetDto(
+                    offerEntity.getOfferId(),
+                    offerEntity.getCreationDate(),
+                    offerEntity.getStatus().toString(),
+
+                    offerEntity.getAddress().getAddressId(),
+                    offerEntity.getAddress().getCountry(),
+                    offerEntity.getAddress().getRegion(),
+                    offerEntity.getAddress().getCity(),
+                    offerEntity.getAddress().getStreet(),
+                    offerEntity.getAddress().getHouseNumber(),
+                    offerEntity.getAddress().getFlatNumber(),
+                    offerEntity.getAddress().getPostCode(),
+                    offerEntity.getAddress().getLatitude(),
+                    offerEntity.getAddress().getLongitude(),
+
+                    offerEntity.getTitle(),
+                    offerEntity.getCondition().toString(),
+                    offerEntity.getCategory().toString(),
+                    offerEntity.getDescription(),
+                    offerEntity.getPhotoId(),
+
+                    offerEntity.getOwner().getUserId(),
+                    offerEntity.getOwner().getName(),
+                    offerEntity.getOwner().getSurname(),
+                    offerEntity.getOwner().getPhotoId(),
+
+                    0.0,// TODO: offerEntity.getOwner().getRating()
+                    0, // TODO: offerEntity.getOwner().getReviewCount()
+
+                    offerEntity.getReservationDate(),
+                    null,
+                    null,
+                    null
+            );
+        }
+
     }
 
     public static OfferEntity toEntity(OfferSnapshot offerSnapshot) {

@@ -25,6 +25,7 @@ import java.util.*;
 @RequestMapping(value = "/offer/*")
 public class OfferRESTController {
     AddOfferUseCaseInterface addOfferUseCaseInterface;
+    AddReviewUseCaseInterface addReviewUseCaseInterface;
     GetUserProfileUseCaseInterface getUserProfileUseCaseInterface;
     GetLocationDaoInterface getLocationDaoInterface;
     GetOfferUseCaseInterface getOfferUseCaseInterface;
@@ -135,5 +136,11 @@ public class OfferRESTController {
     public ResponseEntity<Object> reserveOffer(@PathVariable(value = "id") UUID id, @PathVariable(value = "userId") UUID userId) {
         UUID offerId = reserveOfferUseCaseInterface.reserveOffer(id, userId);
         return new CorrectResponse(offerId, Const.successErrorCode, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/addReview", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> addReviewToOffer(@RequestBody OfferReviewDto offerReviewDto) {
+        UUID reviewId = addReviewUseCaseInterface.addReview(offerReviewDto);
+        return new CorrectResponse(reviewId, Const.successErrorCode, HttpStatus.OK);
     }
 }
