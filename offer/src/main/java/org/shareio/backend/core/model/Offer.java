@@ -80,14 +80,14 @@ public class Offer {
                 null,
                 new Address(new AddressId(UUID.randomUUID()), offerSaveDto.addressSaveDto().country(), offerSaveDto.addressSaveDto().region(), offerSaveDto.addressSaveDto().city(), offerSaveDto.addressSaveDto().street(), offerSaveDto.addressSaveDto().houseNumber(), offerSaveDto.addressSaveDto().flatNumber(), offerSaveDto.addressSaveDto().postCode(), new Location(Const.defaultAddressCenterLat, Const.defaultAddressCenterLon)),
                 offerSaveDto.creationDate(),
-                Status.valueOf(offerSaveDto.status()),
+                Status.CREATED,
                 null,
                 null,
                 offerSaveDto.title(),
                 Condition.valueOf(offerSaveDto.condition()),
                 Category.valueOf(offerSaveDto.category()),
                 offerSaveDto.description(),
-                new PhotoId(offerSaveDto.photoId())
+                new PhotoId(UUID.randomUUID())
         );
     }
 

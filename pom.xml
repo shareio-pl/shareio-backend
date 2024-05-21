@@ -190,6 +190,16 @@
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
+<!--                    <execution>-->
+<!--                        <id>prepare-agent-integration</id>-->
+<!--                        <goals>-->
+<!--                            <goal>prepare-agent-integration</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <destFile>${project.build.directory}/jacoco-integration.exec</destFile>-->
+<!--                            <append>true</append>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
                     <!-- TODO: UNCOMMENT THIS WHEN WE FINISH -->
                     <!--                    <execution>-->
                     <!--                        <id>check-coverage</id>-->

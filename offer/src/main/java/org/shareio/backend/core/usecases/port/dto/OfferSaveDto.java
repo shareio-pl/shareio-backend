@@ -7,12 +7,10 @@ public record OfferSaveDto(
         UUID ownerId,
         AddressSaveDto addressSaveDto,
         LocalDateTime creationDate,
-        String status,
         String title,
         String condition,
         String category,
-        String description,
-        UUID photoId
+        String description
 ) {
 
 }
