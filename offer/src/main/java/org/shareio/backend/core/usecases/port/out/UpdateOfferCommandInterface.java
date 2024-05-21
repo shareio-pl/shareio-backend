@@ -1,7 +1,7 @@
 package org.shareio.backend.core.usecases.port.out;
 
-import org.shareio.backend.core.model.Offer;
+import org.shareio.backend.core.model.OfferSnapshot;
 
 public interface UpdateOfferCommandInterface {
-    void updateOffer(Offer offer);
+    void updateOffer(OfferSnapshot offerSnapshot);
 }
