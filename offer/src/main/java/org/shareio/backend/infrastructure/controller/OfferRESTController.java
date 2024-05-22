@@ -165,7 +165,7 @@ public class OfferRESTController {
         return new ErrorResponse(Const.notImplementedErrorCode, HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @RequestMapping(value = "/reserve", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/reserve", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> reserveOffer(@RequestBody OfferReserveDto offerReserveDto) {
         UUID offerId = reserveOfferUseCaseInterface.reserveOffer(offerReserveDto);
         return new CorrectResponse(offerId, Const.successErrorCode, HttpStatus.OK);

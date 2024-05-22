@@ -2,11 +2,11 @@ package org.shareio.backend.infrastructure.dbadapter.adapters;
 
 import jakarta.transaction.Transactional;
 import org.shareio.backend.core.model.OfferSnapshot;
+import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.core.usecases.port.out.*;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.UserEntity;
-import org.shareio.backend.infrastructure.dbadapter.mappers.AddressDatabaseMapper;
 import org.shareio.backend.infrastructure.dbadapter.mappers.OfferDatabaseMapper;
 import org.shareio.backend.infrastructure.dbadapter.mappers.ReviewMapper;
 import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
@@ -17,8 +17,9 @@ import java.util.*;
 
 @Service
 public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterface, GetOffersByNameDaoInterface,
-        RemoveOfferCommandInterface, SaveOfferCommandInterface, UpdateOfferCommandInterface, GetOffersByUserDaoInterface,
-        UpdateOfferSaveReviewCommandInterface, UpdateOfferReserveOfferCommandInterface {
+        RemoveOfferCommandInterface, SaveOfferCommandInterface, UpdateOfferChangeMetadataCommandInterface, GetOffersByUserDaoInterface,
+        UpdateOfferSaveReviewCommandInterface, UpdateOfferReserveOfferCommandInterface, UpdateOfferDereserveOfferCommandInterface,
+        GetAllOffersByStatusDaoInterface {
     final OfferRepository offerRepository;
     final UserRepository userRepository;
 
@@ -73,12 +74,20 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
     // UPDATE
 
     @Override
-    public void updateOffer(OfferSnapshot offerSnapshot) {
+    public void updateOfferMetadata(OfferSnapshot offerSnapshot) {
         Optional<OfferEntity> offerEntity = offerRepository.findByOfferId(offerSnapshot.offerId().getId());
         OfferEntity offerEntityFromDb = offerEntity.orElseThrow(NoSuchElementException::new);
         offerEntityFromDb.setTitle(offerSnapshot.title());
         offerEntityFromDb.setDescription(offerSnapshot.description());
-        offerEntityFromDb.setAddress(AddressDatabaseMapper.toEntity(offerSnapshot.address()));
+        offerEntityFromDb.getAddress().setCountry(offerSnapshot.address().getCountry());
+        offerEntityFromDb.getAddress().setRegion(offerSnapshot.address().getRegion());
+        offerEntityFromDb.getAddress().setCity(offerSnapshot.address().getCity());
+        offerEntityFromDb.getAddress().setStreet(offerSnapshot.address().getStreet());
+        offerEntityFromDb.getAddress().setHouseNumber(offerSnapshot.address().getHouseNumber());
+        offerEntityFromDb.getAddress().setFlatNumber(offerSnapshot.address().getFlatNumber());
+        offerEntityFromDb.getAddress().setPostCode(offerSnapshot.address().getPostCode());
+        offerEntityFromDb.getAddress().setLatitude(offerSnapshot.address().getLocation().getLatitude());
+        offerEntityFromDb.getAddress().setLongitude(offerSnapshot.address().getLocation().getLongitude());
         offerEntityFromDb.setCondition(offerSnapshot.condition());
         offerEntityFromDb.setCategory(offerSnapshot.category());
         offerRepository.save(offerEntityFromDb);
@@ -103,6 +112,16 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
         offerRepository.save(offerEntityFromDb);
     }
 
+    @Override
+    public void dereserveOffer(OfferSnapshot offerSnapshot) {
+        Optional<OfferEntity> offerEntity = offerRepository.findByOfferId(offerSnapshot.offerId().getId());
+        OfferEntity offerEntityFromDb = offerEntity.orElseThrow(NoSuchElementException::new);
+        offerEntityFromDb.setReceiver(null); // offerSnapshot.receiver()
+        offerEntityFromDb.setStatus(offerSnapshot.status());
+        offerEntityFromDb.setReservationDate(offerSnapshot.reservationDate());
+        offerRepository.save(offerEntityFromDb);
+    }
+
     // DELETE
 
     @Override
@@ -112,5 +131,9 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
     }
 
 
-
+    @Override
+    public List<OfferGetDto> getAllOffersByStatus(Status status) {
+        ArrayList<OfferEntity> offerList = (ArrayList<OfferEntity>) offerRepository.findAllByStatus(status);
+        return offerList.stream().map(OfferDatabaseMapper::toDto).toList();
+    }
 }
