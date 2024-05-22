@@ -35,9 +35,11 @@ public class Const {
     public static final String illegalArgumentErrorCode = "IllArgErr";
     public static final String cannotDetermineAddressErrorCode = "CantDetAddrErr";
     public static final String APINotRespondingErrorCode = "ApiNotResp";
+    public static final String unsupportedMediaTypeErrorCode = "UnsuppMediaTypeErr";
+
 
     // ----------------- DEFAULTS ------------------
 
-    public static final UUID defaultPhotoId = UUID.fromString("94416390-3990-48f3-b9be-de29fa446c04");
+    public static final UUID defaultPhotoId = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
 }

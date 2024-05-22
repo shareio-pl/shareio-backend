@@ -138,12 +138,17 @@ public class OfferRESTController {
         String serverUrl = imageServiceUrl+ "/image/createPNG/" + photoId;
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate
-                .postForEntity(serverUrl, requestEntity, String.class);
-
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            return new ErrorResponse(Const.APINotRespondingErrorCode + ": Photo could not be added", HttpStatus.INTERNAL_SERVER_ERROR);
+        try {
+            ResponseEntity<String> response = restTemplate
+                    .postForEntity(serverUrl, requestEntity, String.class);
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                photoId = Const.defaultPhotoId;
+            }
+        } catch( Exception ex){
+            log.error(Const.unsupportedMediaTypeErrorCode + ": Photo could not be added");
+            photoId = Const.defaultPhotoId;
         }
+
 
 
         try {
