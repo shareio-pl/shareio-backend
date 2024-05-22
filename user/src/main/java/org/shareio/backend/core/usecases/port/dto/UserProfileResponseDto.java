@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
-public record UserProfileResponseDto(
+public record UserProfileResponseDto( // TODO: flatten
         UserId userId,
         String email,
         String name,
