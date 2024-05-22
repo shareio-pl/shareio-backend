@@ -14,34 +14,67 @@ public class OfferInfrastructureMapper {
         if (offerSnapshot.status().equals(Status.RESERVED) && !Objects.isNull(offerSnapshot.reservationDate())) {
             unreservationDate = offerSnapshot.reservationDate().plus(Const.offerReservationDuration);
         }
-        return new OfferResponseDto(
-                offerSnapshot.offerId().getId(),
-                offerSnapshot.creationDate(),
-                offerSnapshot.status().toString(),
+        if (Objects.nonNull(offerSnapshot.reviewSnapshot())) {
+            return new OfferResponseDto(
+                    offerSnapshot.offerId().getId(),
+                    offerSnapshot.creationDate(),
+                    offerSnapshot.status().toString(),
 
-                offerSnapshot.address().getCity(),
-                offerSnapshot.address().getStreet(),
-                "1,5 km", // TODO: distance calculation when getting user from sessions will be ready
-                offerSnapshot.address().getLocation().getLatitude(),
-                offerSnapshot.address().getLocation().getLongitude(),
+                    offerSnapshot.address().getCity(),
+                    offerSnapshot.address().getStreet(),
+                    "1,5 km", // TODO: distance calculation when getting user from sessions will be ready
+                    offerSnapshot.address().getLocation().getLatitude(),
+                    offerSnapshot.address().getLocation().getLongitude(),
 
-                offerSnapshot.title(),
-                offerSnapshot.condition().polishName(),
-                offerSnapshot.category().polishName(),
-                offerSnapshot.description(),
-                offerSnapshot.photoId().getId(),
+                    offerSnapshot.title(),
+                    offerSnapshot.condition().polishName(),
+                    offerSnapshot.category().polishName(),
+                    offerSnapshot.description(),
+                    offerSnapshot.photoId().getId(),
 
-                offerSnapshot.owner().userId().getId(),
-                offerSnapshot.owner().name(),
-                offerSnapshot.owner().surname(),
-                offerSnapshot.owner().photoId().getId(),
-                0.0, // TODO: offerSnapshot.owner().rating()
-                0, // TODO: offerSnapshot.owner().reviewCount()
+                    offerSnapshot.owner().userId().getId(),
+                    offerSnapshot.owner().name(),
+                    offerSnapshot.owner().surname(),
+                    offerSnapshot.owner().photoId().getId(),
+                    0.0, // TODO: offerSnapshot.owner().rating()
+                    0, // TODO: offerSnapshot.owner().reviewCount()
 
-                unreservationDate,
-                offerSnapshot.reviewSnapshot().reviewId().getId(),
-                offerSnapshot.reviewSnapshot().value(),
-                offerSnapshot.reviewSnapshot().date()
-        );
+                    unreservationDate,
+                    offerSnapshot.reviewSnapshot().reviewId().getId(),
+                    offerSnapshot.reviewSnapshot().value(),
+                    offerSnapshot.reviewSnapshot().date()
+            );
+        }
+        else {
+            return new OfferResponseDto(
+                    offerSnapshot.offerId().getId(),
+                    offerSnapshot.creationDate(),
+                    offerSnapshot.status().toString(),
+
+                    offerSnapshot.address().getCity(),
+                    offerSnapshot.address().getStreet(),
+                    "1,5 km", // TODO: distance calculation when getting user from sessions will be ready
+                    offerSnapshot.address().getLocation().getLatitude(),
+                    offerSnapshot.address().getLocation().getLongitude(),
+
+                    offerSnapshot.title(),
+                    offerSnapshot.condition().polishName(),
+                    offerSnapshot.category().polishName(),
+                    offerSnapshot.description(),
+                    offerSnapshot.photoId().getId(),
+
+                    offerSnapshot.owner().userId().getId(),
+                    offerSnapshot.owner().name(),
+                    offerSnapshot.owner().surname(),
+                    offerSnapshot.owner().photoId().getId(),
+                    0.0, // TODO: offerSnapshot.owner().rating()
+                    0, // TODO: offerSnapshot.owner().reviewCount()
+
+                    unreservationDate,
+                    null,
+                    null,
+                    null
+            );
+        }
     }
 }
