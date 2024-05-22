@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.shareio.backend.Const;
+import org.shareio.backend.EnvGetter;
 import org.shareio.backend.controller.responses.CorrectResponse;
 import org.shareio.backend.controller.responses.ErrorResponse;
 import org.shareio.backend.core.model.vo.Category;
@@ -40,6 +41,7 @@ public class OfferRESTController {
     ReserveOfferUseCaseInterface reserveOfferUseCaseInterface;
     GetOffersByNameUseCaseInterface getOffersByNameUseCaseInterface;
     OfferRepository offerRepository;
+
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getOffer(@PathVariable(value = "id") UUID id) {
@@ -121,6 +123,7 @@ public class OfferRESTController {
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Object> addOffer(@Valid @RequestPart("json") OfferSaveDto offerSaveDto, @RequestPart(value = "file", required = false) MultipartFile file) {
         UUID photoId = UUID.randomUUID();
+        String imageServiceUrl = EnvGetter.getImage();
         Resource fileResource = file.getResource();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -131,7 +134,7 @@ public class OfferRESTController {
         HttpEntity<MultiValueMap<String, Object>> requestEntity
                 = new HttpEntity<>(body, headers);
 
-        String serverUrl = "http://image:8084/image/createPNG/" + photoId;
+        String serverUrl = imageServiceUrl+ "/image/createPNG/" + photoId;
 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate
