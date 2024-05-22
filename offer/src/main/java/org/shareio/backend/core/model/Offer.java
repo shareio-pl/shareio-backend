@@ -35,7 +35,9 @@ public class Offer {
     public static Offer fromDto(OfferGetDto offerGetDto) {
         User receiver = null;
         Review review = null;
-        if (Status.valueOf(offerGetDto.status()).equals(Status.RESERVED)) {
+        if (   Status.valueOf(offerGetDto.status()).equals(Status.RESERVED)
+            || Status.valueOf(offerGetDto.status()).equals(Status.FINISHED)
+            ) {
             receiver = new User(null, null, null, null, null, null, null, null);
         }
         if(offerGetDto.reviewId() != null){
