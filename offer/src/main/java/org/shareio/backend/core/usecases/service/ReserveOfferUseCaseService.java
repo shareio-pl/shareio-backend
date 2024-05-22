@@ -1,38 +1,43 @@
 package org.shareio.backend.core.usecases.service;
 
 import lombok.AllArgsConstructor;
+import org.shareio.backend.core.model.Offer;
+import org.shareio.backend.core.model.User;
 import org.shareio.backend.core.model.vo.Status;
+import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
+import org.shareio.backend.core.usecases.port.dto.OfferReserveDto;
+import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
 import org.shareio.backend.core.usecases.port.in.ReserveOfferUseCaseInterface;
-import org.shareio.backend.core.usecases.port.out.GetOfferFullDaoInterface;
-import org.shareio.backend.core.usecases.port.out.SaveOfferCommandInterface;
-import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
-import org.shareio.backend.infrastructure.dbadapter.entities.UserEntity;
-import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
-import org.shareio.backend.infrastructure.dbadapter.repositories.UserRepository;
+import org.shareio.backend.core.usecases.port.out.GetOfferDaoInterface;
+import org.shareio.backend.core.usecases.port.out.GetUserProfileDaoInterface;
+import org.shareio.backend.core.usecases.port.out.UpdateOfferReserveOfferCommandInterface;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
 @Service
 public class ReserveOfferUseCaseService implements ReserveOfferUseCaseInterface {
-    private final UserRepository userRepository;
-    private final OfferRepository offerRepository;
-    GetOfferFullDaoInterface getOfferFullDaoInterface;
-    SaveOfferCommandInterface saveOfferCommandInterface;
+
+    GetUserProfileDaoInterface getUserProfileDaoInterface;
+    GetOfferDaoInterface getOfferDaoInterface;
+    UpdateOfferReserveOfferCommandInterface updateOfferReserveOfferCommandInterface;
 
     @Override
-    public UUID reserveOffer(UUID offerId, UUID userId) {
+    public UUID reserveOffer(OfferReserveDto offerReserveDto) {
         //TODO validate users reserved offer count
         //TODO validate offer status
-        //TODO refactor this method entirely
-        OfferEntity offerEntity = offerRepository.findByOfferId(offerId).get();
-        offerEntity.setReservationDate(LocalDateTime.now());
-        UserEntity recieverEntity = userRepository.findByUserId(userId).get();
-        offerEntity.setReceiver(recieverEntity);
-        offerEntity.setStatus(Status.RESERVED);
-        saveOfferCommandInterface.saveOffer(null);
-        return offerEntity.getOfferId();
+        OfferGetDto offerGetDto = getOfferDaoInterface.getOfferDto(offerReserveDto.offerId()).orElseThrow(NoSuchElementException::new);
+        Offer offer = Optional.of(offerGetDto).map(Offer::fromDto).get();
+        UserProfileGetDto recieverProfileGetDto = getUserProfileDaoInterface.getUserDto(offerReserveDto.recieverId()).orElseThrow(NoSuchElementException::new);
+        User reciever = Optional.of(recieverProfileGetDto).map(User::fromDto).get();
+        offer.setReceiver(reciever);
+        offer.setReservationDate(LocalDateTime.now());
+        offer.setStatus(Status.RESERVED);
+        updateOfferReserveOfferCommandInterface.reserveOffer(offer.toSnapshot());
+        return offer.getOfferId().getId();
     }
 }

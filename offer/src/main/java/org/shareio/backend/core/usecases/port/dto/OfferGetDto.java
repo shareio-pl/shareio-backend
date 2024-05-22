@@ -8,9 +8,14 @@ public record OfferGetDto(
         LocalDateTime creationDate,
         String status,
 
+        UUID addressId,
+        String country,
+        String region,
         String city,
         String street,
         String houseNumber,
+        String flatNumber,
+        String postCode,
         //String distance,
         Double latitude,
         Double longitude,
@@ -28,6 +33,9 @@ public record OfferGetDto(
         Double ownerRating,
         Integer ownerReviewCount,
 
-        LocalDateTime reservationDate
+        LocalDateTime reservationDate,
+        UUID reviewId,
+        Float revievValue,
+        LocalDateTime reviewDate
 ) {
 }

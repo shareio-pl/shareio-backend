@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.shareio.backend.Const;
 import org.shareio.backend.core.model.vo.*;
-import org.shareio.backend.core.usecases.port.dto.OfferFullGetDto;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.core.usecases.port.dto.OfferSaveDto;
 
@@ -31,16 +30,24 @@ public class Offer {
     private Category category;
     private String description;
     private PhotoId photoId;
+    private Review review;
 
     public static Offer fromDto(OfferGetDto offerGetDto) {
         User receiver = null;
-        if (Status.valueOf(offerGetDto.status()).equals(Status.RESERVED)) {
+        Review review = null;
+        if (   Status.valueOf(offerGetDto.status()).equals(Status.RESERVED)
+            || Status.valueOf(offerGetDto.status()).equals(Status.FINISHED)
+            ) {
             receiver = new User(null, null, null, null, null, null, null, null);
+        }
+        if(offerGetDto.reviewId() != null){
+            review = new Review(new ReviewId(offerGetDto.reviewId()), offerGetDto.revievValue(), offerGetDto.reviewDate());
+
         }
         return new Offer(
                 new OfferId(offerGetDto.offerId()),
                 new User(new UserId(offerGetDto.ownerId()), null, offerGetDto.ownerName(), offerGetDto.ownerSurname(), null, new PhotoId(offerGetDto.ownerPhotoId()), null, null),
-                new Address(null, null, null, offerGetDto.city(), offerGetDto.street(), offerGetDto.houseNumber(), null, null, new Location(offerGetDto.latitude(), offerGetDto.longitude())),
+                new Address(new AddressId(offerGetDto.addressId()), offerGetDto.country(), offerGetDto.region(), offerGetDto.city(), offerGetDto.street(), offerGetDto.houseNumber(), offerGetDto.flatNumber(), offerGetDto.postCode(), new Location(offerGetDto.latitude(), offerGetDto.longitude())),
                 offerGetDto.creationDate(),
                 Status.valueOf(offerGetDto.status()),
                 receiver,
@@ -49,28 +56,8 @@ public class Offer {
                 Condition.valueOf(offerGetDto.condition()),
                 Category.valueOf(offerGetDto.category()),
                 offerGetDto.description(),
-                new PhotoId(offerGetDto.photoId())
-        );
-    }
-
-    public static Offer fromDto(OfferFullGetDto offerFullGetDto) {
-        User receiver = null;
-        if (Status.valueOf(offerFullGetDto.status()).equals(Status.RESERVED)) {
-            receiver = new User(null, null, null, null, null, null, null, null);
-        }
-        return new Offer(
-                new OfferId(offerFullGetDto.offerId()),
-                new User(new UserId(offerFullGetDto.ownerId()), null, offerFullGetDto.ownerName(), offerFullGetDto.ownerSurname(), null, new PhotoId(offerFullGetDto.ownerPhotoId()), null, null),
-                new Address(new AddressId(offerFullGetDto.addressId()), offerFullGetDto.country(), offerFullGetDto.region(), offerFullGetDto.city(), offerFullGetDto.street(), offerFullGetDto.houseNumber(), null, null, new Location(offerFullGetDto.latitude(), offerFullGetDto.longitude())),
-                offerFullGetDto.creationDate(),
-                Status.valueOf(offerFullGetDto.status()),
-                receiver,
-                offerFullGetDto.reservationDate(),
-                offerFullGetDto.title(),
-                Condition.valueOf(offerFullGetDto.condition()),
-                Category.valueOf(offerFullGetDto.category()),
-                offerFullGetDto.description(),
-                new PhotoId(offerFullGetDto.photoId())
+                new PhotoId(offerGetDto.photoId()),
+                review
         );
     }
 
@@ -87,15 +74,20 @@ public class Offer {
                 Condition.valueOf(offerSaveDto.condition()),
                 Category.valueOf(offerSaveDto.category()),
                 offerSaveDto.description(),
-                new PhotoId(UUID.randomUUID())
+                new PhotoId(UUID.randomUUID()),
+                null
         );
     }
 
     public OfferSnapshot toSnapshot() {
         UserSnapshot receiverSnapshot = null;
+        ReviewSnapshot reviewSnapshot = null;
         if (this.status.equals(Status.RESERVED) && this.receiver != null) {
             receiverSnapshot = new UserSnapshot(this.receiver);
         }
-        return new OfferSnapshot(this, receiverSnapshot);
+        if(this.review != null){
+            reviewSnapshot = new ReviewSnapshot(this.review);
+        }
+        return new OfferSnapshot(this, receiverSnapshot, reviewSnapshot);
     }
 }

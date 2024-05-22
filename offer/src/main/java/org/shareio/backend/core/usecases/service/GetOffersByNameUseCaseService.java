@@ -5,11 +5,9 @@ import org.shareio.backend.core.model.Offer;
 import org.shareio.backend.core.model.OfferSnapshot;
 import org.shareio.backend.core.model.OfferValidator;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
-import org.shareio.backend.core.usecases.port.dto.OfferResponseDto;
 import org.shareio.backend.core.usecases.port.in.GetOffersByNameUseCaseInterface;
 import org.shareio.backend.core.usecases.port.out.GetOffersByNameDaoInterface;
 import org.shareio.backend.exceptions.MultipleValidationException;
-import org.shareio.backend.infrastructure.mappers.OfferInfrastructureMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

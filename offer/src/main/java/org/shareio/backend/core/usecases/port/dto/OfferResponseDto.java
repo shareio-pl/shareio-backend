@@ -27,6 +27,9 @@ public record OfferResponseDto(
         Double ownerRating,
         Integer ownerReviewCount,
 
-        LocalDateTime unreservationDate
+        LocalDateTime unreservationDate,
+        UUID reviewId,
+        Float revievValue,
+        LocalDateTime reviewDate
 ) {
 }

@@ -21,6 +21,7 @@ import static org.shareio.backend.core.model.UserValidator.validateName;
 
 public class OfferValidator {
     public static void validateOffer(OfferGetDto offerGetDto) throws MultipleValidationException {
+        //TODO: CHECK DATA INTEGRITY
         Map<String, String> errorMap = new HashMap<>();
         try {
             validateDate(offerGetDto.creationDate());
