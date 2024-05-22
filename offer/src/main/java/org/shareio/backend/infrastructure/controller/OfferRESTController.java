@@ -122,7 +122,7 @@ public class OfferRESTController {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Object> addOffer(@Valid @RequestPart("json") OfferSaveDto offerSaveDto, @RequestPart(value = "file", required = false) MultipartFile file) {
+    public ResponseEntity<Object> addOffer(@Valid @RequestPart("json") OfferSaveDto offerSaveDto, @RequestPart(value = "file") MultipartFile file) {
         UUID photoId = UUID.randomUUID();
         String imageServiceUrl = EnvGetter.getImage();
         Resource fileResource = file.getResource();
@@ -138,13 +138,18 @@ public class OfferRESTController {
         String serverUrl = imageServiceUrl+ "/image/createPNG/" + photoId;
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate
-                .postForEntity(serverUrl, requestEntity, String.class);
+        try {
+            ResponseEntity<String> response = restTemplate
+                    .postForEntity(serverUrl, requestEntity, String.class);
 
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            return new ErrorResponse(Const.APINotRespondingErrorCode + ": Photo could not be added", HttpStatus.INTERNAL_SERVER_ERROR);
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                return new ErrorResponse(Const.APINotRespondingErrorCode + ": Photo could not be added", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
+        catch(Exception e){
+            return new ErrorResponse(Const.APINotRespondingErrorCode + ": Photo could not be added", HttpStatus.INTERNAL_SERVER_ERROR);
 
+        }
 
         try {
             getUserProfileUseCaseInterface.getUserProfileResponseDto(offerSaveDto.ownerId());
