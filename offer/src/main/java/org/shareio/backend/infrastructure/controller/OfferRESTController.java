@@ -1,7 +1,10 @@
 package org.shareio.backend.infrastructure.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.shareio.backend.Const;
+import org.shareio.backend.EnvGetter;
 import org.shareio.backend.controller.responses.CorrectResponse;
 import org.shareio.backend.controller.responses.ErrorResponse;
 import org.shareio.backend.core.model.vo.Category;
@@ -13,16 +16,21 @@ import org.shareio.backend.core.usecases.port.out.GetLocationDaoInterface;
 import org.shareio.backend.exceptions.LocationCalculationException;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
-import org.springframework.http.HttpStatus;
+import org.springframework.core.io.Resource;
+import org.springframework.http.*;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping(value = "/offer/*")
+@Slf4j
 public class OfferRESTController {
     AddOfferUseCaseInterface addOfferUseCaseInterface;
     GetUserProfileUseCaseInterface getUserProfileUseCaseInterface;
@@ -33,6 +41,7 @@ public class OfferRESTController {
     ReserveOfferUseCaseInterface reserveOfferUseCaseInterface;
     GetOffersByNameUseCaseInterface getOffersByNameUseCaseInterface;
     OfferRepository offerRepository;
+
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getOffer(@PathVariable(value = "id") UUID id) {
@@ -111,17 +120,41 @@ public class OfferRESTController {
         return new ErrorResponse(Const.notImplementedErrorCode, HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> addOffer(@RequestBody OfferSaveDto offerSaveDto) {
+    @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Object> addOffer(@Valid @RequestPart("json") OfferSaveDto offerSaveDto, @RequestPart(value = "file", required = false) MultipartFile file) {
+        UUID photoId = UUID.randomUUID();
+        String imageServiceUrl = EnvGetter.getImage();
+        Resource fileResource = file.getResource();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        MultiValueMap<String, Object> body
+                = new LinkedMultiValueMap<>();
+        body.add("file", fileResource);
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity
+                = new HttpEntity<>(body, headers);
+
+        String serverUrl = imageServiceUrl+ "/image/createPNG/" + photoId;
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate
+                .postForEntity(serverUrl, requestEntity, String.class);
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            return new ErrorResponse(Const.APINotRespondingErrorCode + ": Photo could not be added", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
         try {
             getUserProfileUseCaseInterface.getUserProfileResponseDto(offerSaveDto.ownerId());
-            OfferSaveResponseDto offerSaveResponseDto = addOfferUseCaseInterface.addOffer(offerSaveDto);
+            OfferSaveResponseDto offerSaveResponseDto = addOfferUseCaseInterface.addOffer(offerSaveDto, photoId);
             return new CorrectResponse(offerSaveResponseDto, Const.successErrorCode, HttpStatus.OK);
         } catch (MultipleValidationException e) {
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (LocationCalculationException e) {
             return new ErrorResponse(Const.cannotDetermineAddressErrorCode, HttpStatus.NO_CONTENT);
         } catch (Exception e) {
+            log.error(e.toString());
             return new ErrorResponse(Const.APINotRespondingErrorCode, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
