@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 public class AddUserUseCaseServiceTests {
 
     AutoCloseable autoCloseable;
-    String existingUserEmail = "test@test.com";
+    final String existingUserEmail = "test@test.com";
     UserAddDto userAddDto;
 
     @Mock

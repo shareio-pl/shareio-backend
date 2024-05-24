@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="test_db@localhost" uuid="7fa2ca98-ca72-466c-b210-9a749100a9d6">
+    <data-source source="LOCAL" name="Shareio" uuid="4c14edae-67d2-4278-8a7d-8a76e1a980e8">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
