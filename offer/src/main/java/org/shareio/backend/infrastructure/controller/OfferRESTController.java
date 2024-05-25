@@ -1,5 +1,6 @@
 package org.shareio.backend.infrastructure.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.shareio.backend.core.usecases.port.out.GetLocationDaoInterface;
 import org.shareio.backend.exceptions.LocationCalculationException;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
+import org.shareio.backend.security.AuthenticationHandler;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -41,6 +43,7 @@ public class OfferRESTController {
     ReserveOfferUseCaseInterface reserveOfferUseCaseInterface;
     GetOffersByNameUseCaseInterface getOffersByNameUseCaseInterface;
     OfferRepository offerRepository;
+    AuthenticationHandler authenticationHandler;
 
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -170,9 +173,15 @@ public class OfferRESTController {
     }
 
     @RequestMapping(value = "/reserve", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> reserveOffer(@RequestBody OfferReserveDto offerReserveDto) {
-        UUID offerId = reserveOfferUseCaseInterface.reserveOffer(offerReserveDto);
-        return new CorrectResponse(offerId, Const.successErrorCode, HttpStatus.OK);
+    public ResponseEntity<Object> reserveOffer(HttpServletRequest httpRequest, @RequestBody OfferReserveDto offerReserveDto) {
+
+       if(authenticationHandler.authenticateRequestForUserIdentity(httpRequest, offerReserveDto.recieverId())){
+            UUID offerId = reserveOfferUseCaseInterface.reserveOffer(offerReserveDto);
+            return new CorrectResponse(offerId, Const.successErrorCode, HttpStatus.OK);
+        }
+        else {
+            return new ErrorResponse("NO PERMISSIONS", HttpStatus.FORBIDDEN);
+        }
     }
 
     @RequestMapping(value = "/addReview", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

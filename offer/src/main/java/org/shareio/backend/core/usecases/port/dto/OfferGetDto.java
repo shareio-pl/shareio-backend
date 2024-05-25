@@ -35,7 +35,7 @@ public record OfferGetDto(
 
         LocalDateTime reservationDate,
         UUID reviewId,
-        Float revievValue,
+        Double revievValue,
         LocalDateTime reviewDate
 ) {
 }

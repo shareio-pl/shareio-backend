@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class Review {
     @Setter(AccessLevel.NONE)
     private ReviewId reviewId;
-    private Float value; // 1-5 stars
+    private Double value; // 1-5 stars
     private LocalDateTime date;
 
     public ReviewSnapshot toSnapshot() {

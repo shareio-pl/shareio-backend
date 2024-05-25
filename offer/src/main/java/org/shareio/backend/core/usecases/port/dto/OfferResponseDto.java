@@ -29,7 +29,7 @@ public record OfferResponseDto(
 
         LocalDateTime unreservationDate,
         UUID reviewId,
-        Float revievValue,
+        Double revievValue,
         LocalDateTime reviewDate
 ) {
 }

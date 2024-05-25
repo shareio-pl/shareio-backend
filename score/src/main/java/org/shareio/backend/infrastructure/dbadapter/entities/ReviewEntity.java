@@ -19,6 +19,6 @@ public class ReviewEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dbId;
     private UUID reviewId;
-    private Float reviewValue;
+    private Double reviewValue;
     private LocalDateTime reviewDate;
 }

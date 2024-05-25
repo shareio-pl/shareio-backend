@@ -52,11 +52,21 @@ public class AddressRESTController {
         }
     }
 
-    @RequestMapping(value = "/modify/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> modifyAddress(@PathVariable(value = "id") UUID id) {
-        // TODO: check role in header
-        // if admin, execute request
-        // if user, check if address in user or address in any of user's offer, then execute request
-        return new ErrorResponse(Const.notImplementedErrorCode, HttpStatus.NOT_IMPLEMENTED);
-    }
+//    @RequestMapping(value = "/modify/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<Object> modifyAddress(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
+//        // TODO: check role in header
+//        // if admin, execute request
+//        // if user, check if address in user or address in any of user's offer, then execute request
+//        log.error("ROLE {}", httpRequest.getHeaders("role").nextElement());
+//        if (Objects.equals(httpRequest.getHeaders("role").nextElement(),"USER"))
+//        {
+//            return new CorrectResponse("USER", Const.successErrorCode, HttpStatus.OK);
+//        }
+//        else if (Objects.equals(httpRequest.getHeaders("role").nextElement(),"ADMIN")) {
+//            return new CorrectResponse("ADMIN", Const.successErrorCode, HttpStatus.OK);
+//        }
+//        else {
+//            return new ErrorResponse("NO ROLE", HttpStatus.BAD_REQUEST);
+//        }
+//    }
 }

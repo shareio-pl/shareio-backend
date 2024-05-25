@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan(basePackages = {"org.shareio.backend.infrastructure.controller",
         "org.shareio.backend.infrastructure.dbadapter",
         "org.shareio.backend.core.usecases.service",
+        "org.shareio.backend.security"
 })
 @EnableJpaRepositories("org.shareio.backend.infrastructure.dbadapter")
 @EntityScan("org.shareio.backend.infrastructure.dbadapter")
@@ -19,7 +20,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class Main {
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(Main.class);
-        // ... customize application settings here
         application.run(args);
     }
 }
