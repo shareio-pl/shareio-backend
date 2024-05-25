@@ -52,7 +52,7 @@ public class DeleteRESTController {
     @RequestMapping(value = "/offer/delete/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> deleteOffer(@PathVariable(value = "id") UUID id) {
         try{
-            getOfferUseCaseInterface.getOfferResponseDto(id);
+            getOfferUseCaseInterface.getOfferResponseDto(id, null, null);
         } catch (MultipleValidationException e) {
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException e) {

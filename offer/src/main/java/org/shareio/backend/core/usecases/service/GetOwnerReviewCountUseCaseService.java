@@ -16,14 +16,14 @@ public class GetOwnerReviewCountUseCaseService implements GetOwnerReviewCountUse
     GetAllOffersDaoInterface getAllOffersDaoInterface;
 
     @Override
-    public Long getUserReviewCount(UUID ownerId) {
-        return getAllOffersDaoInterface
+    public Integer getUserReviewCount(UUID ownerId) {
+        return Math.toIntExact(getAllOffersDaoInterface
                 .getAllOffers()
                 .stream()
                 .map(Offer::fromDto)
                 .filter(offer -> Objects.equals(offer.getOwner().getUserId().getId(), ownerId))
                 .filter(offer -> Objects.nonNull(offer.getReview()))
-                .count();
+                .count());
 
     }
 }

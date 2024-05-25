@@ -52,7 +52,9 @@ public class OfferRESTController {
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getOffer(@PathVariable(value = "id") UUID id) {
         try {
-            OfferResponseDto offerResponseDto = getOfferUseCaseInterface.getOfferResponseDto(id);
+            Integer reviewCount = getOwnerReviewCountUseCaseInterface.getUserReviewCount(id);
+            Double averageUserReviewValue = getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(id);
+            OfferResponseDto offerResponseDto = getOfferUseCaseInterface.getOfferResponseDto(id, reviewCount, averageUserReviewValue);
             return new CorrectResponse(offerResponseDto, Const.successErrorCode, HttpStatus.OK);
         } catch (MultipleValidationException e) {
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
@@ -226,15 +228,4 @@ public class OfferRESTController {
         return new ErrorResponse(Const.notImplementedErrorCode, HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @RequestMapping(value="/getReviewCount/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getReviewCount(@PathVariable(value = "userId") UUID userId) {
-        Long reviewCount = getOwnerReviewCountUseCaseInterface.getUserReviewCount(userId);
-        return new CorrectResponse(reviewCount, Const.successErrorCode, HttpStatus.OK);
-    }
-
-    @RequestMapping(value="/getAverageReviewCount/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getAverageReviewCount(@PathVariable(value = "userId") UUID userId) {
-        Double reviewCount = getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(userId);
-        return new CorrectResponse(reviewCount, Const.successErrorCode, HttpStatus.OK);
-    }
 }
