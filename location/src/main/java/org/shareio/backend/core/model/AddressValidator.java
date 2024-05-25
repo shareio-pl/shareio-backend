@@ -2,7 +2,6 @@ package org.shareio.backend.core.model;
 
 import org.shareio.backend.Const;
 import org.shareio.backend.core.usecases.port.dto.AddressGetDto;
-import org.shareio.backend.core.usecases.port.dto.AddressSaveDto;
 import org.shareio.backend.core.usecases.port.dto.LocationGetDto;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.exceptions.ValidationException;
@@ -54,40 +53,48 @@ public class AddressValidator {
         if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.multipleValidationErrorCode, errorMap);
     }
 
-    public static void validateAddressSaveDto(AddressSaveDto addressSaveDto) throws MultipleValidationException {
+    public static void validateAddressSaveInput(
+            String country,
+            String region,
+            String city,
+            String street,
+            String houseNumber,
+            String flatNumber,
+            String postCode
+    ) throws MultipleValidationException {
         Map<String, String> errorMap = new HashMap<>();
         try {
-            validateCountry(addressSaveDto.country());
+            validateCountry(country);
         } catch (ValidationException validationException) {
             errorMap.put("Country", validationException.getMessage());
         }
         try {
-            validateRegion(addressSaveDto.region());
+            validateRegion(region);
         } catch (ValidationException validationException) {
             errorMap.put("Region", validationException.getMessage());
         }
         try {
-            validateCity(addressSaveDto.city());
+            validateCity(city);
         } catch (ValidationException validationException) {
             errorMap.put("City", validationException.getMessage());
         }
         try {
-            validateStreet(addressSaveDto.street());
+            validateStreet(street);
         } catch (ValidationException validationException) {
             errorMap.put("Street", validationException.getMessage());
         }
         try {
-            validateHouseNumber(addressSaveDto.houseNumber());
+            validateHouseNumber(houseNumber);
         } catch (ValidationException validationException) {
             errorMap.put("HouseNumber", validationException.getMessage());
         }
         try {
-            validateFlatNumber(addressSaveDto.flatNumber());
+            validateFlatNumber(flatNumber);
         } catch (ValidationException validationException) {
             errorMap.put("FlatNumber", validationException.getMessage());
         }
         try {
-            validatePostCode(addressSaveDto.postCode());
+            validatePostCode(postCode);
         } catch (ValidationException validationException) {
             errorMap.put("PostCode", validationException.getMessage());
         }

@@ -67,13 +67,13 @@ public class User {
 
                 new Address(
                         new AddressId(UUID.randomUUID()),
-                        userSaveDto.addressSaveDto().country(),
-                        userSaveDto.addressSaveDto().region(),
-                        userSaveDto.addressSaveDto().city(),
-                        userSaveDto.addressSaveDto().street(),
-                        userSaveDto.addressSaveDto().houseNumber(),
-                        userSaveDto.addressSaveDto().flatNumber(),
-                        userSaveDto.addressSaveDto().postCode(),
+                        userSaveDto.country(),
+                        userSaveDto.region(),
+                        userSaveDto.city(),
+                        userSaveDto.street(),
+                        userSaveDto.houseNumber(),
+                        userSaveDto.flatNumber(),
+                        userSaveDto.postCode(),
                         new Location(0.0, 0.0)
                 ),
                 new Security(

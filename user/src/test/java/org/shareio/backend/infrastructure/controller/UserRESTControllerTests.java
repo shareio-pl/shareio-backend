@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.shareio.backend.core.usecases.port.dto.AddressSaveDto;
 import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
 import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
 import org.shareio.backend.core.usecases.port.out.GetUserProfileByEmailDaoInterface;
@@ -151,15 +150,13 @@ public class UserRESTControllerTests {
                 "bbb",
                 userValidEmail,
                 LocalDate.now(),
-                new AddressSaveDto(
-                        "Polska",
-                        "Łódzkie",
-                        "Łódź",
-                        "95-000",
-                        "Lutomierska",
-                        "12",
-                        "2"
-                )
+                "Polska",
+                "Łódzkie",
+                "Łódź",
+                "95-000",
+                "Lutomierska",
+                "12",
+                "2"
         );
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, userRESTController.addUser(mockHttpServletRequest, userAddDto).getStatusCode());
     }
@@ -172,15 +169,13 @@ public class UserRESTControllerTests {
                 "bbb",
                 "jan.kowal@gmail.com",
                 LocalDate.now(),
-                new AddressSaveDto(
-                        "Polska",
-                        "Łódzkie",
-                        "Łódź",
-                        "Lutomierska",
-                        "12",
-                        "",
-                        "95-020"
-                )
+                "Polska",
+                "Łódzkie",
+                "Łódź",
+                "Lutomierska",
+                "12",
+                "",
+                "95-020"
         );
         Assertions.assertEquals(HttpStatus.OK, userRESTController.addUser(mockHttpServletRequest, userAddDto).getStatusCode());
     }

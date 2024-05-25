@@ -4,10 +4,16 @@ import java.time.LocalDate;
 
 public record UserModifyDto
         (
-                AddressSaveDto addressSaveDto,
                 String name,
                 String surname,
-                LocalDate dateOfBirth
+                LocalDate dateOfBirth,
+                String country,
+                String region,
+                String city,
+                String street,
+                String houseNumber,
+                String flatNumber,
+                String postCode
         ){
 
 }

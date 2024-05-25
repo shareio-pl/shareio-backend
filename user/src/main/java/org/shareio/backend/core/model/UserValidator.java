@@ -10,7 +10,6 @@ import org.shareio.backend.validators.StringValidator;
 import org.shareio.backend.Const;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,7 +64,15 @@ public class UserValidator {
             errorMap.put("DateOfBirth", validationException.getMessage());
         }
         try{
-            AddressValidator.validateAddressSaveDto(userSaveDto.addressSaveDto());
+            AddressValidator.validateAddressSaveInput(
+                    userSaveDto.country(),
+                    userSaveDto.region(),
+                    userSaveDto.city(),
+                    userSaveDto.street(),
+                    userSaveDto.houseNumber(),
+                    userSaveDto.flatNumber(),
+                    userSaveDto.postCode()
+            );
         }
         catch(MultipleValidationException e){
             errorMap.putAll(e.getErrorMap());
@@ -92,7 +99,15 @@ public class UserValidator {
             errorMap.put("DateOfBirth", validationException.getMessage());
         }
         try{
-            AddressValidator.validateAddressSaveDto(userModifyDto.addressSaveDto());
+            AddressValidator.validateAddressSaveInput(
+                    userModifyDto.country(),
+                    userModifyDto.region(),
+                    userModifyDto.city(),
+                    userModifyDto.street(),
+                    userModifyDto.houseNumber(),
+                    userModifyDto.flatNumber(),
+                    userModifyDto.postCode()
+            );
         }
         catch(MultipleValidationException e){
             errorMap.putAll(e.getErrorMap());

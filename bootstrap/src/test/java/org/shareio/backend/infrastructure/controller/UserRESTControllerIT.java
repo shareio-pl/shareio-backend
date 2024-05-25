@@ -7,7 +7,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.shareio.backend.core.model.vo.AccountType;
-import org.shareio.backend.core.usecases.port.dto.AddressSaveDto;
 import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
 import org.shareio.backend.infrastructure.dbadapter.entities.AddressEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.SecurityEntity;
@@ -117,15 +116,13 @@ public class UserRESTControllerIT {
                 "bbb",
                 "jan.kowalski@poczta.pl",
                 LocalDate.now(),
-                new AddressSaveDto(
-                        "Polska",
-                        "Łódzkie",
-                        "Łódź",
-                        "95-000",
-                        "Lutomierska",
-                        "12",
-                        "2"
-                )
+                "Polska",
+                "Łódzkie",
+                "Łódź",
+                "95-000",
+                "Lutomierska",
+                "12",
+                "2"
         );
 
         String requestJson = objectWriter.writeValueAsString(userAddDto);
@@ -153,15 +150,13 @@ public class UserRESTControllerIT {
                 "bbb",
                 "jan.kowalski@poczta.pl",
                 LocalDate.now(),
-                new AddressSaveDto(
-                        "Polska",
-                        "Łódzkie",
-                        "Łódź",
-                        "Lutomierska",
-                        "15",
-                        "12",
-                        "95-000"
-                )
+                "Polska",
+                "Łódzkie",
+                "Łódź",
+                "Lutomierska",
+                "15",
+                "12",
+                "95-000"
         );
 
         String requestJson = objectWriter.writeValueAsString(userAddDto);

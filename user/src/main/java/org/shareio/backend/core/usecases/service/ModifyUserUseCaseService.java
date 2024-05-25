@@ -33,12 +33,12 @@ public class ModifyUserUseCaseService implements ModifyUserUseCaseInterface {
         UserValidator.validateUserModifyDto(userModifyDto);
         UserProfileGetDto userProfileGetDto = getUserProfileDaoInterface.getUserDto(userId).orElseThrow(NoSuchElementException::new);
         User user = Optional.of(userProfileGetDto).map(User::fromDto).get();
-        Address address = new Address(null, userModifyDto.addressSaveDto().country(), userModifyDto.addressSaveDto().region(), userModifyDto.addressSaveDto().city(), userModifyDto.addressSaveDto().street(), userModifyDto.addressSaveDto().houseNumber(), userModifyDto.addressSaveDto().flatNumber(), userModifyDto.addressSaveDto().postCode(), new Location(Const.defaultAddressCenterLat, Const.defaultAddressCenterLon));
+        Address address = new Address(null, userModifyDto.country(), userModifyDto.region(), userModifyDto.city(), userModifyDto.street(), userModifyDto.houseNumber(), userModifyDto.flatNumber(), userModifyDto.postCode(), new Location(Const.defaultAddressCenterLat, Const.defaultAddressCenterLon));
         user.setName(userModifyDto.name());
         user.setSurname(userModifyDto.surname());
         user.setDateOfBirth(userModifyDto.dateOfBirth());
         user.setAddress(address);
-        user.getAddress().setLocation(LocationCalculator.getLocationFromAddress(userModifyDto.addressSaveDto().country(), userModifyDto.addressSaveDto().city(), userModifyDto.addressSaveDto().street(), userModifyDto.addressSaveDto().houseNumber()));
+        user.getAddress().setLocation(LocationCalculator.getLocationFromAddress(userModifyDto.country(), userModifyDto.city(), userModifyDto.street(), userModifyDto.houseNumber()));
         updateUserChangeMetadataCommandInterface.updateUserMetadata(user.toSnapshot());
     }
 }

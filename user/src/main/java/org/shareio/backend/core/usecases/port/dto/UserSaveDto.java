@@ -9,6 +9,13 @@ public record UserSaveDto
                 String password,
                 String email,
                 LocalDate dateOfBirth,
-                AddressSaveDto addressSaveDto
+
+                String country,
+                String region,
+                String city,
+                String street,
+                String houseNumber,
+                String flatNumber,
+                String postCode
         ) {
 }
