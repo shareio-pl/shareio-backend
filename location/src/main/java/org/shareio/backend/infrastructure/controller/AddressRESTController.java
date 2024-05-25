@@ -36,7 +36,7 @@ public class AddressRESTController {
         } catch (MultipleValidationException e) {
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (NoSuchElementException noSuchElementException) {
-            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+            return new ErrorResponse(Const.noSuchElementErrorCode+": NO ADDRESS FOUND", HttpStatus.NOT_FOUND);
         }
     }
 
@@ -48,7 +48,7 @@ public class AddressRESTController {
         } catch (MultipleValidationException e) {
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (NoSuchElementException noSuchElementException) {
-            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+            return new ErrorResponse(Const.noSuchElementErrorCode+": NO LOCATION FOUND", HttpStatus.NOT_FOUND);
         }
     }
 

@@ -42,6 +42,8 @@ public class OfferRESTController {
     GetOffersByUserUseCaseInterface getOffersByUserUseCaseInterface;
     ReserveOfferUseCaseInterface reserveOfferUseCaseInterface;
     GetOffersByNameUseCaseInterface getOffersByNameUseCaseInterface;
+    GetOwnerReviewCountUseCaseInterface getOwnerReviewCountUseCaseInterface;
+    GetAverageUserReviewValueUseCaseInterface getAverageUserReviewValueUseCaseInterface;
     OfferRepository offerRepository;
     AuthenticationHandler authenticationHandler;
 
@@ -188,5 +190,17 @@ public class OfferRESTController {
     public ResponseEntity<Object> addReviewToOffer(@RequestBody OfferReviewDto offerReviewDto) {
         UUID reviewId = addReviewUseCaseInterface.addReview(offerReviewDto);
         return new CorrectResponse(reviewId, Const.successErrorCode, HttpStatus.OK);
+    }
+
+    @RequestMapping(value="/getReviewCount/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getReviewCount(@PathVariable(value = "userId") UUID userId) {
+        Long reviewCount = getOwnerReviewCountUseCaseInterface.getUserReviewCount(userId);
+        return new CorrectResponse(reviewCount, Const.successErrorCode, HttpStatus.OK);
+    }
+
+    @RequestMapping(value="/getAverageReviewCount/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getAverageReviewCount(@PathVariable(value = "userId") UUID userId) {
+        Double reviewCount = getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(userId);
+        return new CorrectResponse(reviewCount, Const.successErrorCode, HttpStatus.OK);
     }
 }

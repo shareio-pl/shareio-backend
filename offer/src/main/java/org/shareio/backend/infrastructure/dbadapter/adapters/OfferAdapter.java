@@ -135,10 +135,4 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
         offerRepository.delete(offerRepository.findByOfferId(offerId).orElseThrow(NoSuchElementException::new));
     }
 
-
-    @Override
-    public List<OfferGetDto> getAllOffersByStatus(Status status) {
-        ArrayList<OfferEntity> offerList = (ArrayList<OfferEntity>) offerRepository.findAllByStatus(status);
-        return offerList.stream().map(OfferDatabaseMapper::toDto).toList();
-    }
 }
