@@ -1,7 +1,5 @@
 package org.shareio.backend.infrastructure.controller;
 
-import org.junit.Test;
-
 public class AddressRESTControllerIT {
 
 //    @Test

@@ -18,7 +18,6 @@ import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
-import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
