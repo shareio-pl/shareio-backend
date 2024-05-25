@@ -16,7 +16,7 @@ public class DescriptionGenerator implements DescriptionGeneratorInterface {
 
     @Override
     public String generateDescription(String title, String condition, String category, String additionalData) throws IOException, InterruptedException, DescriptionGenerationException {
-        String GPTKey = EnvGetter.getAPIKey();
+        String GPTKey = EnvGetter.getGPT_APIKey();
         String offerData = title + ", " + condition + ", " + category + ", " + additionalData;
         String requestBody = "{\"model\": \"gpt-3.5-turbo\", \"messages\": [{\"role\": \"user\", \"content\": \" " + this.prompt + offerData + "\"}], \"temperature\": 1.0}";
 
@@ -36,7 +36,7 @@ public class DescriptionGenerator implements DescriptionGeneratorInterface {
 
     @Override
     public String generateDescription(String title, String condition, String category) throws IOException, InterruptedException, DescriptionGenerationException {
-        String GPTKey = EnvGetter.getAPIKey();
+        String GPTKey = EnvGetter.getGPT_APIKey();
         String offerData = title + ", " + condition + ", " + category;
         String requestBody = "{\"model\": \"gpt-3.5-turbo\", \"messages\": [{\"role\": \"user\", \"content\": \" " + this.prompt + offerData + "\"}], \"temperature\": 1.0}";
 
