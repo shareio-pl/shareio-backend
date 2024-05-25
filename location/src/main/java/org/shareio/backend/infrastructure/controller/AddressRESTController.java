@@ -52,6 +52,7 @@ public class AddressRESTController {
         }
     }
 
+//TODO: this
 //    @RequestMapping(value = "/modify/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 //    public ResponseEntity<Object> modifyAddress(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
 //        // TODO: check role in header
