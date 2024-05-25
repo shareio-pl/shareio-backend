@@ -193,7 +193,7 @@ public class OfferRESTController {
         } catch (MultipleValidationException e) {
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (LocationCalculationException e) {
-            return new ErrorResponse(Const.cannotDetermineAddressErrorCode, HttpStatus.NO_CONTENT);
+            return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             log.error(e.toString());
             return new ErrorResponse(Const.APINotRespondingErrorCode, HttpStatus.INTERNAL_SERVER_ERROR);
