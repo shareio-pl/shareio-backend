@@ -15,6 +15,7 @@ import org.shareio.backend.core.usecases.port.in.*;
 import org.shareio.backend.core.usecases.port.out.GetLocationDaoInterface;
 import org.shareio.backend.exceptions.LocationCalculationException;
 import org.shareio.backend.exceptions.MultipleValidationException;
+import org.shareio.backend.external_API.GPT.DescriptionGenerator;
 import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -86,6 +87,24 @@ public class OfferRESTController {
 
     }
 
+    @RequestMapping(value = "/getOffersByUser/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getOffersByUser(@PathVariable(value = "id") UUID id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            response.put("offerIds", getOffersByUserUseCaseInterface.getOfferResponseDtoListByUser(id));
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (MultipleValidationException e) {
+            response.put("error", e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.FAILED_DEPENDENCY);
+        } catch (NoSuchElementException e) {
+            response.put("error", e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            response.put("error", e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @RequestMapping(value = "/getOffersByName", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getOffersByName(@RequestParam String name) {
         Map<String, Object> response = new HashMap<>();
@@ -120,6 +139,23 @@ public class OfferRESTController {
         return new ErrorResponse(Const.notImplementedErrorCode, HttpStatus.NOT_IMPLEMENTED);
     }
 
+    @RequestMapping(value = "/generateDescription", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> generateDescription(@RequestParam String title, @RequestParam String condition, @RequestParam String category, @RequestParam(required = false) String additionalData) {
+        DescriptionGenerator generator = new DescriptionGenerator();
+        String description;
+        try {
+            if (additionalData == null) {
+                description = generator.generateDescription(title, condition, category);
+            } else {
+                description = generator.generateDescription(title, condition, category, additionalData);
+            }
+
+            return new CorrectResponse(description, Const.successErrorCode, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Object> addOffer(@Valid @RequestPart("json") OfferSaveDto offerSaveDto, @RequestPart(value = "file") MultipartFile file) {
         UUID photoId = UUID.randomUUID();
@@ -134,7 +170,7 @@ public class OfferRESTController {
         HttpEntity<MultiValueMap<String, Object>> requestEntity
                 = new HttpEntity<>(body, headers);
 
-        String serverUrl = imageServiceUrl+ "/image/createPNG/" + photoId;
+        String serverUrl = imageServiceUrl + "/image/createPNG/" + photoId;
 
         RestTemplate restTemplate = new RestTemplate();
         try {
@@ -144,8 +180,7 @@ public class OfferRESTController {
             if (!response.getStatusCode().is2xxSuccessful()) {
                 return new ErrorResponse(Const.APINotRespondingErrorCode + ": Photo could not be added", HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             return new ErrorResponse(Const.APINotRespondingErrorCode + ": Photo could not be added", HttpStatus.INTERNAL_SERVER_ERROR);
 
         }
@@ -164,11 +199,6 @@ public class OfferRESTController {
         }
     }
 
-    @RequestMapping(value = "/modify/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> modifyOffer(@PathVariable(value = "id") UUID id) {
-        return new ErrorResponse(Const.notImplementedErrorCode, HttpStatus.NOT_IMPLEMENTED);
-    }
-
     @RequestMapping(value = "/reserve", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> reserveOffer(@RequestBody OfferReserveDto offerReserveDto) {
         UUID offerId = reserveOfferUseCaseInterface.reserveOffer(offerReserveDto);
@@ -179,5 +209,10 @@ public class OfferRESTController {
     public ResponseEntity<Object> addReviewToOffer(@RequestBody OfferReviewDto offerReviewDto) {
         UUID reviewId = addReviewUseCaseInterface.addReview(offerReviewDto);
         return new CorrectResponse(reviewId, Const.successErrorCode, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/modify/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> modifyOffer(@PathVariable(value = "id") UUID id) {
+        return new ErrorResponse(Const.notImplementedErrorCode, HttpStatus.NOT_IMPLEMENTED);
     }
 }
