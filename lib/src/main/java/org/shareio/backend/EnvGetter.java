@@ -13,11 +13,11 @@ public class EnvGetter {
         }
     }
 
-    public static String getAPIKey() {
-        if (System.getenv("API_KEY").isBlank()) {
+    public static String getGPT_APIKey() {
+        if (System.getenv("CHAT_GPT_API_KEY").isBlank()) {
             throw new RuntimeException("Could not load service addressed from envs!");
         } else {
-            return System.getenv("API_KEY");
+            return System.getenv("CHAT_GPT_API_KEY");
         }
     }
 }
