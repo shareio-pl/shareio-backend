@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.shareio.backend.core.usecases.port.dto.UserAddDto;
+import org.shareio.backend.core.usecases.port.dto.AddressSaveDto;
+import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
 import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
 import org.shareio.backend.core.usecases.port.out.GetUserProfileByEmailDaoInterface;
 import org.shareio.backend.core.usecases.port.out.SaveUserCommandInterface;
@@ -28,7 +29,7 @@ public class AddUserUseCaseServiceTests {
 
     AutoCloseable autoCloseable;
     final String existingUserEmail = "test@test.com";
-    UserAddDto userAddDto;
+    UserSaveDto userSaveDto;
 
     @Mock
     GetUserProfileByEmailDaoInterface getUserProfileByEmailDaoInterface;
@@ -63,39 +64,45 @@ public class AddUserUseCaseServiceTests {
 
     @Test
     public void add_user_with_existing_email_and_throw_IllegalArgumentException() {
-        userAddDto = new UserAddDto(
+        userSaveDto = new UserSaveDto(
                 "Jan",
                 "Kowal",
+                "bbb",
                 existingUserEmail,
                 LocalDate.now(),
-                "bbb",
-                "Polska",
-                "Łódzkie",
-                "Łódź",
-                "95-000",
-                "Lutomierska",
-                "12",
-                "2"
+                new AddressSaveDto(
+                        "Polska",
+                        "Łódzkie",
+                        "Łódź",
+                        "95-000",
+                        "Lutomierska",
+                        "12",
+                        "2"
+                )
+
         );
-        Assertions.assertThrows(IllegalArgumentException.class, () -> addUserUseCaseService.addUser(userAddDto));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> addUserUseCaseService.addUser(userSaveDto));
     }
 
     @Test
     public void add_correct_user_and_succeed() {
-        userAddDto = new UserAddDto(
+        userSaveDto = new UserSaveDto(
                 "Jan",
                 "Kowal",
+                "bbb",
                 "jankowal@gmail.com",
                 LocalDate.now(),
-                "bbb",
-                "Polska",
-                "Łódzkie",
-                "Łódź",
-                "95-000",
-                "Lutomierska",
-                "12",
-                "2"
+                new AddressSaveDto(
+                        "Polska",
+                        "Łódzkie",
+                        "Łódź",
+                        "95-000",
+                        "Lutomierska",
+                        "12",
+                        "2"
+                )
+
         );
-        Assertions.assertDoesNotThrow(() -> addUserUseCaseService.addUser(userAddDto));
+        Assertions.assertDoesNotThrow(() -> addUserUseCaseService.addUser(userSaveDto));
     }
 }

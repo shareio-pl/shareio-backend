@@ -24,7 +24,7 @@ public class GetAddressUseCaseService implements GetAddressUseCaseInterface {
     @Override
     public AddressResponseDto getAddressResponseDto(UUID id) throws MultipleValidationException, NoSuchElementException {
         Optional<AddressGetDto> getAddressDto = getAddressDaoInterface.getAddressDto(id);
-        AddressValidator.validateAddress(getAddressDto.orElseThrow());
+        AddressValidator.validateAddressGetDto(getAddressDto.orElseThrow());
         return Optional.of(getAddressDto.map(Address::fromDto).get().toSnapshot()).map(AddressInfrastructureMapper::toDto).get();
     }
 }

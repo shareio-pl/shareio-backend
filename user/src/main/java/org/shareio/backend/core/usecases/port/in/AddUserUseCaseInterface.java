@@ -1,9 +1,9 @@
 package org.shareio.backend.core.usecases.port.in;
 
-import org.shareio.backend.core.usecases.port.dto.UserAddDto;
+import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
 
 import java.util.UUID;
 
 public interface AddUserUseCaseInterface {
-    UUID addUser(UserAddDto userAddDto);
+    UUID addUser(UserSaveDto userAddDto);
 }
