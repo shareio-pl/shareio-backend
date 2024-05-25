@@ -206,7 +206,6 @@ public class OfferRESTController {
 
     @RequestMapping(value = "/reserve", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> reserveOffer(HttpServletRequest httpRequest, @RequestBody OfferReserveDto offerReserveDto) {
-
        if(authenticationHandler.authenticateRequestForUserIdentity(httpRequest, offerReserveDto.recieverId())){
             UUID offerId = reserveOfferUseCaseInterface.reserveOffer(offerReserveDto);
             return new CorrectResponse(offerId, Const.successErrorCode, HttpStatus.OK);

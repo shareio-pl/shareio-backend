@@ -29,8 +29,7 @@ public class AuthenticationHandler {
     }
 
     public boolean authenticateRequestForUserIdentity(HttpServletRequest httpRequest, UUID userId) {
-        String logMessage = "";
-        logMessage+=("\n------- AUTHENTICATE REQUEST -------\n");
+        String logMessage = "\n------- AUTHENTICATE REQUEST -------\n";
         if(checkIfTestProfile()){
             return true;
         }
@@ -44,7 +43,7 @@ public class AuthenticationHandler {
             log.error(logMessage);
             return true;
         } else {
-            logMessage+=("Authentication failed");
+            logMessage+=("Authentication failed for user "+ httpRequest.getHeaders("id").nextElement()+": Identity mismatch!\n");
             logMessage+=(messageEnd);
             log.error(logMessage);
             return false;
@@ -54,18 +53,25 @@ public class AuthenticationHandler {
 
     public boolean authenticateRequest(HttpServletRequest httpRequest, UUID userId) {
         String logMessage = "\n------- AUTHENTICATE REQUEST -------\n";
-        String messageEnd = "------------------------------------";
+        logMessage+= "Requested endpoint: " + httpRequest.getRequestURI() + "\n";
         if(checkIfTestProfile()){
             return true;
         }
         if(checkAdminRole(httpRequest)){
             return true;
         }
-        logMessage+=("Authentication sucessful for user "+ userId+"\n");
-        logMessage+=(messageEnd);
-        log.error(logMessage);
-        return true;
-
+        if(permissionHandler.isUser(httpRequest)){
+            logMessage+=("Authentication sucessful for user "+ userId+"\n");
+            logMessage+=(messageEnd);
+            log.error(logMessage);
+            return true;
+        }
+        else {
+            logMessage+=("Authentication failed for user "+ userId+"\n");
+            logMessage+=(messageEnd);
+            log.error(logMessage);
+            return false;
+        }
         }
 
     private boolean checkIfTestProfile() {
@@ -98,7 +104,7 @@ public class AuthenticationHandler {
             return true;
         }
         else {
-            logMessage+=("User permission\n");
+            logMessage+=("Non-admin permission\n");
             logMessage+=(messageEnd);
             log.error(logMessage);
             return false;

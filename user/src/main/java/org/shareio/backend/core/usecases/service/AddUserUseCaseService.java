@@ -3,7 +3,6 @@ package org.shareio.backend.core.usecases.service;
 import lombok.AllArgsConstructor;
 import org.shareio.backend.core.model.User;
 import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
-import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
 import org.shareio.backend.core.usecases.port.in.AddUserUseCaseInterface;
 import org.shareio.backend.core.usecases.port.out.GetUserProfileByEmailDaoInterface;
 import org.shareio.backend.core.usecases.port.out.SaveUserCommandInterface;
@@ -25,7 +24,7 @@ public class AddUserUseCaseService implements AddUserUseCaseInterface {
     @Override
     public UUID addUser(UserSaveDto userAddDto) {
         try {
-            Optional<UserProfileGetDto> userProfileGetDto = getUserProfileByEmailDaoInterface.getUserDto(userAddDto.email());
+            getUserProfileByEmailDaoInterface.getUserDto(userAddDto.email());
 
             throw new IllegalArgumentException("User with such email already exists");
 
