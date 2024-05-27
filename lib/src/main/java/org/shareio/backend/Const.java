@@ -42,4 +42,10 @@ public class Const {
 
     public static final UUID defaultPhotoId = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
+
+    // ----------------- EMAIL ---------------------
+
+    public static final String messageStart = "Zgłoszony problem:\n";
+    public static final String messageEnd = "\nDziękujemy za skorzystanie z naszego panelu pomocy technicznej! \nZespół Shareio";
+
 }
