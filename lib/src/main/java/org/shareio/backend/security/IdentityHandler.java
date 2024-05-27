@@ -17,4 +17,11 @@ public class IdentityHandler {
         }
         return Objects.equals(httpRequest.getHeaders("id").nextElement(),userId.toString());
     }
+
+    public UUID getUserIdFromHeader(HttpServletRequest httpRequest){
+        if(!httpRequest.getHeaders("role").asIterator().hasNext()){
+            return null;
+        }
+        return UUID.fromString(httpRequest.getHeaders("id").nextElement());
+    }
 }
