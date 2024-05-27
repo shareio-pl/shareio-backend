@@ -7,7 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.shareio.backend.core.model.vo.AccountType;
-import org.shareio.backend.core.usecases.port.dto.UserAddDto;
+import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
 import org.shareio.backend.infrastructure.dbadapter.entities.AddressEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.SecurityEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.UserEntity;
@@ -15,6 +15,7 @@ import org.shareio.backend.infrastructure.dbadapter.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -32,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@ComponentScan("org.shareio.backend.security")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class UserRESTControllerIT {
 
@@ -108,12 +110,12 @@ public class UserRESTControllerIT {
         correctUserEntity.setSurname("Kowal");
         userRepository.save(correctUserEntity);
 
-        UserAddDto userAddDto = new UserAddDto(
+        UserSaveDto userAddDto = new UserSaveDto(
                 "Jan",
                 "Kowal",
+                "bbb",
                 "jan.kowalski@poczta.pl",
                 LocalDate.now(),
-                "bbb",
                 "Polska",
                 "Łódzkie",
                 "Łódź",
@@ -141,21 +143,20 @@ public class UserRESTControllerIT {
         UserEntity correctUserEntity = generateUserEntity(userId);
         correctUserEntity.setName("Jan");
         correctUserEntity.setSurname("Kowal");
-        userRepository.save(correctUserEntity);
 
-        UserAddDto userAddDto = new UserAddDto(
+        UserSaveDto userAddDto = new UserSaveDto(
                 "Jan",
                 "Kowal",
-                "jean.kowalski@poczta.pl",
-                LocalDate.now(),
                 "bbb",
+                "jan.kowalski@poczta.pl",
+                LocalDate.now(),
                 "Polska",
                 "Łódzkie",
                 "Łódź",
-                "95-000",
                 "Lutomierska",
+                "15",
                 "12",
-                "2"
+                "95-000"
         );
 
         String requestJson = objectWriter.writeValueAsString(userAddDto);

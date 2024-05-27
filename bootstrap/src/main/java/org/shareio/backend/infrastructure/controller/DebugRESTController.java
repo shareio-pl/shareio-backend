@@ -64,7 +64,7 @@ public class DebugRESTController {
             return new ResponseEntity<>(response, HttpStatusCode.valueOf(400));
         }
         ReviewEntity reviewEntity = new ReviewEntity(null, reviewId,
-                20.0F, LocalDateTime.now());
+                2.0, LocalDateTime.now());
         offerEntity.setReview(reviewEntity);
         offerRepository.save(offerEntity);
         response.put("id", reviewId);

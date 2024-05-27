@@ -2,6 +2,7 @@ package org.shareio.backend.core.usecases.service;
 
 import lombok.AllArgsConstructor;
 import org.shareio.backend.core.model.Offer;
+import org.shareio.backend.core.model.OfferSnapshot;
 import org.shareio.backend.core.model.OfferValidator;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.core.usecases.port.dto.OfferResponseDto;
@@ -19,11 +20,11 @@ import java.util.UUID;
 public class GetOfferUseCaseService implements GetOfferUseCaseInterface {
     GetOfferDaoInterface getOfferDaoInterface;
 
-
     @Override
-    public OfferResponseDto getOfferResponseDto(UUID id) throws MultipleValidationException {
+    public OfferResponseDto getOfferResponseDto(UUID id, Integer reviewCount, Double averageUserReviewValue) throws MultipleValidationException {
         Optional<OfferGetDto> getOfferDto = getOfferDaoInterface.getOfferDto(id);
         OfferValidator.validateOffer(getOfferDto.orElseThrow());
-        return Optional.of(getOfferDto.map(Offer::fromDto).get().toSnapshot()).map(OfferInfrastructureMapper::toDto).get();
+        OfferSnapshot offerSnapshot = getOfferDto.map(Offer::fromDto).get().toSnapshot();
+        return OfferInfrastructureMapper.toDto(offerSnapshot, reviewCount, averageUserReviewValue);
     }
 }

@@ -10,9 +10,10 @@ import org.shareio.backend.validators.StringValidator;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class AddressValidator {
-    public static void validateAddress(AddressGetDto addressGetDto) throws MultipleValidationException {
+    public static void validateAddressGetDto(AddressGetDto addressGetDto) throws MultipleValidationException {
         Map<String, String> errorMap = new HashMap<>();
         try {
             validateCountry(addressGetDto.country());
@@ -51,6 +52,55 @@ public class AddressValidator {
         }
         if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.multipleValidationErrorCode, errorMap);
     }
+
+    public static void validateAddressSaveInput(
+            String country,
+            String region,
+            String city,
+            String street,
+            String houseNumber,
+            String flatNumber,
+            String postCode
+    ) throws MultipleValidationException {
+        Map<String, String> errorMap = new HashMap<>();
+        try {
+            validateCountry(country);
+        } catch (ValidationException validationException) {
+            errorMap.put("Country", validationException.getMessage());
+        }
+        try {
+            validateRegion(region);
+        } catch (ValidationException validationException) {
+            errorMap.put("Region", validationException.getMessage());
+        }
+        try {
+            validateCity(city);
+        } catch (ValidationException validationException) {
+            errorMap.put("City", validationException.getMessage());
+        }
+        try {
+            validateStreet(street);
+        } catch (ValidationException validationException) {
+            errorMap.put("Street", validationException.getMessage());
+        }
+        try {
+            validateHouseNumber(houseNumber);
+        } catch (ValidationException validationException) {
+            errorMap.put("HouseNumber", validationException.getMessage());
+        }
+        try {
+            validateFlatNumber(flatNumber);
+        } catch (ValidationException validationException) {
+            errorMap.put("FlatNumber", validationException.getMessage());
+        }
+        try {
+            validatePostCode(postCode);
+        } catch (ValidationException validationException) {
+            errorMap.put("PostCode", validationException.getMessage());
+        }
+        if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.multipleValidationErrorCode, errorMap);
+    }
+
 
     public static void validateLocation(LocationGetDto locationGetDto) throws MultipleValidationException {
         Map<String, String> errorMap = new HashMap<>();
@@ -93,8 +143,9 @@ public class AddressValidator {
     }
 
     public static void validateFlatNumber(String flatNumber) throws ValidationException {
-        StringValidator.validateStringNotEmpty(flatNumber);
-        StringValidator.validateStringOnlyLettersOrNumbersOrSlashesOrDots(flatNumber);
+        if (!(Objects.isNull(flatNumber) || flatNumber.isEmpty() || flatNumber.isBlank())) {
+            StringValidator.validateStringOnlyLettersOrNumbersOrSlashesOrDots(flatNumber);
+        }
     }
 
     public static void validatePostCode(String postCode) throws ValidationException {

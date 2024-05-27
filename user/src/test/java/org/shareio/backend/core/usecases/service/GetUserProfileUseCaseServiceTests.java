@@ -176,9 +176,8 @@ public class GetUserProfileUseCaseServiceTests {
         );
         when(getUserDaoInterface.getUserDto(incorrectDateId)).thenReturn(Optional.of(expectedIncorrectNameUserProfileGetDto));
         MultipleValidationException multipleValidationException = Assertions.assertThrows(MultipleValidationException.class, () -> getUserProfileUseCaseService.getUserProfileResponseDto(incorrectDateId));
-        Assertions.assertEquals(multipleValidationException.getErrorMap().size(), 2);
+        Assertions.assertEquals(multipleValidationException.getErrorMap().size(), 1);
         Assertions.assertEquals("Object is null", multipleValidationException.getErrorMap().get("DateOfBirth"));
-        Assertions.assertEquals("Object is null", multipleValidationException.getErrorMap().get("LastLoginDate"));
     }
 
     @Test

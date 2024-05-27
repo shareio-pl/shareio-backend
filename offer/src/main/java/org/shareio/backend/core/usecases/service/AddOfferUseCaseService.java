@@ -31,7 +31,7 @@ public class AddOfferUseCaseService implements AddOfferUseCaseInterface {
         User owner = getUserProfileDaoInterface.getUserDto(offerSaveDto.ownerId()).map(User::fromDto).orElseThrow(NoSuchElementException::new);
         offer.setOwner(owner);
         offer.setPhotoId(new PhotoId(photoId));
-        offer.getAddress().setLocation(LocationCalculator.getLocationFromAddress(offerSaveDto.addressSaveDto().country(), offerSaveDto.addressSaveDto().city(), offerSaveDto.addressSaveDto().street(), offerSaveDto.addressSaveDto().houseNumber()));
+        offer.getAddress().setLocation(LocationCalculator.getLocationFromAddress(offerSaveDto.country(), offerSaveDto.city(), offerSaveDto.street(), offerSaveDto.houseNumber()));
         OfferSnapshot offerSnapshot = offer.toSnapshot();
         saveOfferCommandInterface.saveOffer(offerSnapshot);
         return new OfferSaveResponseDto(offer.getOfferId().getId());

@@ -3,10 +3,7 @@ package org.shareio.backend.infrastructure.dbadapter.adapters;
 import jakarta.transaction.Transactional;
 import org.shareio.backend.core.model.UserSnapshot;
 import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
-import org.shareio.backend.core.usecases.port.out.GetUserProfileByEmailDaoInterface;
-import org.shareio.backend.core.usecases.port.out.GetUserProfileDaoInterface;
-import org.shareio.backend.core.usecases.port.out.RemoveUserCommandInterface;
-import org.shareio.backend.core.usecases.port.out.SaveUserCommandInterface;
+import org.shareio.backend.core.usecases.port.out.*;
 import org.shareio.backend.infrastructure.dbadapter.entities.UserEntity;
 import org.shareio.backend.infrastructure.dbadapter.mappers.UserDatabaseMapper;
 import org.shareio.backend.infrastructure.dbadapter.repositories.UserRepository;
@@ -18,7 +15,9 @@ import java.util.UUID;
 
 
 @Service
-public class UserAdapter implements GetUserProfileDaoInterface, GetUserProfileByEmailDaoInterface, RemoveUserCommandInterface, SaveUserCommandInterface {
+public class UserAdapter implements GetUserProfileDaoInterface,
+        GetUserProfileByEmailDaoInterface, RemoveUserCommandInterface, SaveUserCommandInterface,
+        UpdateUserChangeMetadataCommandInterface {
     final UserRepository userRepository;
 
     public UserAdapter(UserRepository userRepository) {
@@ -60,4 +59,22 @@ public class UserAdapter implements GetUserProfileDaoInterface, GetUserProfileBy
     }
 
 
+    @Override
+    public void updateUserMetadata(UserSnapshot userSnapshot) {
+        Optional<UserEntity> userEntity = userRepository.findByUserId(userSnapshot.userId().getId());
+        UserEntity userEntityFromDb = userEntity.orElseThrow(NoSuchElementException::new);
+        userEntityFromDb.setName(userSnapshot.name());
+        userEntityFromDb.setSurname(userSnapshot.surname());
+        userEntityFromDb.setDateOfBirth(userSnapshot.dateOfBirth());
+        userEntityFromDb.getAddress().setCountry(userSnapshot.address().getCountry());
+        userEntityFromDb.getAddress().setRegion(userSnapshot.address().getRegion());
+        userEntityFromDb.getAddress().setCity(userSnapshot.address().getCity());
+        userEntityFromDb.getAddress().setStreet(userSnapshot.address().getStreet());
+        userEntityFromDb.getAddress().setHouseNumber(userSnapshot.address().getHouseNumber());
+        userEntityFromDb.getAddress().setFlatNumber(userSnapshot.address().getFlatNumber());
+        userEntityFromDb.getAddress().setPostCode(userSnapshot.address().getPostCode());
+        userEntityFromDb.getAddress().setLatitude(userSnapshot.address().getLocation().getLatitude());
+        userEntityFromDb.getAddress().setLongitude(userSnapshot.address().getLocation().getLongitude());
+        userRepository.save(userEntityFromDb);
+    }
 }

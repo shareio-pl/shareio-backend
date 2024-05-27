@@ -85,13 +85,12 @@ public class GetAddressUseCaseServiceTests {
         );
         when(getAddressDaoInterface.getAddressDto(incorrectStringId)).thenReturn(Optional.of(expectedIncorrectNameUserProfileGetDto));
         MultipleValidationException multipleValidationException = Assertions.assertThrows(MultipleValidationException.class, () -> getAddressUseCaseService.getAddressResponseDto(incorrectStringId));
-        Assertions.assertEquals(6, multipleValidationException.getErrorMap().size());
+        Assertions.assertEquals(5, multipleValidationException.getErrorMap().size());
         Assertions.assertEquals("String is empty", multipleValidationException.getErrorMap().get("Country"));
         Assertions.assertEquals("String is empty", multipleValidationException.getErrorMap().get("Region"));
         Assertions.assertEquals("String is empty", multipleValidationException.getErrorMap().get("City"));
         Assertions.assertEquals("String is empty", multipleValidationException.getErrorMap().get("Street"));
         Assertions.assertEquals("String is empty", multipleValidationException.getErrorMap().get("HouseNumber"));
-        Assertions.assertEquals("String is empty", multipleValidationException.getErrorMap().get("FlatNumber"));
     }
 
 }

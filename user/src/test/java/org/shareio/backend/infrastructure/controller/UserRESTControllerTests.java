@@ -7,16 +7,18 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.shareio.backend.core.usecases.port.dto.UserAddDto;
+import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
 import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
 import org.shareio.backend.core.usecases.port.out.GetUserProfileByEmailDaoInterface;
 import org.shareio.backend.core.usecases.port.out.GetUserProfileDaoInterface;
 import org.shareio.backend.core.usecases.port.out.SaveUserCommandInterface;
 import org.shareio.backend.core.usecases.service.AddUserUseCaseService;
 import org.shareio.backend.core.usecases.service.GetUserProfileUseCaseService;
-import org.shareio.backend.core.usecases.service.RemoveUserUseCaseService;
+import org.shareio.backend.core.usecases.service.ModifyUserUseCaseService;
+import org.shareio.backend.security.AuthenticationHandler;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,6 +36,7 @@ public class UserRESTControllerTests {
     UUID userInvalidId;
     UUID userValidId;
     String userValidEmail;
+    MockHttpServletRequest mockHttpServletRequest;
 
     @Mock
     private GetUserProfileDaoInterface getUserProfileDaoInterface;
@@ -53,21 +56,28 @@ public class UserRESTControllerTests {
     private AddUserUseCaseService addUserUseCaseService;
 
     @MockBean
-    private RemoveUserUseCaseService removeUserUseCaseService;
+    @InjectMocks
+    private ModifyUserUseCaseService modifyUserUseCaseService;
 
     @InjectMocks
     UserRESTController userRESTController;
 
+    @MockBean
+    AuthenticationHandler authenticationHandler;
+
     @BeforeEach
     public void setUp() {
+        mockHttpServletRequest = new MockHttpServletRequest();
         userInvalidId = UUID.randomUUID();
         userValidId = UUID.randomUUID();
         userValidEmail = "jan.kowal@onet.pl";
         autoCloseable = MockitoAnnotations.openMocks(this);
         userRESTController = new UserRESTController(
+                authenticationHandler,
+                addUserUseCaseService,
                 getUserProfileUseCaseService,
-                removeUserUseCaseService,
-                addUserUseCaseService);
+                modifyUserUseCaseService
+        );
 
         when(getUserProfileDaoInterface.getUserDto(userInvalidId)).thenReturn(
                 Optional.of(new UserProfileGetDto(
@@ -119,27 +129,27 @@ public class UserRESTControllerTests {
 
     @Test
     void get_nonexistent_user_and_get_NOT_FOUND_status() {
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, userRESTController.getUser(UUID.randomUUID()).getStatusCode());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, userRESTController.getUser(mockHttpServletRequest,UUID.randomUUID()).getStatusCode());
     }
 
     @Test
     void get_invalid_user_and_get_BAD_REQUEST_status() {
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, userRESTController.getUser(userInvalidId).getStatusCode());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, userRESTController.getUser(mockHttpServletRequest,userInvalidId).getStatusCode());
     }
 
     @Test
     void get_valid_user_and_get_OK_status() {
-        Assertions.assertEquals(HttpStatus.OK, userRESTController.getUser(userValidId).getStatusCode());
+        Assertions.assertEquals(HttpStatus.OK, userRESTController.getUser(mockHttpServletRequest,userValidId).getStatusCode());
     }
 
     @Test
     void add_user_with_existing_email_and_get_BAD_REQUEST_status() {
-        UserAddDto userAddDto = new UserAddDto(
+        UserSaveDto userAddDto = new UserSaveDto(
                 "Jan",
                 "Kowal",
+                "bbb",
                 userValidEmail,
                 LocalDate.now(),
-                "bbb",
                 "Polska",
                 "Łódzkie",
                 "Łódź",
@@ -148,26 +158,26 @@ public class UserRESTControllerTests {
                 "12",
                 "2"
         );
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, userRESTController.addUser(userAddDto).getStatusCode());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, userRESTController.addUser(mockHttpServletRequest, userAddDto).getStatusCode());
     }
 
     @Test
     void add_user_with_correct_data_and_get_OK_status() {
-        UserAddDto userAddDto = new UserAddDto(
+        UserSaveDto userAddDto = new UserSaveDto(
                 "Jan",
                 "Kowal",
+                "bbb",
                 "jan.kowal@gmail.com",
                 LocalDate.now(),
-                "bbb",
                 "Polska",
                 "Łódzkie",
                 "Łódź",
-                "95-000",
                 "Lutomierska",
                 "12",
-                "2"
+                "",
+                "95-020"
         );
-        Assertions.assertEquals(HttpStatus.OK, userRESTController.addUser(userAddDto).getStatusCode());
+        Assertions.assertEquals(HttpStatus.OK, userRESTController.addUser(mockHttpServletRequest, userAddDto).getStatusCode());
     }
 
 }

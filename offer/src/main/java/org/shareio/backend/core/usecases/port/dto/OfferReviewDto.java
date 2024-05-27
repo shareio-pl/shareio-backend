@@ -6,6 +6,6 @@ import java.util.UUID;
 public record OfferReviewDto
         (
                 UUID offerId,
-                Float reviewValue,
+                Double reviewValue,
                 LocalDateTime reviewDate
         ){ }

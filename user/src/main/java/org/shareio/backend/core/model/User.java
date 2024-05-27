@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.shareio.backend.Const;
 import org.shareio.backend.core.model.vo.*;
-import org.shareio.backend.core.usecases.port.dto.UserAddDto;
+import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
 import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
 
 import java.time.LocalDate;
@@ -56,24 +56,24 @@ public class User {
         );
     }
 
-    public static User fromDto(UserAddDto userAddDto) {
+    public static User fromDto(UserSaveDto userSaveDto) {
         return new User(
                 new UserId(UUID.randomUUID()),
-                userAddDto.email(),
-                userAddDto.name(),
-                userAddDto.surname(),
-                userAddDto.dateOfBirth(),
+                userSaveDto.email(),
+                userSaveDto.name(),
+                userSaveDto.surname(),
+                userSaveDto.dateOfBirth(),
                 new PhotoId(Const.defaultPhotoId),
 
                 new Address(
                         new AddressId(UUID.randomUUID()),
-                        userAddDto.country(),
-                        userAddDto.region(),
-                        userAddDto.city(),
-                        userAddDto.street(),
-                        userAddDto.houseNumber(),
-                        userAddDto.flatNumber(),
-                        userAddDto.postcode(),
+                        userSaveDto.country(),
+                        userSaveDto.region(),
+                        userSaveDto.city(),
+                        userSaveDto.street(),
+                        userSaveDto.houseNumber(),
+                        userSaveDto.flatNumber(),
+                        userSaveDto.postCode(),
                         new Location(0.0, 0.0)
                 ),
                 new Security(

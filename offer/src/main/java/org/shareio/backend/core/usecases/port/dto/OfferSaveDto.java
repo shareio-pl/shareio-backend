@@ -5,12 +5,19 @@ import java.util.UUID;
 
 public record OfferSaveDto(
         UUID ownerId,
-        AddressSaveDto addressSaveDto,
         LocalDateTime creationDate,
         String title,
         String condition,
         String category,
-        String description
+        String description,
+
+        String country,
+        String region,
+        String city,
+        String street,
+        String houseNumber,
+        String flatNumber,
+        String postCode
 ) {
 
 }
