@@ -27,18 +27,14 @@ public class PeriodicOfferReservationTimeoutReservationTimeoutUseCaseService imp
     @Override
     public void periodicOfferReservationTimeoutHandler() {
         List<OfferGetDto> offerGetDtoList = getAllOffersDaoInterface.getAllOffers();
-        offerGetDtoList.forEach(offer ->
-        {
+        offerGetDtoList = offerGetDtoList.stream().filter(offer -> {
             try {
                 OfferValidator.validateOffer(offer);
+                return true;
             } catch (MultipleValidationException e) {
-                try {
-                    throw new MultipleValidationException(e.getMessage(), e.getErrorMap());
-                } catch (MultipleValidationException ex) {
-                    throw new RuntimeException(ex);
-                }
+                return false;
             }
-        });
+        }).toList();
         List<Offer> offerToDereserveList = offerGetDtoList
                 .stream()
                 .map(Offer::fromDto)

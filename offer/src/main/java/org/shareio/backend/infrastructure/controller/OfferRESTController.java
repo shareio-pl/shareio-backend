@@ -14,6 +14,7 @@ import org.shareio.backend.core.model.vo.Location;
 import org.shareio.backend.core.usecases.port.dto.*;
 import org.shareio.backend.core.usecases.port.in.*;
 import org.shareio.backend.core.usecases.port.out.GetLocationDaoInterface;
+import org.shareio.backend.core.usecases.service.GetNewestOffersUseCaseService;
 import org.shareio.backend.exceptions.LocationCalculationException;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.external_API.GPT.DescriptionGenerator;
@@ -46,6 +47,7 @@ public class OfferRESTController {
     GetOffersByNameUseCaseInterface getOffersByNameUseCaseInterface;
     GetOwnerReviewCountUseCaseInterface getOwnerReviewCountUseCaseInterface;
     GetAverageUserReviewValueUseCaseInterface getAverageUserReviewValueUseCaseInterface;
+    GetNewestOffersUseCaseService getNewestOffersUseCaseService;
 
     ModifyOfferUseCaseInterface modifyOfferUseCaseInterface;
 
@@ -199,6 +201,20 @@ public class OfferRESTController {
             return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @RequestMapping(value = "/getNewest", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getNewestOffers(HttpServletRequest httpRequest) {
+        RequestLogHandler.handleRequest(httpRequest);
+        try{
+            List<UUID> newestOffersId = getNewestOffersUseCaseService.getNewestOffers();
+            RequestLogHandler.handleCorrectResponse();
+            return new CorrectResponse(newestOffersId, Const.successErrorCode, HttpStatus.OK);
+
+        } catch(IllegalArgumentException illegalArgumentException){
+            RequestLogHandler.handleErrorResponse(HttpStatus.BAD_REQUEST, illegalArgumentException.getMessage());
+            return new ErrorResponse(Const.illegalArgumentErrorCode, HttpStatus.BAD_REQUEST);
+        }
+     }
 
     // ------------------- POST -------------------
 
