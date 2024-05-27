@@ -1,6 +1,7 @@
 package org.shareio.backend.core.usecases.service;
 
 import lombok.AllArgsConstructor;
+import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.util.DistanceCalculator;
 import org.shareio.backend.core.model.Offer;
 import org.shareio.backend.core.model.OfferValidator;
@@ -28,18 +29,25 @@ public class GetClosestOfferUseCaseService implements GetClosestOfferUseCaseInte
         List<OfferGetDto> allOfferList = getAllOffersDaoInterface.getAllOffers();
         AtomicReference<UUID> closestOfferId = new AtomicReference<>();
         AtomicReference<Double> distance = new AtomicReference<>(Double.MAX_VALUE);
-        allOfferList = allOfferList.stream().filter(offer -> {
+        allOfferList = allOfferList.stream()
+                .filter(offer -> {
             try {
                 OfferValidator.validateOffer(offer);
                 return true;
             } catch (MultipleValidationException e) {
                 return false;
             }
-        }).toList();
+        })
+
+                .toList();
         if (allOfferList.isEmpty()) {
             throw new NoSuchElementException("No valid offers found!");
         }
         List<Offer> offerList = allOfferList.stream().map(Offer::fromDto).toList();
+        offerList = offerList
+                .stream()
+                .filter(offer -> offer.getStatus().equals(Status.CANCELED))
+                .toList();
         offerList.forEach(offer -> {
             Double possibleDistance = DistanceCalculator.calculateDistance(location, offer.getAddress().getLocation());
             if (possibleDistance < distance.get()) {

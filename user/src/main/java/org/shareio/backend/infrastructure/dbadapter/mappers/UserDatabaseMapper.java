@@ -16,7 +16,8 @@ public class UserDatabaseMapper {
                 userEntity.getDateOfBirth(),
                 userEntity.getPhotoId(),
                 userEntity.getAddress().getAddressId(),
-                userEntity.getSecurity().getLastLoginDate()
+                userEntity.getSecurity().getLastLoginDate(),
+                userEntity.getSecurity().getPwHash()
         );
     }
 

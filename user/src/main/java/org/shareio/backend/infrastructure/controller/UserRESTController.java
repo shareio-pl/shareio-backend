@@ -8,9 +8,11 @@ import org.shareio.backend.controller.responses.CorrectResponse;
 import org.shareio.backend.controller.responses.ErrorResponse;
 import org.shareio.backend.core.model.UserValidator;
 import org.shareio.backend.core.usecases.port.dto.UserModifyDto;
+import org.shareio.backend.core.usecases.port.dto.UserPasswordDto;
 import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
 import org.shareio.backend.core.usecases.port.dto.UserProfileResponseDto;
 import org.shareio.backend.core.usecases.port.in.AddUserUseCaseInterface;
+import org.shareio.backend.core.usecases.port.in.ChangePasswordUserUseCaseInterface;
 import org.shareio.backend.core.usecases.port.in.GetUserProfileUseCaseInterface;
 import org.shareio.backend.core.usecases.port.in.ModifyUserUseCaseInterface;
 import org.shareio.backend.exceptions.LocationCalculationException;
@@ -34,9 +36,10 @@ public class UserRESTController {
     AuthenticationHandler authenticationHandler;
 
     AddUserUseCaseInterface addUserUseCaseInterface;
+    ChangePasswordUserUseCaseInterface changePasswordUserUseCaseInterface;
     GetUserProfileUseCaseInterface getUserProfileUseCaseInterface;
     ModifyUserUseCaseInterface modifyUserUseCaseInterface;
-    
+
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> addUser(HttpServletRequest httpRequest, @RequestBody UserSaveDto userSaveDto) {
         RequestLogHandler.handleRequest(httpRequest);
@@ -96,5 +99,28 @@ public class UserRESTController {
 
     }
 
-}
+    @RequestMapping(value = "/changePassword/{userId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> changePassword(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID userId, @RequestBody UserPasswordDto userPasswordDto) {
+        RequestLogHandler.handleRequest(httpRequest);
+        if(authenticationHandler.authenticateRequestForUserIdentity(httpRequest, userId)){
+            try{
+                changePasswordUserUseCaseInterface.changePassword(userId, userPasswordDto);
+                RequestLogHandler.handleCorrectResponse();
+                return new CorrectResponse(userId, Const.successErrorCode, HttpStatus.OK);
+            } catch (NoSuchElementException e) {
+                RequestLogHandler.handleErrorResponse(HttpStatus.NOT_FOUND, e.getMessage());
+                return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+            } catch (IllegalArgumentException e) {
+                RequestLogHandler.handleErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+                return new ErrorResponse(Const.illegalArgumentErrorCode, HttpStatus.BAD_REQUEST);
+            }
+        }
+        else {
+            return new ErrorResponse("Modification not allowed", HttpStatus.FORBIDDEN);
+        }
+    }
+
+
+
+    }
 

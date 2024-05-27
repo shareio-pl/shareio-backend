@@ -3,6 +3,7 @@ package org.shareio.backend.core.usecases.service;
 import lombok.AllArgsConstructor;
 import org.shareio.backend.core.model.Offer;
 import org.shareio.backend.core.model.OfferSnapshot;
+import org.shareio.backend.core.model.OfferValidator;
 import org.shareio.backend.core.model.User;
 import org.shareio.backend.core.model.vo.PhotoId;
 import org.shareio.backend.core.usecases.port.dto.OfferSaveDto;
@@ -11,6 +12,7 @@ import org.shareio.backend.core.usecases.port.in.AddOfferUseCaseInterface;
 import org.shareio.backend.core.usecases.port.out.*;
 import org.shareio.backend.core.usecases.util.LocationCalculator;
 import org.shareio.backend.exceptions.LocationCalculationException;
+import org.shareio.backend.exceptions.MultipleValidationException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -26,7 +28,8 @@ public class AddOfferUseCaseService implements AddOfferUseCaseInterface {
     SaveOfferCommandInterface saveOfferCommandInterface;
 
     @Override
-    public OfferSaveResponseDto addOffer(OfferSaveDto offerSaveDto, UUID photoId) throws LocationCalculationException, IOException, InterruptedException {
+    public OfferSaveResponseDto addOffer(OfferSaveDto offerSaveDto, UUID photoId) throws LocationCalculationException, IOException, InterruptedException, MultipleValidationException {
+        OfferValidator.validateOffer(offerSaveDto);
         Offer offer = Optional.of(offerSaveDto).map(Offer::fromDto).get();
         User owner = getUserProfileDaoInterface.getUserDto(offerSaveDto.ownerId()).map(User::fromDto).orElseThrow(NoSuchElementException::new);
         offer.setOwner(owner);

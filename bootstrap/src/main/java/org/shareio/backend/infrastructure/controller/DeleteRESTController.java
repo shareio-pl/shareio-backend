@@ -26,12 +26,10 @@ public class DeleteRESTController {
 
     RemoveUserUseCaseInterface removeUserUseCaseInterface;
     RemoveOffersForUserUseCaseInterface removeOffersForUserUseCaseInterface;
-//    RemoveReviewsForUserUseCaseInterface removeReviewsForUserUseCaseInterface;
 
     GetOfferUseCaseInterface getOfferUseCaseInterface;
 
     RemoveOfferUseCaseInterface removeOfferUseCaseInterface;
-//    RemoveReviewsForOfferUseCaseInterface removeReviewsForOfferUseCaseInterface;
 
     @RequestMapping(value = "/user/delete/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> deleteUser(@PathVariable(value = "id") UUID id) {
@@ -43,7 +41,6 @@ public class DeleteRESTController {
             return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
         }
         RemoveResponseDto removeResponseDto = new RemoveResponseDto();
-//        removeResponseDto = removeReviewsForUserUseCaseInterface.removeReviewsForUser(id, removeResponseDto);
         removeResponseDto = removeOffersForUserUseCaseInterface.removeOffersForUser(id, removeResponseDto);
         removeResponseDto = removeUserUseCaseInterface.removeUser(id, removeResponseDto);
         return new CorrectResponse(removeResponseDto, Const.successErrorCode, HttpStatus.OK);
@@ -59,7 +56,6 @@ public class DeleteRESTController {
             return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
         }
         RemoveResponseDto removeResponseDto = new RemoveResponseDto();
-//        removeResponseDto = removeReviewsForOfferUseCaseInterface.removeReviewsForOffer(id, removeResponseDto);
         removeResponseDto = removeOfferUseCaseInterface.removeOffer(id, removeResponseDto);
         return new CorrectResponse(removeResponseDto, Const.successErrorCode, HttpStatus.OK);
     }

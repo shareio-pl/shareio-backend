@@ -1,6 +1,5 @@
 package org.shareio.backend.infrastructure.dbadapter.adapters;
 
-import jakarta.transaction.Transactional;
 import org.shareio.backend.core.model.OfferSnapshot;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
@@ -18,8 +17,8 @@ import java.util.*;
 @Service
 public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterface, GetOffersByNameDaoInterface,
         RemoveOfferCommandInterface, SaveOfferCommandInterface, UpdateOfferChangeMetadataCommandInterface, GetOffersByUserDaoInterface,
-        UpdateOfferSaveReviewCommandInterface, UpdateOfferReserveOfferCommandInterface, UpdateOfferDereserveOfferCommandInterface,
-        GetAllOffersByStatusDaoInterface {
+        UpdateOfferSaveReviewCommandInterface, UpdateOfferReserveOfferCommandInterface, UpdateOfferDereserveOfferCommandInterface
+         {
     final OfferRepository offerRepository;
     final UserRepository userRepository;
 
@@ -59,11 +58,6 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
         return offerList.stream().filter(offer -> Objects.equals(offer.getOwner().getUserId(), id)).map(OfferDatabaseMapper::toDto).toList();
     }
 
-    @Override
-    public List<OfferGetDto> getAllOffersByStatus(Status status) {
-        ArrayList<OfferEntity> offerList = (ArrayList<OfferEntity>) offerRepository.findAllByStatus(status);
-        return offerList.stream().map(OfferDatabaseMapper::toDto).toList();
-    }
     // SAVE
 
     @Override
@@ -130,9 +124,11 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
     // DELETE
 
     @Override
-    @Transactional
     public void removeOffer(UUID offerId) {
-        offerRepository.delete(offerRepository.findByOfferId(offerId).orElseThrow(NoSuchElementException::new));
+        Optional<OfferEntity> offerEntity = offerRepository.findByOfferId(offerId);
+        OfferEntity offerEntityFromDb = offerEntity.orElseThrow(NoSuchElementException::new);
+        offerEntityFromDb.setStatus(Status.CANCELED);
+        offerRepository.save(offerEntityFromDb);
     }
 
 }

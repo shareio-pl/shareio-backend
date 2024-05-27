@@ -5,10 +5,9 @@ import org.shareio.backend.core.model.vo.Category;
 import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
+import org.shareio.backend.core.usecases.port.dto.OfferSaveDto;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.exceptions.ValidationException;
-import org.shareio.backend.validators.DoubleValidator;
-import org.shareio.backend.validators.IntegerValidator;
 import org.shareio.backend.validators.ObjectValidator;
 import org.shareio.backend.validators.StringValidator;
 
@@ -21,7 +20,6 @@ import static org.shareio.backend.core.model.UserValidator.validateName;
 
 public class OfferValidator {
     public static void validateOffer(OfferGetDto offerGetDto) throws MultipleValidationException {
-        //TODO: CHECK DATA INTEGRITY
         Map<String, String> errorMap = new HashMap<>();
         try {
             validateDate(offerGetDto.creationDate());
@@ -90,18 +88,55 @@ public class OfferValidator {
         } catch (ValidationException validationException) {
             errorMap.put("Surname", validationException.getMessage());
         }
+        if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.multipleValidationErrorCode, errorMap);
+    }
+
+    public static void validateOffer(OfferSaveDto offerSaveDto) throws MultipleValidationException {
+        Map<String, String> errorMap = new HashMap<>();
         try {
-            validateOwnerRating(offerGetDto.ownerRating());
+            validateDate(offerSaveDto.creationDate());
         } catch (ValidationException validationException) {
-            errorMap.put("OwnerRating", validationException.getMessage());
+            errorMap.put("CreationDate", validationException.getMessage());
         }
         try {
-            validateOwnerReviewCount(offerGetDto.ownerReviewCount());
+            validateCity(offerSaveDto.city());
         } catch (ValidationException validationException) {
-            errorMap.put("OwnerReviewCount", validationException.getMessage());
+            errorMap.put("City", validationException.getMessage());
+        }
+        try {
+            validateStreet(offerSaveDto.street());
+        } catch (ValidationException validationException) {
+            errorMap.put("Street", validationException.getMessage());
+        }
+        try {
+            validateHouseNumber(offerSaveDto.houseNumber());
+        } catch (ValidationException validationException) {
+            errorMap.put("HouseNumber", validationException.getMessage());
+        }
+
+        try {
+            validateTitle(offerSaveDto.title());
+        } catch (ValidationException validationException) {
+            errorMap.put("Title", validationException.getMessage());
+        }
+        try {
+            validateCondition(offerSaveDto.condition());
+        } catch (ValidationException validationException) {
+            errorMap.put("Condition", validationException.getMessage());
+        }
+        try {
+            validateCategory(offerSaveDto.category());
+        } catch (ValidationException validationException) {
+            errorMap.put("Category", validationException.getMessage());
+        }
+        try {
+            validateDescription(offerSaveDto.description());
+        } catch (ValidationException validationException) {
+            errorMap.put("Description", validationException.getMessage());
         }
         if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.multipleValidationErrorCode, errorMap);
     }
+
 
     public static void validateDate(LocalDateTime date) throws ValidationException {
         ObjectValidator.validateObjectIsNotNull(date);
@@ -121,6 +156,9 @@ public class OfferValidator {
         StringValidator.validateStringNotEmpty(title);
         StringValidator.validateStringLength(title, Const.minTitleLength, Const.maxTitleLength);
     }
+
+
+
 
     public static void validateCondition(String condition) throws ValidationException {
         ObjectValidator.validateObjectIsNotNull(condition);
@@ -146,13 +184,4 @@ public class OfferValidator {
         StringValidator.validateStringLength(description, Const.minDescriptionLength, Const.maxDescriptionLength);
     }
 
-    public static void validateOwnerRating(Double ownerRating) throws ValidationException {
-        DoubleValidator.validateDoubleNotEmpty(ownerRating);
-        DoubleValidator.validateDoubleBounds(ownerRating, 0.0, 5.0);
-    }
-
-    public static void validateOwnerReviewCount(Integer ownerReviewCount) throws ValidationException {
-        IntegerValidator.validateIntegerNotEmpty(ownerReviewCount);
-        IntegerValidator.validateIntegerNotNegative(ownerReviewCount);
-    }
 }

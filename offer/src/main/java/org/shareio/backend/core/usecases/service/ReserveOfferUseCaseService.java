@@ -2,6 +2,7 @@ package org.shareio.backend.core.usecases.service;
 
 import lombok.AllArgsConstructor;
 import org.shareio.backend.core.model.Offer;
+import org.shareio.backend.core.model.OfferValidator;
 import org.shareio.backend.core.model.User;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
@@ -11,6 +12,7 @@ import org.shareio.backend.core.usecases.port.in.ReserveOfferUseCaseInterface;
 import org.shareio.backend.core.usecases.port.out.GetOfferDaoInterface;
 import org.shareio.backend.core.usecases.port.out.GetUserProfileDaoInterface;
 import org.shareio.backend.core.usecases.port.out.UpdateOfferReserveOfferCommandInterface;
+import org.shareio.backend.exceptions.MultipleValidationException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,11 +29,15 @@ public class ReserveOfferUseCaseService implements ReserveOfferUseCaseInterface 
     UpdateOfferReserveOfferCommandInterface updateOfferReserveOfferCommandInterface;
 
     @Override
-    public UUID reserveOffer(OfferReserveDto offerReserveDto) {
+    public UUID reserveOffer(OfferReserveDto offerReserveDto) throws MultipleValidationException {
         //TODO validate users reserved offer count
         //TODO validate offer status
         OfferGetDto offerGetDto = getOfferDaoInterface.getOfferDto(offerReserveDto.offerId()).orElseThrow(NoSuchElementException::new);
+        OfferValidator.validateOffer(offerGetDto);
         Offer offer = Optional.of(offerGetDto).map(Offer::fromDto).get();
+        if(offer.getStatus().equals(Status.CANCELED)){
+            throw new NoSuchElementException();
+        }
         UserProfileGetDto recieverProfileGetDto = getUserProfileDaoInterface.getUserDto(offerReserveDto.recieverId()).orElseThrow(NoSuchElementException::new);
         User reciever = Optional.of(recieverProfileGetDto).map(User::fromDto).get();
         offer.setReceiver(reciever);

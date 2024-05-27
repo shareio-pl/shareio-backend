@@ -13,5 +13,6 @@ public record UserProfileGetDto(
         LocalDate dateOfBirth,
         UUID photoId,
         UUID addressId,
-        LocalDateTime lastLoginDate) {
+        LocalDateTime lastLoginDate,
+        String pwHash) {
 }

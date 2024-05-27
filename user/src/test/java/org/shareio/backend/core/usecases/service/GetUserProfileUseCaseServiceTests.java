@@ -54,7 +54,8 @@ public class GetUserProfileUseCaseServiceTests {
                 LocalDate.of(2020, 5, 13),
                 photoId,
                 addressId,
-                LocalDateTime.of(2020, 5, 13, 6, 30)
+                LocalDateTime.of(2020, 5, 13, 6, 30),
+                null
         );
 
         expectedCorrectUserProfileResponseDto = new UserProfileResponseDto(
@@ -92,7 +93,8 @@ public class GetUserProfileUseCaseServiceTests {
                 LocalDate.now(),
                 photoId,
                 addressId,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                null
         );
         when(getUserDaoInterface.getUserDto(incorrectStringId)).thenReturn(Optional.of(expectedIncorrectNameUserProfileGetDto));
         MultipleValidationException multipleValidationException = Assertions.assertThrows(MultipleValidationException.class, () -> getUserProfileUseCaseService.getUserProfileResponseDto(incorrectStringId));
@@ -113,7 +115,8 @@ public class GetUserProfileUseCaseServiceTests {
                 LocalDate.now(),
                 photoId,
                 addressId,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                null
         );
         when(getUserDaoInterface.getUserDto(incorrectStringId)).thenReturn(Optional.of(expectedIncorrectNameUserProfileGetDto));
         MultipleValidationException multipleValidationException = Assertions.assertThrows(MultipleValidationException.class, () -> getUserProfileUseCaseService.getUserProfileResponseDto(incorrectStringId));
@@ -133,7 +136,8 @@ public class GetUserProfileUseCaseServiceTests {
                 LocalDate.now(),
                 photoId,
                 addressId,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                null
         );
         when(getUserDaoInterface.getUserDto(incorrectStringId)).thenReturn(Optional.of(expectedIncorrectNameUserProfileGetDto));
         MultipleValidationException multipleValidationException = Assertions.assertThrows(MultipleValidationException.class, () -> getUserProfileUseCaseService.getUserProfileResponseDto(incorrectStringId));
@@ -153,7 +157,8 @@ public class GetUserProfileUseCaseServiceTests {
                 LocalDate.now(),
                 photoId,
                 addressId,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                null
         );
         when(getUserDaoInterface.getUserDto(incorrectStringId)).thenReturn(Optional.of(expectedIncorrectNameUserProfileGetDto));
         MultipleValidationException multipleValidationException = Assertions.assertThrows(MultipleValidationException.class, () -> getUserProfileUseCaseService.getUserProfileResponseDto(incorrectStringId));
@@ -172,6 +177,7 @@ public class GetUserProfileUseCaseServiceTests {
                 null,
                 photoId,
                 addressId,
+                null,
                 null
         );
         when(getUserDaoInterface.getUserDto(incorrectDateId)).thenReturn(Optional.of(expectedIncorrectNameUserProfileGetDto));
