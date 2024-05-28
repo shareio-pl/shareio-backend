@@ -16,6 +16,7 @@ import org.shareio.backend.core.usecases.port.out.UpdateOfferSaveReviewCommandIn
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,11 +34,11 @@ public class AddReviewUseCaseService implements AddReviewUseCaseInterface {
         UUID reviewId = UUID.randomUUID();
         OfferGetDto offerGetDto = getOfferDaoInterface.getOfferDto(offerReviewDto.offerId()).orElseThrow(NoSuchElementException::new);
         OfferValidator.validateOffer(offerGetDto);
-        Offer offer = Optional.of(offerGetDto).map(Offer::fromDto).get();
+        Offer offer = Optional.of(offerGetDto).map(Offer::fromDto).orElseThrow(NoSuchElementException::new);
         if(!offer.getStatus().equals(Status.FINISHED)){
             throw new NoSuchElementException();
         }
-        Review review = new Review(new ReviewId(reviewId), offerReviewDto.reviewValue(), offerReviewDto.reviewDate());
+        Review review = new Review(new ReviewId(reviewId), offerReviewDto.reviewValue(), LocalDateTime.now());
         offer.setReview(review);
         OfferSnapshot offerSnapshot = offer.toSnapshot();
         updateOfferSaveReviewCommandInterface.updateOfferAddReview(offerSnapshot);

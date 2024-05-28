@@ -9,4 +9,8 @@ public class DistanceCalculator {
         Coordinate point2 = new Coordinate(l2.getLatitude(), l2.getLongitude());
         return point1.distance(point2) / 1000; // .distance() returns distance in meters
     }
+
+    private DistanceCalculator() {
+        throw new IllegalStateException("Utility class");
+    }
 }

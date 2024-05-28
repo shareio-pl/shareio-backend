@@ -5,10 +5,12 @@ import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.core.usecases.port.out.*;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
+import org.shareio.backend.infrastructure.dbadapter.entities.ReviewEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.UserEntity;
 import org.shareio.backend.infrastructure.dbadapter.mappers.OfferDatabaseMapper;
 import org.shareio.backend.infrastructure.dbadapter.mappers.ReviewMapper;
 import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
+import org.shareio.backend.infrastructure.dbadapter.repositories.ReviewRepository;
 import org.shareio.backend.infrastructure.dbadapter.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,14 +19,15 @@ import java.util.*;
 @Service
 public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterface, GetOffersByNameDaoInterface,
         RemoveOfferCommandInterface, SaveOfferCommandInterface, UpdateOfferChangeMetadataCommandInterface, GetOffersByUserDaoInterface,
-        UpdateOfferSaveReviewCommandInterface, UpdateOfferReserveOfferCommandInterface, UpdateOfferDereserveOfferCommandInterface
-         {
+        UpdateOfferSaveReviewCommandInterface, UpdateOfferReserveOfferCommandInterface, UpdateOfferDereserveOfferCommandInterface {
     final OfferRepository offerRepository;
     final UserRepository userRepository;
+    final ReviewRepository reviewRepository;
 
-    public OfferAdapter(OfferRepository offerRepository, UserRepository userRepository) {
+    public OfferAdapter(OfferRepository offerRepository, UserRepository userRepository, ReviewRepository reviewRepository) {
         this.offerRepository = offerRepository;
         this.userRepository = userRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     // GET
@@ -63,7 +66,7 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
     @Override
     public void saveOffer(OfferSnapshot offerSnapshot) {
 
-        OfferEntity offerEntity = Optional.of(offerSnapshot).map(OfferDatabaseMapper::toEntity).get();
+        OfferEntity offerEntity = Optional.of(offerSnapshot).map(OfferDatabaseMapper::toEntity).orElseThrow(NoSuchElementException::new);
         UserEntity ownerEntity = userRepository.findByUserId(offerSnapshot.owner().userId().getId()).orElseThrow(NoSuchElementException::new);
         offerEntity.setOwner(ownerEntity);
 
@@ -96,12 +99,12 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
     public void updateOfferAddReview(OfferSnapshot offerSnapshot) {
         Optional<OfferEntity> offerEntity = offerRepository.findByOfferId(offerSnapshot.offerId().getId());
         OfferEntity offerEntityFromDb = offerEntity.orElseThrow(NoSuchElementException::new);
-        offerEntityFromDb.setReview(Optional.of(offerSnapshot.reviewSnapshot()).map(ReviewMapper::toEntity).get());
+        offerEntityFromDb.setReview(Optional.of(offerSnapshot.reviewSnapshot()).map(ReviewMapper::toEntity).orElseThrow(NoSuchElementException::new));
         offerRepository.save(offerEntityFromDb);
     }
 
     @Override
-    public void reserveOffer(OfferSnapshot offerSnapshot){
+    public void reserveOffer(OfferSnapshot offerSnapshot) {
         Optional<OfferEntity> offerEntity = offerRepository.findByOfferId(offerSnapshot.offerId().getId());
         OfferEntity offerEntityFromDb = offerEntity.orElseThrow(NoSuchElementException::new);
         UserEntity recieverEntityFromDb = userRepository.findByUserId(offerSnapshot.receiver().userId().getId()).orElseThrow(NoSuchElementException::new);
@@ -126,8 +129,17 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
     @Override
     public void removeOffer(UUID offerId) {
         Optional<OfferEntity> offerEntity = offerRepository.findByOfferId(offerId);
+        ReviewEntity reviewEntity;
         OfferEntity offerEntityFromDb = offerEntity.orElseThrow(NoSuchElementException::new);
         offerEntityFromDb.setStatus(Status.CANCELED);
+        if (Objects.nonNull(offerEntityFromDb.getReview())) {
+            reviewEntity = offerEntityFromDb.getReview();
+            offerEntityFromDb.setReview(null);
+            reviewRepository.delete(reviewEntity);
+        } else {
+            offerEntityFromDb.setReview(null);
+        }
+
         offerRepository.save(offerEntityFromDb);
     }
 

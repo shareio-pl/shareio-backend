@@ -38,4 +38,8 @@ public class AddressDatabaseMapper {
                 address.getLocation().getLatitude(),
                 address.getLocation().getLongitude());
     }
+
+    private AddressDatabaseMapper() {
+        throw new IllegalArgumentException("Utility class");
+    }
 }

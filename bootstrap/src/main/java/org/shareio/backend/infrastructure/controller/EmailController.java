@@ -14,10 +14,7 @@ import org.shareio.backend.security.IdentityHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -32,7 +29,7 @@ public class EmailController {
     GetUserProfileUseCaseService getUserProfileUseCaseService;
     EmailHandler emailHandler;
 
-    @RequestMapping(value = "/send", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/send", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> sendHelpdeskEmail(HttpServletRequest httpServletRequest, @RequestBody EmailDto emailDto) {
         UUID userId = identityHandler.getUserIdFromHeader(httpServletRequest);
         if (authenticationHandler.authenticateRequestForUserIdentity(httpServletRequest, userId)) {
@@ -46,9 +43,6 @@ public class EmailController {
             }
         } else {
             return new ErrorResponse("NO PERMISSIONS", HttpStatus.FORBIDDEN);
-
         }
     }
-
-
 }

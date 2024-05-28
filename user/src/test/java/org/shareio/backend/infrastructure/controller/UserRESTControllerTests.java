@@ -12,10 +12,7 @@ import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
 import org.shareio.backend.core.usecases.port.out.GetUserProfileByEmailDaoInterface;
 import org.shareio.backend.core.usecases.port.out.GetUserProfileDaoInterface;
 import org.shareio.backend.core.usecases.port.out.SaveUserCommandInterface;
-import org.shareio.backend.core.usecases.service.AddUserUseCaseService;
-import org.shareio.backend.core.usecases.service.ChangePasswordUserUseCaseService;
-import org.shareio.backend.core.usecases.service.GetUserProfileUseCaseService;
-import org.shareio.backend.core.usecases.service.ModifyUserUseCaseService;
+import org.shareio.backend.core.usecases.service.*;
 import org.shareio.backend.security.AuthenticationHandler;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -63,6 +60,9 @@ public class UserRESTControllerTests {
     @MockBean
     @InjectMocks
     private ChangePasswordUserUseCaseService changePasswordUseCaseService;
+    @MockBean
+    @InjectMocks
+    private GetAllUserIdListUseCaseService getAllUserIdListUseCaseService;
 
     @InjectMocks
     UserRESTController userRESTController;
@@ -82,7 +82,8 @@ public class UserRESTControllerTests {
                 addUserUseCaseService,
                 changePasswordUseCaseService,
                 getUserProfileUseCaseService,
-                modifyUserUseCaseService
+                modifyUserUseCaseService,
+                getAllUserIdListUseCaseService
         );
 
         when(getUserProfileDaoInterface.getUserDto(userInvalidId)).thenReturn(

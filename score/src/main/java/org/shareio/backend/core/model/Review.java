@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.shareio.backend.core.model.vo.ReviewId;
-import org.shareio.backend.core.usecases.port.dto.ReviewGetDto;
 
 import java.time.LocalDateTime;
 
@@ -20,13 +19,5 @@ public class Review {
 
     public ReviewSnapshot toSnapshot() {
         return new ReviewSnapshot(this);
-    }
-
-    public static Review fromDto(ReviewGetDto reviewGetDto){
-        return new Review(
-                new ReviewId(reviewGetDto.reviewId()),
-                reviewGetDto.value(),
-                reviewGetDto.date()
-        );
     }
 }

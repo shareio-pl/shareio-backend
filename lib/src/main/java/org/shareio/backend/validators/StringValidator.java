@@ -6,6 +6,8 @@ import org.shareio.backend.exceptions.ValidationException;
 import java.util.Objects;
 
 public class StringValidator {
+    
+    private static final String NON_LETTER_STRING = "String contains non letter characters";
     public static void validateStringNotEmpty(String string) throws ValidationException {
         if (Objects.isNull(string) || string.isBlank() || string.isEmpty())
             throw new ValidationException("String is empty");
@@ -21,7 +23,7 @@ public class StringValidator {
 
         for (char c : chars) {
             if (!Character.isLetter(c)) {
-                throw new ValidationException("String contains non-letter character");
+                throw new ValidationException(NON_LETTER_STRING);
             }
         }
     }
@@ -31,7 +33,7 @@ public class StringValidator {
 
         for (char c : chars) {
             if (!Character.isLetterOrDigit(c)) {
-                throw new ValidationException("String contains non-letter character");
+                throw new ValidationException(NON_LETTER_STRING);
             }
         }
     }
@@ -40,8 +42,8 @@ public class StringValidator {
         char[] chars = string.toCharArray();
 
         for (char c : chars) {
-            if (!Character.isLetterOrDigit(c) && !(c == '/')) {
-                throw new ValidationException("String contains non-letter character");
+            if (!Character.isLetterOrDigit(c) && (c != '/')) {
+                throw new ValidationException(NON_LETTER_STRING);
             }
         }
     }
@@ -50,8 +52,8 @@ public class StringValidator {
         char[] chars = string.toCharArray();
 
         for (char c : chars) {
-            if (!Character.isLetterOrDigit(c) && !(c == '/') && !(c == '.')) {
-                throw new ValidationException("String contains non-letter character");
+            if (!Character.isLetterOrDigit(c) && (c != '/') && (c != '.')) {
+                throw new ValidationException(NON_LETTER_STRING);
             }
         }
     }
@@ -60,19 +62,23 @@ public class StringValidator {
         char[] chars = string.toCharArray();
 
         for (char c : chars) {
-            if (!Character.isLetterOrDigit(c) && !Character.isSpaceChar(c) && !(-1 == "-.".indexOf(c))) {
+            if (!Character.isLetterOrDigit(c) && !Character.isSpaceChar(c) && (-1 != "-.".indexOf(c))) {
                 throw new ValidationException("String contains not ok character");
             }
         }
     }
 
     public static void validatePolishPostCode(String polishPostCode) throws ValidationException {
-        if (!Const.polishPostCodeRegex.matcher(polishPostCode).find())
+        if (!Const.POLISH_POST_CODE_REGEX.matcher(polishPostCode).find())
             throw new ValidationException("Invalid polish post code");
     }
 
     public static void validateEmail(String email) throws ValidationException {
-        if (!Const.emailRegex.matcher(email).find())
+        if (!Const.EMAIL_REGEX.matcher(email).find())
             throw new ValidationException("Invalid email");
+    }
+    
+    private StringValidator() {
+        throw new IllegalArgumentException("Utility class");
     }
 }

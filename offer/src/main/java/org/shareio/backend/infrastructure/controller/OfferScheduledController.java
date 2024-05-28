@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 
 import org.shareio.backend.Const;
 import org.shareio.backend.core.usecases.port.in.PeriodicOfferReservationTimeoutUseCaseInterface;
+import org.shareio.backend.security.RequestLogHandler;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +16,9 @@ public class OfferScheduledController {
 
     PeriodicOfferReservationTimeoutUseCaseInterface periodicOfferReservationTimeoutUseCaseInterface;
 
-    @Scheduled(fixedRate = Const.offerReservationCheckRate)
+    @Scheduled(fixedRate = Const.OFFER_RESERVATION_CHECK_RATE)
     public void dereserveOffers() {
+        RequestLogHandler.handlePeriodicTask();
         periodicOfferReservationTimeoutUseCaseInterface.periodicOfferReservationTimeoutHandler();
     }
 }

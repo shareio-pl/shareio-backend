@@ -25,6 +25,6 @@ public class GetUserProfileUseCaseService implements GetUserProfileUseCaseInterf
     public UserProfileResponseDto getUserProfileResponseDto(UUID id) throws MultipleValidationException, NoSuchElementException {
         Optional<UserProfileGetDto> getUserDto = getUserDaoInterface.getUserDto(id);
         UserValidator.validateUserGetDto(getUserDto.orElseThrow());
-        return Optional.of(getUserDto.map(User::fromDto).get().toSnapshot()).map(UserInfrastructureMapper::toDto).get();
+        return Optional.of(getUserDto.map(User::fromDto).orElseThrow(NoSuchElementException::new).toSnapshot()).map(UserInfrastructureMapper::toDto).orElseThrow(NoSuchElementException::new);
     }
 }

@@ -31,7 +31,7 @@ public class AddUserUseCaseService implements AddUserUseCaseInterface {
         } catch (NoSuchElementException noSuchElementException) {
             BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
             String pwHash = bCryptPasswordEncoder.encode(userAddDto.password());
-            User user = Optional.of(userAddDto).map(User::fromDto).get();
+            User user = Optional.of(userAddDto).map(User::fromDto).orElseThrow(NoSuchElementException::new);
             user.getSecurity().setPwHash(pwHash);
             saveUserCommandInterface.saveUser(Optional.of(user).map(User::toSnapshot));
             return user.getUserId().getId();

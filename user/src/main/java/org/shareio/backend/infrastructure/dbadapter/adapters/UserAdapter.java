@@ -9,15 +9,13 @@ import org.shareio.backend.infrastructure.dbadapter.mappers.UserDatabaseMapper;
 import org.shareio.backend.infrastructure.dbadapter.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 @Service
 public class UserAdapter implements GetUserProfileDaoInterface,
         GetUserProfileByEmailDaoInterface, RemoveUserCommandInterface, SaveUserCommandInterface,
-        UpdateUserChangeMetadataCommandInterface, UpdateUserChangePasswordCommandInterface {
+        UpdateUserChangeMetadataCommandInterface, UpdateUserChangePasswordCommandInterface, GetAllUserProfileListDaoInterface {
     final UserRepository userRepository;
 
     public UserAdapter(UserRepository userRepository) {
@@ -84,5 +82,11 @@ public class UserAdapter implements GetUserProfileDaoInterface,
         UserEntity userEntityFromDb = userEntity.orElseThrow(NoSuchElementException::new);
         userEntityFromDb.getSecurity().setPwHash(userSnapshot.security().getPwHash());
         userRepository.save(userEntityFromDb);
+    }
+
+    @Override
+    public List<UserProfileGetDto> getAllUserProfileList() {
+        List<UserEntity> userEntityList = (ArrayList<UserEntity>) userRepository.findAll();
+        return userEntityList.stream().map(UserDatabaseMapper::toDto).toList();
     }
 }

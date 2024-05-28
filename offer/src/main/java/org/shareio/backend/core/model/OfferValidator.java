@@ -88,16 +88,11 @@ public class OfferValidator {
         } catch (ValidationException validationException) {
             errorMap.put("Surname", validationException.getMessage());
         }
-        if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.multipleValidationErrorCode, errorMap);
+        if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.MUL_VAL_ERR, errorMap);
     }
 
     public static void validateOffer(OfferSaveDto offerSaveDto) throws MultipleValidationException {
         Map<String, String> errorMap = new HashMap<>();
-        try {
-            validateDate(offerSaveDto.creationDate());
-        } catch (ValidationException validationException) {
-            errorMap.put("CreationDate", validationException.getMessage());
-        }
         try {
             validateCity(offerSaveDto.city());
         } catch (ValidationException validationException) {
@@ -134,7 +129,7 @@ public class OfferValidator {
         } catch (ValidationException validationException) {
             errorMap.put("Description", validationException.getMessage());
         }
-        if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.multipleValidationErrorCode, errorMap);
+        if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.MUL_VAL_ERR, errorMap);
     }
 
 
@@ -154,7 +149,7 @@ public class OfferValidator {
     public static void validateTitle(String title) throws ValidationException {
         ObjectValidator.validateObjectIsNotNull(title);
         StringValidator.validateStringNotEmpty(title);
-        StringValidator.validateStringLength(title, Const.minTitleLength, Const.maxTitleLength);
+        StringValidator.validateStringLength(title, Const.MIN_TITLE_LENGTH, Const.MAX_TITLE_LENGTH);
     }
 
 
@@ -181,7 +176,11 @@ public class OfferValidator {
     public static void validateDescription(String description) throws ValidationException {
         ObjectValidator.validateObjectIsNotNull(description);
         StringValidator.validateStringNotEmpty(description);
-        StringValidator.validateStringLength(description, Const.minDescriptionLength, Const.maxDescriptionLength);
+        StringValidator.validateStringLength(description, Const.MIN_DESCRIPTION_LENGTH, Const.MAX_DESCRIPTION_LENGTH);
+    }
+
+    private OfferValidator(){
+        throw new IllegalArgumentException("Utility class");
     }
 
 }

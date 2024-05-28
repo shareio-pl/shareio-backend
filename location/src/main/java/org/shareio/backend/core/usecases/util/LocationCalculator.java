@@ -2,7 +2,7 @@ package org.shareio.backend.core.usecases.util;
 
 import org.shareio.backend.core.model.vo.Location;
 import org.shareio.backend.exceptions.LocationCalculationException;
-import org.shareio.backend.external_API.OSM.CoordinatesCalculator;
+import org.shareio.backend.external.map.CoordinatesCalculator;
 
 import java.io.IOException;
 import java.util.Map;
@@ -12,5 +12,9 @@ public class LocationCalculator {
         CoordinatesCalculator calculator = new CoordinatesCalculator();
         Map<String, Double> coordinates = calculator.getCoordinatesFromAddress(country, city, street, houseNumber);
         return new Location(coordinates.get("lat"), coordinates.get("lon"));
+    }
+
+    private LocationCalculator() {
+        throw new IllegalStateException("Utility class");
     }
 }

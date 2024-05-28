@@ -65,8 +65,8 @@ public class Offer {
         return new Offer(
                 new OfferId(UUID.randomUUID()),
                 null,
-                new Address(new AddressId(UUID.randomUUID()), offerSaveDto.country(), offerSaveDto.region(), offerSaveDto.city(), offerSaveDto.street(), offerSaveDto.houseNumber(), offerSaveDto.flatNumber(), offerSaveDto.postCode(), new Location(Const.defaultAddressCenterLat, Const.defaultAddressCenterLon)),
-                offerSaveDto.creationDate(),
+                new Address(new AddressId(UUID.randomUUID()), offerSaveDto.country(), offerSaveDto.region(), offerSaveDto.city(), offerSaveDto.street(), offerSaveDto.houseNumber(), offerSaveDto.flatNumber(), offerSaveDto.postCode(), new Location(Const.DEFAULT_ADDRESS_CENTER_LAT, Const.DEFAULT_ADDRESS_CENTER_LON)),
+                LocalDateTime.now(),
                 Status.CREATED,
                 null,
                 null,

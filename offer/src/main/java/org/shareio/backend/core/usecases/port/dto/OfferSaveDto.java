@@ -1,11 +1,9 @@
 package org.shareio.backend.core.usecases.port.dto;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record OfferSaveDto(
         UUID ownerId,
-        LocalDateTime creationDate,
         String title,
         String condition,
         String category,

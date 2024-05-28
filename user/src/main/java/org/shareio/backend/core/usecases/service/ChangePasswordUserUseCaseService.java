@@ -28,7 +28,7 @@ public class ChangePasswordUserUseCaseService implements ChangePasswordUserUseCa
         Optional<UserProfileGetDto> userProfileGetDto = getUserProfileDaoInterface.getUserDto(userId);
         User user = userProfileGetDto.map(User::fromDto).orElseThrow(NoSuchElementException::new);
         if(bCryptPasswordEncoder.matches(userPasswordDto.newPassword(), user.getSecurity().getPwHash())){
-            throw new IllegalArgumentException(Const.illegalArgumentErrorCode+": New password must differ from the old password!");
+            throw new IllegalArgumentException(Const.ILL_ARG_ERR +": New password must differ from the old password!");
         }
         if(bCryptPasswordEncoder.matches(userPasswordDto.oldPassword(), user.getSecurity().getPwHash())){
             user.getSecurity().setPwHash(bCryptPasswordEncoder.encode(userPasswordDto.newPassword()));

@@ -1,4 +1,4 @@
-package org.shareio.backend.external_API.OSM;
+package org.shareio.backend.external.map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,11 +17,10 @@ public class CoordinatesCalculator implements CoordinatesCalculatorInterface {
     public Map<String, Double> getCoordinatesFromAddress(String country, String city, String street, String houseNumber) throws LocationCalculationException, IOException, InterruptedException {
         Map<String, Double> coordinates = new HashMap<>();
         String address = country + "," + city + "," + street + "," + houseNumber;
-        String APIUrl = "https://nominatim.openstreetmap.org/search?q=" + address + "&format=json";
+        String apiUrl = "https://nominatim.openstreetmap.org/search?q=" + address + "&format=json";
 
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(APIUrl)).GET().build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(apiUrl)).GET().build();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
         JSONArray array = new JSONArray(response.body());
         JSONObject object = array.getJSONObject(0);

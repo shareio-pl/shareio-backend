@@ -23,6 +23,9 @@ public class RemoveOffersForUserUseCaseService implements RemoveOffersForUserUse
         offerList = offerList.stream().filter(offer -> Objects.equals(offer.getOwner().getUserId().getId() , userId)).toList();
         for (Offer offer : offerList) {
             // TODO: REMOVE PHOTO BY SHAREIO-IMAGE
+            if(Objects.nonNull(offer.getReview())){
+                removeResponseDto.setDeletedReviewCount(removeResponseDto.getDeletedReviewCount() + 1);
+            }
             removeOfferCommandInterface.removeOffer(offer.getOfferId().getId());
             removeResponseDto.setDeletedOfferCount(removeResponseDto.getDeletedOfferCount() + 1);
         }
