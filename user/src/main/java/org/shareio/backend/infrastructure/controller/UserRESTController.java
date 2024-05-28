@@ -38,7 +38,7 @@ public class UserRESTController {
     ModifyUserUseCaseInterface modifyUserUseCaseInterface;
     GetAllUserIdListUseCaseInterface getAllUserIdListUseCaseInterface;
 
-    @GetMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> addUser(HttpServletRequest httpRequest, @RequestBody UserSaveDto userSaveDto) {
         RequestLogHandler.handleRequest(httpRequest);
         try {
