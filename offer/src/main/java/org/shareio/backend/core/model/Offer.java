@@ -66,7 +66,7 @@ public class Offer {
                 new OfferId(UUID.randomUUID()),
                 null,
                 new Address(new AddressId(UUID.randomUUID()), offerSaveDto.country(), offerSaveDto.region(), offerSaveDto.city(), offerSaveDto.street(), offerSaveDto.houseNumber(), offerSaveDto.flatNumber(), offerSaveDto.postCode(), new Location(Const.defaultAddressCenterLat, Const.defaultAddressCenterLon)),
-                offerSaveDto.creationDate(),
+                LocalDateTime.now(),
                 Status.CREATED,
                 null,
                 null,
