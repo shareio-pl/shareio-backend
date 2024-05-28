@@ -8,6 +8,7 @@ import org.shareio.backend.Const;
 import org.shareio.backend.EnvGetter;
 import org.shareio.backend.controller.responses.CorrectResponse;
 import org.shareio.backend.controller.responses.ErrorResponse;
+import org.shareio.backend.controller.responses.ShareioResponse;
 import org.shareio.backend.core.model.vo.Category;
 import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.core.model.vo.Location;
@@ -109,71 +110,17 @@ public class OfferRESTController {
 
     @RequestMapping(value = "/getCreatedOffersByUser/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getCreatedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
-        RequestLogHandler.handleRequest(httpRequest);
-        Map<String, Object> response = new HashMap<>();
-        try {
-            response.put("offerIds", getOffersByUserAndStatusUseCaseInterface.getOfferResponseDtoListByUser(id, Status.CREATED));
-            RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (MultipleValidationException e) {
-            response.put("error", e.getMessage());
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, "Database data error");
-            return new ResponseEntity<>(response, HttpStatus.FAILED_DEPENDENCY);
-        } catch (NoSuchElementException e) {
-            response.put("error", e.getMessage());
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "Entity not found");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            response.put("error", e.getMessage());
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, "Server error");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return getOfferListBasedOnStatus(httpRequest, id, Status.CREATED);
     }
 
     @RequestMapping(value = "/getReservedOffersByUser/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getReservedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
-        RequestLogHandler.handleRequest(httpRequest);
-        Map<String, Object> response = new HashMap<>();
-        try {
-            response.put("offerIds", getOffersByUserAndStatusUseCaseInterface.getOfferResponseDtoListByUser(id, Status.RESERVED));
-            RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (MultipleValidationException e) {
-            response.put("error", e.getMessage());
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, "Database data error");
-            return new ResponseEntity<>(response, HttpStatus.FAILED_DEPENDENCY);
-        } catch (NoSuchElementException e) {
-            response.put("error", e.getMessage());
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "Entity not found");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            response.put("error", e.getMessage());
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, "Server error");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return getOfferListBasedOnStatus(httpRequest, id, Status.RESERVED);
     }
 
     @RequestMapping(value = "/getFinishedOffersByUser/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getFinishedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
-        RequestLogHandler.handleRequest(httpRequest);
-        Map<String, Object> response = new HashMap<>();
-        try {
-            response.put("offerIds", getOffersByUserAndStatusUseCaseInterface.getOfferResponseDtoListByUser(id, Status.FINISHED));
-            RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (MultipleValidationException e) {
-            response.put("error", e.getMessage());
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, "Database data error");
-            return new ResponseEntity<>(response, HttpStatus.FAILED_DEPENDENCY);
-        } catch (NoSuchElementException e) {
-            response.put("error", e.getMessage());
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "Entity not found");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            response.put("error", e.getMessage());
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, "Server error");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return getOfferListBasedOnStatus(httpRequest, id, Status.FINISHED);
     }
 
     @RequestMapping(value = "/getOffersByName", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -422,6 +369,28 @@ public class OfferRESTController {
         } catch (Exception e) {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, "Server error");
             return new ErrorResponse(Const.APINotRespondingErrorCode, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private ShareioResponse getOfferListBasedOnStatus(HttpServletRequest httpRequest, UUID id, Status status){
+        RequestLogHandler.handleRequest(httpRequest);
+        Map<String, Object> response = new HashMap<>();
+        try {
+            response.put("offerIds", getOffersByUserAndStatusUseCaseInterface.getOfferResponseDtoListByUser(id, status));
+            RequestLogHandler.handleCorrectResponse(httpRequest);
+            return new CorrectResponse(response, Const.successErrorCode, HttpStatus.OK);
+        } catch (MultipleValidationException e) {
+            response.put("error", e.getMessage());
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, "Database data error");
+            return new ErrorResponse(e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
+        } catch (NoSuchElementException e) {
+            response.put("error", e.getMessage());
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "Entity not found");
+            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            response.put("error", e.getMessage());
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, "Server error");
+            return new ErrorResponse("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
