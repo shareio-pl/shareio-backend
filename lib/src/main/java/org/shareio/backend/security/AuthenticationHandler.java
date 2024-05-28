@@ -20,7 +20,7 @@ public class AuthenticationHandler {
     private final PermissionHandler permissionHandler;
     private final ProfileHandler profileHandler;
 
-    private final String messageEnd = "------------------------------------";
+    private static final String ME = "------------------------------------";
 
     public AuthenticationHandler(IdentityHandler identityHandler, PermissionHandler permissionHandler, ProfileHandler profileHandler) {
         this.identityHandler = identityHandler;
@@ -39,12 +39,12 @@ public class AuthenticationHandler {
         logMessage+=("IsSameUser: "+ identityHandler.isSameUser(httpRequest, userId)+"\n");
         if (permissionHandler.isUser(httpRequest) && identityHandler.isSameUser(httpRequest, userId)) {
             logMessage+=("Authentication sucessful for user "+ userId+"\n");
-            logMessage+=(messageEnd);
+            logMessage+=(ME);
             log.error(logMessage);
             return true;
         } else {
             logMessage+=("Authentication failed for user "+ httpRequest.getHeaders("id").nextElement()+": Identity mismatch!\n");
-            logMessage+=(messageEnd);
+            logMessage+=(ME);
             log.error(logMessage);
             return false;
         }
@@ -62,13 +62,13 @@ public class AuthenticationHandler {
         }
         if(permissionHandler.isUser(httpRequest)){
             logMessage+=("Authentication sucessful for user "+ userId+"\n");
-            logMessage+=(messageEnd);
+            logMessage+=(ME);
             log.error(logMessage);
             return true;
         }
         else {
             logMessage+=("Authentication failed for user "+ userId+"\n");
-            logMessage+=(messageEnd);
+            logMessage+=(ME);
             log.error(logMessage);
             return false;
         }
@@ -80,14 +80,14 @@ public class AuthenticationHandler {
         logMessage += ("ProdProfile: " + profileHandler.checkProdProfile(activeProfile) + "\n");
         if (profileHandler.checkTestProfile(activeProfile)) {
             logMessage += ("Test profile - skipping authentication" + "\n");
-            logMessage += (messageEnd);
+            logMessage += (ME);
             log.error(logMessage);
             return true;
         }
 
         else {
             logMessage += ("Production profile" + "\n");
-            logMessage += (messageEnd);
+            logMessage += (ME);
             log.error(logMessage);
             return false;
         }
@@ -99,13 +99,13 @@ public class AuthenticationHandler {
         logMessage+=("IsUser: "+ permissionHandler.isUser(httpRequest)+"\n");
         if (permissionHandler.isAdmin(httpRequest)){
             logMessage+=("Admin permission - skipping authentication\n");
-            logMessage+=(messageEnd);
+            logMessage+=(ME);
             log.error(logMessage);
             return true;
         }
         else {
             logMessage+=("Non-admin permission\n");
-            logMessage+=(messageEnd);
+            logMessage+=(ME);
             log.error(logMessage);
             return false;
         }

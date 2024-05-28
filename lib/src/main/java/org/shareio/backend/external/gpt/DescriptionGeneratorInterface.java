@@ -1,4 +1,4 @@
-package org.shareio.backend.external_API.GPT;
+package org.shareio.backend.external.gpt;
 
 import org.shareio.backend.exceptions.DescriptionGenerationException;
 

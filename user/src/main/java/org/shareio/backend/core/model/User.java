@@ -63,7 +63,7 @@ public class User {
                 userSaveDto.name(),
                 userSaveDto.surname(),
                 userSaveDto.dateOfBirth(),
-                new PhotoId(Const.defaultPhotoId),
+                new PhotoId(Const.DEFAULT_PHOTO_ID),
 
                 new Address(
                         new AddressId(UUID.randomUUID()),

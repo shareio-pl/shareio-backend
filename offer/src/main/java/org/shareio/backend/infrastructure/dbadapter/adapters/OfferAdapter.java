@@ -66,7 +66,7 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
     @Override
     public void saveOffer(OfferSnapshot offerSnapshot) {
 
-        OfferEntity offerEntity = Optional.of(offerSnapshot).map(OfferDatabaseMapper::toEntity).get();
+        OfferEntity offerEntity = Optional.of(offerSnapshot).map(OfferDatabaseMapper::toEntity).orElseThrow(NoSuchElementException::new);
         UserEntity ownerEntity = userRepository.findByUserId(offerSnapshot.owner().userId().getId()).orElseThrow(NoSuchElementException::new);
         offerEntity.setOwner(ownerEntity);
 
@@ -99,7 +99,7 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
     public void updateOfferAddReview(OfferSnapshot offerSnapshot) {
         Optional<OfferEntity> offerEntity = offerRepository.findByOfferId(offerSnapshot.offerId().getId());
         OfferEntity offerEntityFromDb = offerEntity.orElseThrow(NoSuchElementException::new);
-        offerEntityFromDb.setReview(Optional.of(offerSnapshot.reviewSnapshot()).map(ReviewMapper::toEntity).get());
+        offerEntityFromDb.setReview(Optional.of(offerSnapshot.reviewSnapshot()).map(ReviewMapper::toEntity).orElseThrow(NoSuchElementException::new));
         offerRepository.save(offerEntityFromDb);
     }
 

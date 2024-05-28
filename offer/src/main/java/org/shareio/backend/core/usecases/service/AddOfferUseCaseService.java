@@ -30,7 +30,7 @@ public class AddOfferUseCaseService implements AddOfferUseCaseInterface {
     @Override
     public OfferSaveResponseDto addOffer(OfferSaveDto offerSaveDto, UUID photoId) throws LocationCalculationException, IOException, InterruptedException, MultipleValidationException {
         OfferValidator.validateOffer(offerSaveDto);
-        Offer offer = Optional.of(offerSaveDto).map(Offer::fromDto).get();
+        Offer offer = Optional.of(offerSaveDto).map(Offer::fromDto).orElseThrow(NoSuchElementException::new);
         User owner = getUserProfileDaoInterface.getUserDto(offerSaveDto.ownerId()).map(User::fromDto).orElseThrow(NoSuchElementException::new);
         offer.setOwner(owner);
         offer.setPhotoId(new PhotoId(photoId));

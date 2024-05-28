@@ -16,7 +16,7 @@ public class OfferScheduledController {
 
     PeriodicOfferReservationTimeoutUseCaseInterface periodicOfferReservationTimeoutUseCaseInterface;
 
-    @Scheduled(fixedRate = Const.offerReservationCheckRate)
+    @Scheduled(fixedRate = Const.OFFER_RESERVATION_CHECK_RATE)
     public void dereserveOffers() {
         RequestLogHandler.handlePeriodicTask();
         periodicOfferReservationTimeoutUseCaseInterface.periodicOfferReservationTimeoutHandler();

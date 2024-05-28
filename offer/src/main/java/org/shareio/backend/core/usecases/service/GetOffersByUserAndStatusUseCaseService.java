@@ -21,20 +21,15 @@ public class GetOffersByUserAndStatusUseCaseService implements GetOffersByUserAn
 
     @Override
     public List<UUID> getOfferResponseDtoListByUser(UUID id, Status status) throws NoSuchElementException {
-        //TODO: think about statuses
         List<OfferGetDto> getOfferDtoList = getOffersByUserDaoInterface.getOffersByUser(id);
-        getOfferDtoList.forEach(offer ->
-        {
+        getOfferDtoList = getOfferDtoList.stream().filter(offer -> {
             try {
                 OfferValidator.validateOffer(offer);
+                return true;
             } catch (MultipleValidationException e) {
-                try {
-                    throw new MultipleValidationException(e.getMessage(), e.getErrorMap());
-                } catch (MultipleValidationException ex) {
-                    throw new RuntimeException(ex);
-                }
+                return false;
             }
-        });
+        }).toList();
 
         if (getOfferDtoList.isEmpty()) {
             throw new NoSuchElementException("No offers found for this user!");

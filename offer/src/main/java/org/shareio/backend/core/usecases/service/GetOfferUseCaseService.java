@@ -26,7 +26,7 @@ public class GetOfferUseCaseService implements GetOfferUseCaseInterface {
     public OfferResponseDto getOfferResponseDto(UUID id, Integer reviewCount, Double averageUserReviewValue) throws MultipleValidationException {
         Optional<OfferGetDto> getOfferDto = getOfferDaoInterface.getOfferDto(id);
         OfferValidator.validateOffer(getOfferDto.orElseThrow());
-        Offer offer = getOfferDto.map(Offer::fromDto).get();
+        Offer offer = getOfferDto.map(Offer::fromDto).orElseThrow(NoSuchElementException::new);
         if(offer.getStatus().equals(Status.CANCELED)){
             throw new NoSuchElementException();
         }

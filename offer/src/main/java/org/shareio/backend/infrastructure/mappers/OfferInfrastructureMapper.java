@@ -12,7 +12,7 @@ public class OfferInfrastructureMapper {
     public static OfferResponseDto toDto(OfferSnapshot offerSnapshot, Integer reviewCount, Double averageUserReviewValue) {
         LocalDateTime unreservationDate = null;
         if (offerSnapshot.status().equals(Status.RESERVED) && !Objects.isNull(offerSnapshot.reservationDate())) {
-            unreservationDate = offerSnapshot.reservationDate().plus(Const.offerReservationDuration);
+            unreservationDate = offerSnapshot.reservationDate().plus(Const.OFFER_RESERVATION_DURATION);
         }
         if (Objects.nonNull(offerSnapshot.reviewSnapshot())) {
             return new OfferResponseDto(
@@ -76,5 +76,9 @@ public class OfferInfrastructureMapper {
                     null
             );
         }
+    }
+
+    private OfferInfrastructureMapper() {
+        throw new IllegalStateException("Utility class");
     }
 }

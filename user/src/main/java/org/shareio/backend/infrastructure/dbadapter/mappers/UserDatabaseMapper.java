@@ -35,4 +35,8 @@ public class UserDatabaseMapper {
                 userSnapshot.security().getRegistrationDate(),
                 userSnapshot.security().getLastLoginDate());
     }
+
+    private UserDatabaseMapper() {
+        throw new IllegalArgumentException("Utility class");
+    }
 }

@@ -17,9 +17,10 @@ import org.shareio.backend.core.usecases.port.dto.*;
 import org.shareio.backend.core.usecases.port.in.*;
 import org.shareio.backend.core.usecases.port.out.GetLocationDaoInterface;
 import org.shareio.backend.core.usecases.service.GetNewestOffersUseCaseService;
+import org.shareio.backend.exceptions.DescriptionGenerationException;
 import org.shareio.backend.exceptions.LocationCalculationException;
 import org.shareio.backend.exceptions.MultipleValidationException;
-import org.shareio.backend.external_API.GPT.DescriptionGenerator;
+import org.shareio.backend.external.gpt.DescriptionGenerator;
 import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
 import org.shareio.backend.security.AuthenticationHandler;
 import org.shareio.backend.security.RequestLogHandler;
@@ -71,13 +72,13 @@ public class OfferRESTController {
             Double averageUserReviewValue = getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(id);
             OfferResponseDto offerResponseDto = getOfferUseCaseInterface.getOfferResponseDto(id, reviewCount, averageUserReviewValue);
             RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new CorrectResponse(offerResponseDto, Const.successErrorCode, HttpStatus.OK);
+            return new CorrectResponse(offerResponseDto, Const.SUCC_ERR, HttpStatus.OK);
         } catch (MultipleValidationException e) {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, e.getMessage());
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException noSuchElementException) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
-            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
+            return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -92,19 +93,17 @@ public class OfferRESTController {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, e.getMessage());
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException noSuchElementException) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
-            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
+            return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         }
-
-        //TODO Move location validation to UserValidator
         Optional<LocationGetDto> locationGetDto = getLocationDaoInterface.getLocationDto(userProfileResponseDto.address().getId());
         if (locationGetDto.map(Location::fromDto).isPresent()) {
-            UUID closestOfferId = getClosestOfferUseCaseInterface.getOfferResponseDto(locationGetDto.map(Location::fromDto).get());
+            UUID closestOfferId = getClosestOfferUseCaseInterface.getOfferResponseDto(locationGetDto.map(Location::fromDto).orElseThrow(NoSuchElementException::new));
             RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new CorrectResponse(closestOfferId, Const.successErrorCode, HttpStatus.OK);
+            return new CorrectResponse(closestOfferId, Const.SUCC_ERR, HttpStatus.OK);
         } else {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.dataIntegrityErrorCode);
-            return new ErrorResponse(Const.toDoErrorCode, HttpStatus.FAILED_DEPENDENCY);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.DATA_INTEGRITY_ERR);
+            return new ErrorResponse(Const.TO_DO_ERR, HttpStatus.FAILED_DEPENDENCY);
         }
 
     }
@@ -131,15 +130,15 @@ public class OfferRESTController {
         try {
             response.put("offerIds", getOffersByNameUseCaseInterface.getOfferResponseDtoListByName(name));
             RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new CorrectResponse(response, Const.successErrorCode, HttpStatus.OK);
+            return new CorrectResponse(response, Const.SUCC_ERR, HttpStatus.OK);
         } catch (MultipleValidationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.dataIntegrityErrorCode);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.DATA_INTEGRITY_ERR);
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException noSuchElementException) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
-            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
+            return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, Const.serverError);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR);
             return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -152,7 +151,7 @@ public class OfferRESTController {
             categories.add(new CategoryWithDisplayName(category));
         }
         RequestLogHandler.handleCorrectResponse(httpRequest);
-        return new CorrectResponse(new CategoriesResponseDto(categories), Const.successErrorCode, HttpStatus.OK);
+        return new CorrectResponse(new CategoriesResponseDto(categories), Const.SUCC_ERR, HttpStatus.OK);
     }
 
     @GetMapping(value = "/getConditions", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -163,21 +162,22 @@ public class OfferRESTController {
             conditionsWithDisplayNames.add(new ConditionWithDisplayName(condition));
         }
         RequestLogHandler.handleCorrectResponse(httpRequest);
-        return new CorrectResponse(new ConditionsResponseDto(conditionsWithDisplayNames), Const.successErrorCode, HttpStatus.OK);
+        return new CorrectResponse(new ConditionsResponseDto(conditionsWithDisplayNames), Const.SUCC_ERR, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> searchOffersForList(HttpServletRequest httpRequest) {
         RequestLogHandler.handleRequest(httpRequest);
         //TODO
-        return new ErrorResponse(Const.notImplementedErrorCode, HttpStatus.NOT_IMPLEMENTED);
+        return new ErrorResponse(Const.NO_IMPL_ERR, HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @RequestMapping(value = "/searchForMap", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/searchForMap", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> searchOffersForMap(HttpServletRequest httpRequest) {
         RequestLogHandler.handleRequest(httpRequest);
-        //TODO
-        return new ErrorResponse(Const.notImplementedErrorCode, HttpStatus.NOT_IMPLEMENTED);
+        //TODO: create this
+        RequestLogHandler.handleRequest(httpRequest);
+        return new ErrorResponse(Const.NO_IMPL_ERR, HttpStatus.NOT_IMPLEMENTED);
     }
 
     @GetMapping(value = "/generateDescription", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -192,9 +192,10 @@ public class OfferRESTController {
                 description = generator.generateDescription(title, condition, category, additionalData);
             }
             RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new CorrectResponse(description, Const.successErrorCode, HttpStatus.OK);
-        } catch (Exception e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, Const.serverError);
+            return new CorrectResponse(description, Const.SUCC_ERR, HttpStatus.OK);
+        } catch (IOException | InterruptedException | DescriptionGenerationException e) {
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR);
+            Thread.currentThread().interrupt();
             return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -205,11 +206,11 @@ public class OfferRESTController {
         try {
             List<UUID> newestOfferIdList = getNewestOffersUseCaseService.getNewestOffers();
             RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new CorrectResponse(newestOfferIdList, Const.successErrorCode, HttpStatus.OK);
+            return new CorrectResponse(newestOfferIdList, Const.SUCC_ERR, HttpStatus.OK);
 
         } catch (IllegalArgumentException illegalArgumentException) {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.BAD_REQUEST, illegalArgumentException.getMessage());
-            return new ErrorResponse(Const.illegalArgumentErrorCode, HttpStatus.BAD_REQUEST);
+            return new ErrorResponse(Const.ILL_ARG_ERR, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -218,7 +219,7 @@ public class OfferRESTController {
         RequestLogHandler.handleRequest(httpRequest);
         List<UUID> allOfferIdList = getAllOffersUseCaseInterface.getAllOfferIdList();
         RequestLogHandler.handleCorrectResponse(httpRequest);
-        return new CorrectResponse(allOfferIdList, Const.successErrorCode, HttpStatus.OK);
+        return new CorrectResponse(allOfferIdList, Const.SUCC_ERR, HttpStatus.OK);
     }
 
     @GetMapping(value = "/getScore/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -229,13 +230,13 @@ public class OfferRESTController {
             Double userScore = getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(userId);
             UserScoreDto userScoreDto = new UserScoreDto(userId, userProfileResponseDto.email(), userScore);
             RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new CorrectResponse(userScoreDto, Const.successErrorCode, HttpStatus.OK);
+            return new CorrectResponse(userScoreDto, Const.SUCC_ERR, HttpStatus.OK);
         } catch (MultipleValidationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.dataIntegrityErrorCode);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.DATA_INTEGRITY_ERR);
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException noSuchElementException) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
-            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
+            return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         }
 
     }
@@ -253,7 +254,7 @@ public class OfferRESTController {
                 .toList()
                 .reversed();
         RequestLogHandler.handleCorrectResponse(httpRequest);
-        return new CorrectResponse(sortedUserIdList, Const.successErrorCode, HttpStatus.OK);
+        return new CorrectResponse(sortedUserIdList, Const.SUCC_ERR, HttpStatus.OK);
 
     }
     // ------------------- POST -------------------
@@ -283,11 +284,11 @@ public class OfferRESTController {
 
             if (!response.getStatusCode().is2xxSuccessful()) {
                 RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, "Photo could not be added");
-                return new ErrorResponse(Const.APINotRespondingErrorCode + ": Photo could not be added", HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ErrorResponse(Const.API_NOT_RESP_ERR + ": Photo could not be added", HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } catch (Exception e) {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, "Photo could not be added");
-            return new ErrorResponse(Const.APINotRespondingErrorCode + ": Photo could not be added", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ErrorResponse(Const.API_NOT_RESP_ERR + ": Photo could not be added", HttpStatus.INTERNAL_SERVER_ERROR);
 
         }
 
@@ -295,7 +296,7 @@ public class OfferRESTController {
             getUserProfileUseCaseInterface.getUserProfileResponseDto(offerSaveDto.ownerId());
             OfferSaveResponseDto offerSaveResponseDto = addOfferUseCaseInterface.addOffer(offerSaveDto, photoId);
             RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new CorrectResponse(offerSaveResponseDto, Const.successErrorCode, HttpStatus.OK);
+            return new CorrectResponse(offerSaveResponseDto, Const.SUCC_ERR, HttpStatus.OK);
         } catch (MultipleValidationException e) {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.BAD_REQUEST, "Validation error");
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -303,8 +304,9 @@ public class OfferRESTController {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.BAD_REQUEST, "Location calculation error");
             return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, Const.serverError);
-            return new ErrorResponse(Const.APINotRespondingErrorCode, HttpStatus.INTERNAL_SERVER_ERROR);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR);
+            Thread.currentThread().interrupt();
+            return new ErrorResponse(Const.API_NOT_RESP_ERR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -315,16 +317,16 @@ public class OfferRESTController {
             if (authenticationHandler.authenticateRequestForUserIdentity(httpRequest, offerReserveDto.recieverId())) {
                 UUID offerId = reserveOfferUseCaseInterface.reserveOffer(offerReserveDto);
                 RequestLogHandler.handleCorrectResponse(httpRequest);
-                return new CorrectResponse(offerId, Const.successErrorCode, HttpStatus.OK);
+                return new CorrectResponse(offerId, Const.SUCC_ERR, HttpStatus.OK);
             } else {
                 RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FORBIDDEN, "NO PERMISSIONS");
                 return new ErrorResponse("NO PERMISSIONS", HttpStatus.FORBIDDEN);
             }
         } catch (NoSuchElementException noSuchElementException) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
-            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
+            return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         } catch (MultipleValidationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.dataIntegrityErrorCode);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.DATA_INTEGRITY_ERR);
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         }
 
@@ -337,12 +339,12 @@ public class OfferRESTController {
         try {
             UUID reviewId = addReviewUseCaseInterface.addReview(offerReviewDto);
             RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new CorrectResponse(reviewId, Const.successErrorCode, HttpStatus.OK);
+            return new CorrectResponse(reviewId, Const.SUCC_ERR, HttpStatus.OK);
         } catch (NoSuchElementException noSuchElementException) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
-            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
+            return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         } catch (MultipleValidationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.dataIntegrityErrorCode);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.DATA_INTEGRITY_ERR);
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
 
         }
@@ -357,15 +359,16 @@ public class OfferRESTController {
         try {
             modifyOfferUseCaseInterface.modifyOffer(offerId, offerModifyDto);
             RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new CorrectResponse(offerId, Const.successErrorCode, HttpStatus.OK);
+            return new CorrectResponse(offerId, Const.SUCC_ERR, HttpStatus.OK);
         } catch (NoSuchElementException noSuchElementException) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
-            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
+            return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         } catch (MultipleValidationException e) {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.BAD_REQUEST, "Validation error");
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (LocationCalculationException | IOException | InterruptedException e) {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.BAD_REQUEST, "Location calculation error");
+            Thread.currentThread().interrupt();
             return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
@@ -376,15 +379,15 @@ public class OfferRESTController {
         try {
             response.put("offerIds", getOffersByUserAndStatusUseCaseInterface.getOfferResponseDtoListByUser(id, status));
             RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new CorrectResponse(response, Const.successErrorCode, HttpStatus.OK);
+            return new CorrectResponse(response, Const.SUCC_ERR, HttpStatus.OK);
         } catch (MultipleValidationException e) {
             response.put("error", e.getMessage());
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.dataIntegrityErrorCode);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.DATA_INTEGRITY_ERR);
             return new ErrorResponse(e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException e) {
             response.put("error", e.getMessage());
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
-            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
+            return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         }
     }
 

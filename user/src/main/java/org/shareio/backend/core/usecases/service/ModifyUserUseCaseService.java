@@ -32,8 +32,8 @@ public class ModifyUserUseCaseService implements ModifyUserUseCaseInterface {
     public void modifyUser(UUID userId, UserModifyDto userModifyDto) throws LocationCalculationException, IOException, InterruptedException, MultipleValidationException {
         UserValidator.validateUserModifyDto(userModifyDto);
         UserProfileGetDto userProfileGetDto = getUserProfileDaoInterface.getUserDto(userId).orElseThrow(NoSuchElementException::new);
-        User user = Optional.of(userProfileGetDto).map(User::fromDto).get();
-        Address address = new Address(null, userModifyDto.country(), userModifyDto.region(), userModifyDto.city(), userModifyDto.street(), userModifyDto.houseNumber(), userModifyDto.flatNumber(), userModifyDto.postCode(), new Location(Const.defaultAddressCenterLat, Const.defaultAddressCenterLon));
+        User user = Optional.of(userProfileGetDto).map(User::fromDto).orElseThrow(NoSuchElementException::new);
+        Address address = new Address(null, userModifyDto.country(), userModifyDto.region(), userModifyDto.city(), userModifyDto.street(), userModifyDto.houseNumber(), userModifyDto.flatNumber(), userModifyDto.postCode(), new Location(Const.DEFAULT_ADDRESS_CENTER_LAT, Const.DEFAULT_ADDRESS_CENTER_LON));
         user.setName(userModifyDto.name());
         user.setSurname(userModifyDto.surname());
         user.setDateOfBirth(userModifyDto.dateOfBirth());

@@ -19,4 +19,8 @@ public class RequestLogHandler {
     public static void handlePeriodicTask(){
         log.error("Periodic task started");
     }
+
+    private RequestLogHandler(){
+        throw new IllegalStateException("Utility class");
+    }
 }

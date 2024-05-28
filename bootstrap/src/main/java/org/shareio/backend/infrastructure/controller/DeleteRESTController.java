@@ -12,10 +12,7 @@ import org.shareio.backend.security.RequestLogHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -33,7 +30,7 @@ public class DeleteRESTController {
 
     RemoveOfferUseCaseInterface removeOfferUseCaseInterface;
 
-    @RequestMapping(value = "/user/delete/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/user/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> deleteUser(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
         try{
             RequestLogHandler.handleRequest(httpRequest);
@@ -43,16 +40,16 @@ public class DeleteRESTController {
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException e) {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "User with id: "+id+" not found");
-            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+            return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         }
         RemoveResponseDto removeResponseDto = new RemoveResponseDto();
         removeResponseDto = removeOffersForUserUseCaseInterface.removeOffersForUser(id, removeResponseDto);
         removeResponseDto = removeUserUseCaseInterface.removeUser(id, removeResponseDto);
         RequestLogHandler.handleCorrectResponse(httpRequest);
-        return new CorrectResponse(removeResponseDto, Const.successErrorCode, HttpStatus.OK);
+        return new CorrectResponse(removeResponseDto, Const.SUCC_ERR, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/offer/delete/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/offer/delete/{id}",  produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> deleteOffer(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
         try{
             RequestLogHandler.handleRequest(httpRequest);
@@ -62,11 +59,11 @@ public class DeleteRESTController {
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException e) {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "Offer with id: "+id+" not found");
-            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+            return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         }
         RemoveResponseDto removeResponseDto = new RemoveResponseDto();
         removeResponseDto = removeOfferUseCaseInterface.removeOffer(id, removeResponseDto);
         RequestLogHandler.handleCorrectResponse(httpRequest);
-        return new CorrectResponse(removeResponseDto, Const.successErrorCode, HttpStatus.OK);
+        return new CorrectResponse(removeResponseDto, Const.SUCC_ERR, HttpStatus.OK);
     }
 }

@@ -99,4 +99,7 @@ public class OfferDatabaseMapper {
                 null
         );
     }
+    private OfferDatabaseMapper() {
+        throw new IllegalArgumentException("Utility class");
+    }
 }

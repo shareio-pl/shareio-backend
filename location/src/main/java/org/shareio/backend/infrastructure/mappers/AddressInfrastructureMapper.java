@@ -24,4 +24,8 @@ public class AddressInfrastructureMapper {
                 locationSnapshot.longitude()
         );
     }
+
+    private AddressInfrastructureMapper() {
+        throw new IllegalStateException("Utility class");
+    }
 }

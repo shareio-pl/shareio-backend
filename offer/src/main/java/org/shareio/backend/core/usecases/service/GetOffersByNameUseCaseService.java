@@ -21,17 +21,15 @@ public class GetOffersByNameUseCaseService implements GetOffersByNameUseCaseInte
     @Override
     public List<UUID> getOfferResponseDtoListByName(String name) {
         List<OfferGetDto> getOfferDtoList = getOffersByNameDaoInterface.getOffersByName(name);
-        getOfferDtoList.forEach(offer -> {
+        getOfferDtoList = getOfferDtoList.stream().filter(offer -> {
             try {
                 OfferValidator.validateOffer(offer);
+                return true;
             } catch (MultipleValidationException e) {
-                try {
-                    throw new MultipleValidationException(e.getMessage(), e.getErrorMap());
-                } catch (MultipleValidationException ex) {
-                    throw new RuntimeException(ex);
-                }
+                return false;
             }
-        });
+        }).toList();
+
         return getOfferDtoList
                 .stream()
                 .map(Offer::fromDto)

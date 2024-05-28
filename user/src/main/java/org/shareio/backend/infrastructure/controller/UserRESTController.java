@@ -38,36 +38,36 @@ public class UserRESTController {
     ModifyUserUseCaseInterface modifyUserUseCaseInterface;
     GetAllUserIdListUseCaseInterface getAllUserIdListUseCaseInterface;
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> addUser(HttpServletRequest httpRequest, @RequestBody UserSaveDto userSaveDto) {
         RequestLogHandler.handleRequest(httpRequest);
         try {
             UserValidator.validateUserSaveDto(userSaveDto);
             UUID createdUserUUID = addUserUseCaseInterface.addUser(userSaveDto);
             RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new CorrectResponse(createdUserUUID, Const.successErrorCode, HttpStatus.OK);
+            return new CorrectResponse(createdUserUUID, Const.SUCC_ERR, HttpStatus.OK);
         } catch (MultipleValidationException e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, e.getMessage());
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (IllegalArgumentException e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, e.getMessage());
-            return new ErrorResponse(Const.illegalArgumentErrorCode, HttpStatus.BAD_REQUEST);
+            return new ErrorResponse(Const.ILL_ARG_ERR, HttpStatus.BAD_REQUEST);
         }
     }
 
-    @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getUser(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
         RequestLogHandler.handleRequest(httpRequest);
         try {
             UserProfileResponseDto userProfileResponseDto = getUserProfileUseCaseInterface.getUserProfileResponseDto(id);
             RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new CorrectResponse(userProfileResponseDto, Const.successErrorCode, HttpStatus.OK);
+            return new CorrectResponse(userProfileResponseDto, Const.SUCC_ERR, HttpStatus.OK);
         } catch (MultipleValidationException e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, e.getMessage());
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (NoSuchElementException e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, e.getMessage());
-            return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+            return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -76,12 +76,12 @@ public class UserRESTController {
         RequestLogHandler.handleRequest(httpRequest);
         List<UUID> userIdList = getAllUserIdListUseCaseInterface.getAllUserIdList();
         RequestLogHandler.handleCorrectResponse(httpRequest);
-        return new CorrectResponse(userIdList, Const.successErrorCode, HttpStatus.OK);
+        return new CorrectResponse(userIdList, Const.SUCC_ERR, HttpStatus.OK);
 
     }
 
 
-    @RequestMapping(value = "/modify/{userId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/modify/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> modifyUser(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID userId, @RequestBody UserModifyDto userModifyDto) {
         RequestLogHandler.handleRequest(httpRequest);
         if (authenticationHandler.authenticateRequestForUserIdentity(httpRequest, userId)) {
@@ -89,13 +89,14 @@ public class UserRESTController {
                 modifyUserUseCaseInterface.modifyUser(userId, userModifyDto);
                 UserProfileResponseDto userProfileResponseDto = getUserProfileUseCaseInterface.getUserProfileResponseDto(userId);
                 RequestLogHandler.handleCorrectResponse(httpRequest);
-                return new CorrectResponse(userProfileResponseDto, Const.successErrorCode, HttpStatus.OK);
+                return new CorrectResponse(userProfileResponseDto, Const.SUCC_ERR, HttpStatus.OK);
             } catch (LocationCalculationException | IOException | InterruptedException e) {
+                Thread.currentThread().interrupt();
                 RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, e.getMessage());
-                return new ErrorResponse(Const.APINotRespondingErrorCode, HttpStatus.BAD_REQUEST);
+                return new ErrorResponse(Const.API_NOT_RESP_ERR, HttpStatus.BAD_REQUEST);
             } catch (NoSuchElementException e) {
                 RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, e.getMessage());
-                return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+                return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
             } catch (MultipleValidationException e) {
                 RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, e.getMessage());
                 return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -106,20 +107,20 @@ public class UserRESTController {
 
     }
 
-    @RequestMapping(value = "/changePassword/{userId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/changePassword/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> changePassword(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID userId, @RequestBody UserPasswordDto userPasswordDto) {
         RequestLogHandler.handleRequest(httpRequest);
         if (authenticationHandler.authenticateRequestForUserIdentity(httpRequest, userId)) {
             try {
                 changePasswordUserUseCaseInterface.changePassword(userId, userPasswordDto);
                 RequestLogHandler.handleCorrectResponse(httpRequest);
-                return new CorrectResponse(userId, Const.successErrorCode, HttpStatus.OK);
+                return new CorrectResponse(userId, Const.SUCC_ERR, HttpStatus.OK);
             } catch (NoSuchElementException e) {
                 RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, e.getMessage());
-                return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
+                return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
             } catch (IllegalArgumentException e) {
                 RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, e.getMessage());
-                return new ErrorResponse(Const.illegalArgumentErrorCode, HttpStatus.BAD_REQUEST);
+                return new ErrorResponse(Const.ILL_ARG_ERR, HttpStatus.BAD_REQUEST);
             }
         } else {
             return new ErrorResponse("Modification not allowed", HttpStatus.FORBIDDEN);

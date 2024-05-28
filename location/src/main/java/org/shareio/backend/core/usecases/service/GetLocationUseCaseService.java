@@ -25,6 +25,6 @@ public class GetLocationUseCaseService implements GetLocationUseCaseInterface {
     public LocationResponseDto getLocationResponseDto(UUID id) throws MultipleValidationException, NoSuchElementException {
         Optional<LocationGetDto> getLocationDto = getLocationDaoInterface.getLocationDto(id);
         AddressValidator.validateLocation(getLocationDto.orElseThrow());
-        return Optional.of(getLocationDto.map(Location::fromDto).get().toSnapshot()).map(AddressInfrastructureMapper::toDto).get();
+        return Optional.of(getLocationDto.map(Location::fromDto).orElseThrow(NoSuchElementException::new).toSnapshot()).map(AddressInfrastructureMapper::toDto).orElseThrow(NoSuchElementException::new);
     }
 }

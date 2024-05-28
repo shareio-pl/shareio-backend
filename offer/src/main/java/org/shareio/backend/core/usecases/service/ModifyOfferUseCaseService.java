@@ -34,11 +34,11 @@ public class ModifyOfferUseCaseService implements ModifyOfferUseCaseInterface {
     public void modifyOffer(UUID offerId, OfferModifyDto offerModifyDto) throws LocationCalculationException, IOException, InterruptedException, MultipleValidationException {
         OfferGetDto offerGetDto = getOfferDaoInterface.getOfferDto(offerId).orElseThrow(NoSuchElementException::new);
         OfferValidator.validateOffer(offerGetDto);
-        Offer offer = Optional.of(offerGetDto).map(Offer::fromDto).get();
+        Offer offer = Optional.of(offerGetDto).map(Offer::fromDto).orElseThrow(NoSuchElementException::new);
         if(offer.getStatus().equals(Status.CANCELED)){
             throw new NoSuchElementException();
         }
-        Address address = new Address(null, offerModifyDto.addressSaveDto().country(), offerModifyDto.addressSaveDto().region(), offerModifyDto.addressSaveDto().city(), offerModifyDto.addressSaveDto().street(), offerModifyDto.addressSaveDto().houseNumber(), offerModifyDto.addressSaveDto().flatNumber(), offerModifyDto.addressSaveDto().postCode(), new Location(Const.defaultAddressCenterLat, Const.defaultAddressCenterLon));
+        Address address = new Address(null, offerModifyDto.addressSaveDto().country(), offerModifyDto.addressSaveDto().region(), offerModifyDto.addressSaveDto().city(), offerModifyDto.addressSaveDto().street(), offerModifyDto.addressSaveDto().houseNumber(), offerModifyDto.addressSaveDto().flatNumber(), offerModifyDto.addressSaveDto().postCode(), new Location(Const.DEFAULT_ADDRESS_CENTER_LAT, Const.DEFAULT_ADDRESS_CENTER_LON));
         offer.setTitle(offerModifyDto.title());
         offer.setDescription(offerModifyDto.description());
         offer.setAddress(address);

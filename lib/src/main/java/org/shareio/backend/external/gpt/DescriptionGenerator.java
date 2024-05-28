@@ -1,4 +1,4 @@
-package org.shareio.backend.external_API.GPT;
+package org.shareio.backend.external.gpt;
 
 import org.json.JSONObject;
 import org.shareio.backend.EnvGetter;
@@ -11,19 +11,19 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class DescriptionGenerator implements DescriptionGeneratorInterface {
-    final String prompt = "Wygeneruj opis przedmiotu oddawanego za darmo na podstawie jego tytułu, stanu, kategorii i dodatkowych informacji";
-    final String APIUrl = "https://api.openai.com/v1/chat/completions";
+    static final String PROMPT = "Wygeneruj opis przedmiotu oddawanego za darmo na podstawie jego tytułu, stanu, kategorii i dodatkowych informacji";
+    static final String APIURL = "https://api.openai.com/v1/chat/completions";
 
     @Override
     public String generateDescription(String title, String condition, String category, String additionalData) throws IOException, InterruptedException, DescriptionGenerationException {
-        String GPTKey = EnvGetter.getGPT_APIKey();
+        String gptKey = EnvGetter.getGptApikey();
         String offerData = title + ", " + condition + ", " + category + ", " + additionalData;
-        String requestBody = "{\"model\": \"gpt-3.5-turbo\", \"messages\": [{\"role\": \"user\", \"content\": \" " + this.prompt + offerData + "\"}], \"temperature\": 1.0}";
+        String requestBody = "{\"model\": \"gpt-3.5-turbo\", \"messages\": [{\"role\": \"user\", \"content\": \" " + PROMPT + offerData + "\"}], \"temperature\": 1.0}";
 
         HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(this.APIUrl)).POST(HttpRequest.BodyPublishers
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(APIURL)).POST(HttpRequest.BodyPublishers
                         .ofString(requestBody)).header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + GPTKey).build();
+                .header("Authorization", "Bearer " + gptKey).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         JSONObject json = new JSONObject(response.body());
@@ -36,14 +36,14 @@ public class DescriptionGenerator implements DescriptionGeneratorInterface {
 
     @Override
     public String generateDescription(String title, String condition, String category) throws IOException, InterruptedException, DescriptionGenerationException {
-        String GPTKey = EnvGetter.getGPT_APIKey();
+        String gptKey = EnvGetter.getGptApikey();
         String offerData = title + ", " + condition + ", " + category;
-        String requestBody = "{\"model\": \"gpt-3.5-turbo\", \"messages\": [{\"role\": \"user\", \"content\": \" " + this.prompt + offerData + "\"}], \"temperature\": 1.0}";
+        String requestBody = "{\"model\": \"gpt-3.5-turbo\", \"messages\": [{\"role\": \"user\", \"content\": \" " + PROMPT + offerData + "\"}], \"temperature\": 1.0}";
 
         HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(this.APIUrl)).POST(HttpRequest.BodyPublishers
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(APIURL)).POST(HttpRequest.BodyPublishers
                         .ofString(requestBody)).header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + GPTKey).build();
+                .header("Authorization", "Bearer " + gptKey).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         JSONObject json = new JSONObject(response.body());

@@ -13,4 +13,8 @@ public class ReviewMapper {
                 reviewSnapshot.date()
         );
     }
+
+    private ReviewMapper(){
+        throw new IllegalStateException("Utility class");
+    }
 }

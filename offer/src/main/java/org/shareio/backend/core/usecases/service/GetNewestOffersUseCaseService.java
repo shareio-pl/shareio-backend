@@ -42,8 +42,8 @@ public class GetNewestOffersUseCaseService implements GetNewestOffersUseCaseInte
                 .filter(offer -> offer.getStatus().equals(Status.CREATED))
                 .sorted(Comparator.comparing(Offer::getCreationDate))
                 .toList();
-        if(offerList.size() >= Const.minOfferListSize) {
-            for(int i=0; i<Const.minOfferListSize;i++){
+        if(offerList.size() >= Const.MIN_OFFER_LIST_SIZE) {
+            for(int i = 0; i<Const.MIN_OFFER_LIST_SIZE; i++){
                 backupNewestOfferList.add(offerList.get(i));
             }
 

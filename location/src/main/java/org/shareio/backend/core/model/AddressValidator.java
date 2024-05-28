@@ -50,7 +50,7 @@ public class AddressValidator {
         } catch (ValidationException validationException) {
             errorMap.put("PostCode", validationException.getMessage());
         }
-        if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.multipleValidationErrorCode, errorMap);
+        if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.MUL_VAL_ERR, errorMap);
     }
 
     public static void validateAddressSaveInput(
@@ -98,7 +98,7 @@ public class AddressValidator {
         } catch (ValidationException validationException) {
             errorMap.put("PostCode", validationException.getMessage());
         }
-        if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.multipleValidationErrorCode, errorMap);
+        if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.MUL_VAL_ERR, errorMap);
     }
 
 
@@ -114,7 +114,7 @@ public class AddressValidator {
         } catch (ValidationException validationException) {
             errorMap.put("Longitude", validationException.getMessage());
         }
-        if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.multipleValidationErrorCode, errorMap);
+        if (!errorMap.isEmpty()) throw new MultipleValidationException(Const.MUL_VAL_ERR, errorMap);
     }
 
     public static void validateCountry(String country) throws ValidationException {
@@ -159,5 +159,9 @@ public class AddressValidator {
 
     public static void validateLatLon(Double latOrLon) throws ValidationException {
         DoubleValidator.validateDoubleNotEmpty(latOrLon);
+    }
+
+    private AddressValidator(){
+        throw new IllegalArgumentException("Utility class");
     }
 }
