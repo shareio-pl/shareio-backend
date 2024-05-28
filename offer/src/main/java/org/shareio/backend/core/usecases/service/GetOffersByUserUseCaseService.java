@@ -21,6 +21,7 @@ public class GetOffersByUserUseCaseService implements GetOffersByUserUseCaseInte
 
     @Override
     public List<UUID> getOfferResponseDtoListByUser(UUID id) throws NoSuchElementException {
+        //TODO: think about statuses
         List<OfferGetDto> getOfferDtoList = getOffersByUserDaoInterface.getOffersByUser(id);
         getOfferDtoList.forEach(offer ->
         {
