@@ -58,6 +58,8 @@ public class SearchOffersUseCaseService implements SearchOffersUseCaseInterface 
             allOfferList = allOfferList.stream()
                     .filter(offer -> offer.getCreationDate().isBefore(endDate.atStartOfDay())).toList();
         }
+
+        //TODO: add sorting
         return allOfferList.stream().map(offer -> offer.getOfferId().getId()).toList();
 
     }
