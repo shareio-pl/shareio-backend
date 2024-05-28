@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 @AllArgsConstructor
@@ -62,7 +63,7 @@ public class OfferRESTController {
 
     // ------------------- GET -------------------
 
-    @RequestMapping(value = "/get/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getOffer(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
         RequestLogHandler.handleRequest(httpRequest);
         try {
@@ -75,13 +76,13 @@ public class OfferRESTController {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, e.getMessage());
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException noSuchElementException) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "Entity not found");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
             return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
         }
     }
 
 
-    @RequestMapping(value = "/getClosestOfferForUser/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getClosestOfferForUser/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getClosestOfferForUser(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID userId) {
         RequestLogHandler.handleRequest(httpRequest);
         UserProfileResponseDto userProfileResponseDto;
@@ -91,7 +92,7 @@ public class OfferRESTController {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, e.getMessage());
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException noSuchElementException) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "Entity not found");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
             return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
         }
 
@@ -102,28 +103,28 @@ public class OfferRESTController {
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(closestOfferId, Const.successErrorCode, HttpStatus.OK);
         } else {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, "Database data error");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.dataIntegrityErrorCode);
             return new ErrorResponse(Const.toDoErrorCode, HttpStatus.FAILED_DEPENDENCY);
         }
 
     }
 
-    @RequestMapping(value = "/getCreatedOffersByUser/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getCreatedOffersByUser/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getCreatedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
         return getOfferListBasedOnStatus(httpRequest, id, Status.CREATED);
     }
 
-    @RequestMapping(value = "/getReservedOffersByUser/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getReservedOffersByUser/{id}",  produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getReservedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
         return getOfferListBasedOnStatus(httpRequest, id, Status.RESERVED);
     }
 
-    @RequestMapping(value = "/getFinishedOffersByUser/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getFinishedOffersByUser/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getFinishedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
         return getOfferListBasedOnStatus(httpRequest, id, Status.FINISHED);
     }
 
-    @RequestMapping(value = "/getOffersByName", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getOffersByName",  produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getOffersByName(HttpServletRequest httpRequest, @RequestParam String name) {
         RequestLogHandler.handleRequest(httpRequest);
         Map<String, Object> response = new HashMap<>();
@@ -132,18 +133,18 @@ public class OfferRESTController {
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(response, Const.successErrorCode, HttpStatus.OK);
         } catch (MultipleValidationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, "Database data error");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.dataIntegrityErrorCode);
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException noSuchElementException) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "Entity not found");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
             return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, "Server error");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, Const.serverError);
             return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @RequestMapping(value = "/getCategories", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getCategories", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getCategories(HttpServletRequest httpRequest) {
         RequestLogHandler.handleRequest(httpRequest);
         List<CategoryWithDisplayName> categories = new ArrayList<>();
@@ -154,7 +155,7 @@ public class OfferRESTController {
         return new CorrectResponse(new CategoriesResponseDto(categories), Const.successErrorCode, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/getConditions", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getConditions", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getConditions(HttpServletRequest httpRequest) {
         RequestLogHandler.handleRequest(httpRequest);
         List<ConditionWithDisplayName> conditionsWithDisplayNames = new ArrayList<>();
@@ -179,7 +180,7 @@ public class OfferRESTController {
         return new ErrorResponse(Const.notImplementedErrorCode, HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @RequestMapping(value = "/generateDescription", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/generateDescription", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> generateDescription(HttpServletRequest httpRequest, @RequestParam String title, @RequestParam String condition, @RequestParam String category, @RequestParam(required = false) String additionalData) {
         RequestLogHandler.handleRequest(httpRequest);
         DescriptionGenerator generator = new DescriptionGenerator();
@@ -193,12 +194,12 @@ public class OfferRESTController {
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(description, Const.successErrorCode, HttpStatus.OK);
         } catch (Exception e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, "Server error");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, Const.serverError);
             return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @RequestMapping(value = "/getNewest", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getNewest", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getNewestOffers(HttpServletRequest httpRequest) {
         RequestLogHandler.handleRequest(httpRequest);
         try {
@@ -212,7 +213,7 @@ public class OfferRESTController {
         }
     }
 
-    @RequestMapping(value = "/getAllOffers", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getAllOffers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getAllOffers(HttpServletRequest httpRequest) {
         RequestLogHandler.handleRequest(httpRequest);
         List<UUID> allOfferIdList = getAllOffersUseCaseInterface.getAllOfferIdList();
@@ -220,7 +221,7 @@ public class OfferRESTController {
         return new CorrectResponse(allOfferIdList, Const.successErrorCode, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/getScore/{userId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getScore/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getUserScore(HttpServletRequest httpRequest, @PathVariable(name="userId") UUID userId) {
         RequestLogHandler.handleRequest(httpRequest);
         try{
@@ -230,16 +231,16 @@ public class OfferRESTController {
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(userScoreDto, Const.successErrorCode, HttpStatus.OK);
         } catch (MultipleValidationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, "Database data error");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.dataIntegrityErrorCode);
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException noSuchElementException) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "Entity not found");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
             return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
         }
 
     }
 
-    @RequestMapping(value = "/getTopScoreUserList", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getTopScoreUserList", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getTopScoreUserList(HttpServletRequest httpRequest) {
         RequestLogHandler.handleRequest(httpRequest);
         List<UUID> userIdList = getAllUserIdListUseCaseInterface.getAllUserIdList();
@@ -258,7 +259,7 @@ public class OfferRESTController {
     // ------------------- POST -------------------
 
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Object> addOffer(HttpServletRequest httpRequest, @Valid @RequestPart("json") OfferSaveDto offerSaveDto, @RequestPart(value = "file") MultipartFile file) {
         RequestLogHandler.handleRequest(httpRequest);
         UUID photoId = UUID.randomUUID();
@@ -302,12 +303,12 @@ public class OfferRESTController {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.BAD_REQUEST, "Location calculation error");
             return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, "Server error");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, Const.serverError);
             return new ErrorResponse(Const.APINotRespondingErrorCode, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @RequestMapping(value = "/reserve", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/reserve",  produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> reserveOffer(HttpServletRequest httpRequest, @RequestBody OfferReserveDto offerReserveDto) {
         RequestLogHandler.handleRequest(httpRequest);
         try {
@@ -320,17 +321,17 @@ public class OfferRESTController {
                 return new ErrorResponse("NO PERMISSIONS", HttpStatus.FORBIDDEN);
             }
         } catch (NoSuchElementException noSuchElementException) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "Entity not found");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
             return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
         } catch (MultipleValidationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, "Database data error");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.dataIntegrityErrorCode);
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         }
 
     }
 
 
-    @RequestMapping(value = "/addReview", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/addReview",  produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> addReviewToOffer(HttpServletRequest httpRequest, @RequestBody OfferReviewDto offerReviewDto) {
         RequestLogHandler.handleRequest(httpRequest);
         try {
@@ -338,10 +339,10 @@ public class OfferRESTController {
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(reviewId, Const.successErrorCode, HttpStatus.OK);
         } catch (NoSuchElementException noSuchElementException) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "Entity not found");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
             return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
         } catch (MultipleValidationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, "Database data error");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.dataIntegrityErrorCode);
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
 
         }
@@ -350,7 +351,7 @@ public class OfferRESTController {
     // ------------------- PUT -------------------
 
 
-    @RequestMapping(value = "/modify/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/modify/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> modifyOffer(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID offerId, @RequestBody OfferModifyDto offerModifyDto) {
         RequestLogHandler.handleRequest(httpRequest);
         try {
@@ -358,17 +359,14 @@ public class OfferRESTController {
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(offerId, Const.successErrorCode, HttpStatus.OK);
         } catch (NoSuchElementException noSuchElementException) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "Entity not found");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
             return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
         } catch (MultipleValidationException e) {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.BAD_REQUEST, "Validation error");
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (LocationCalculationException e) {
+        } catch (LocationCalculationException | IOException | InterruptedException e) {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.BAD_REQUEST, "Location calculation error");
             return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, "Server error");
-            return new ErrorResponse(Const.APINotRespondingErrorCode, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -381,16 +379,12 @@ public class OfferRESTController {
             return new CorrectResponse(response, Const.successErrorCode, HttpStatus.OK);
         } catch (MultipleValidationException e) {
             response.put("error", e.getMessage());
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, "Database data error");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.dataIntegrityErrorCode);
             return new ErrorResponse(e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException e) {
             response.put("error", e.getMessage());
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "Entity not found");
+            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.noSuchElementErrorCode);
             return new ErrorResponse(Const.noSuchElementErrorCode, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            response.put("error", e.getMessage());
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.INTERNAL_SERVER_ERROR, "Server error");
-            return new ErrorResponse("Server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

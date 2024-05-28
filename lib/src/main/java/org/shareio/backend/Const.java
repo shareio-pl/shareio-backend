@@ -36,6 +36,8 @@ public class Const {
     public static final String cannotDetermineAddressErrorCode = "CantDetAddrErr";
     public static final String APINotRespondingErrorCode = "ApiNotResp";
     public static final String unsupportedMediaTypeErrorCode = "UnsuppMediaTypeErr";
+    public static final String dataIntegrityErrorCode = "DataIntegrityErr";
+    public static final String serverError = "ServerErr";
 
 
     // ----------------- DEFAULTS ------------------

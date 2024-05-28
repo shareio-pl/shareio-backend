@@ -71,7 +71,7 @@ public class UserRESTController {
         }
     }
 
-    @RequestMapping(value = "/getAll", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getAllUserIdList(HttpServletRequest httpRequest) {
         RequestLogHandler.handleRequest(httpRequest);
         List<UUID> userIdList = getAllUserIdListUseCaseInterface.getAllUserIdList();
