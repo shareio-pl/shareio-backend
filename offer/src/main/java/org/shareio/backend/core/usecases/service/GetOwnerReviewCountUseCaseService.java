@@ -37,7 +37,7 @@ public class GetOwnerReviewCountUseCaseService implements GetOwnerReviewCountUse
         return Math.toIntExact(offerGetDtoList
                 .stream()
                 .map(Offer::fromDto)
-                .filter(offer -> !offer.getStatus().equals(Status.CANCELED))
+                .filter(offer -> offer.getStatus().equals(Status.FINISHED))
                 .filter(offer -> Objects.equals(offer.getOwner().getUserId().getId(), ownerId))
                 .filter(offer -> Objects.nonNull(offer.getReview()))
                 .count());

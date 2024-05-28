@@ -46,7 +46,7 @@ public class GetClosestOfferUseCaseService implements GetClosestOfferUseCaseInte
         List<Offer> offerList = allOfferList.stream().map(Offer::fromDto).toList();
         offerList = offerList
                 .stream()
-                .filter(offer -> offer.getStatus().equals(Status.CANCELED))
+                .filter(offer -> offer.getStatus().equals(Status.CREATED))
                 .toList();
         offerList.forEach(offer -> {
             Double possibleDistance = DistanceCalculator.calculateDistance(location, offer.getAddress().getLocation());

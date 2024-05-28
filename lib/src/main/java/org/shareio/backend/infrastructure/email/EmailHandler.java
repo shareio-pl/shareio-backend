@@ -18,12 +18,12 @@ public class EmailHandler {
     private JavaMailSender emailSender;
 
     public void sendHelpdeskMessage(
-            String to, String subject, String text) {
+            String reciever, String subject, String text) {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(sender);
         message.setBcc(sender);
-        message.setTo(to);
+        message.setTo(reciever);
         message.setSubject(subject);
         message.setText(Const.messageStart + text + Const.messageEnd);
         emailSender.send(message);

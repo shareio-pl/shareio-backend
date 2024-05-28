@@ -35,7 +35,7 @@ public class GetOffersByNameUseCaseService implements GetOffersByNameUseCaseInte
         return getOfferDtoList
                 .stream()
                 .map(Offer::fromDto)
-                .filter(offer -> !offer.getStatus().equals(Status.CANCELED))
+                .filter(offer -> offer.getStatus().equals(Status.CREATED))
                 .map(Offer::toSnapshot)
                 .map(offer -> offer.offerId().getId())
                 .toList();

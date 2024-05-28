@@ -38,7 +38,7 @@ public class GetAverageUserReviewValueUseCaseService implements GetAverageUserRe
                 .map(Offer::fromDto)
                 .filter(offer -> Objects.equals(offer.getOwner().getUserId().getId(), userId))
                 .filter(offer -> Objects.nonNull(offer.getReview()))
-                .filter(offer -> !offer.getStatus().equals(Status.CANCELED))
+                .filter(offer -> offer.getStatus().equals(Status.FINISHED))
                 .toList();
 
         return offerList.stream().map(offer -> offer.getReview().getValue())

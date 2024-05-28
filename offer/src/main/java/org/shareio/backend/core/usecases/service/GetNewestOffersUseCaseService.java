@@ -1,6 +1,7 @@
 package org.shareio.backend.core.usecases.service;
 
 import lombok.AllArgsConstructor;
+import org.shareio.backend.Const;
 import org.shareio.backend.core.model.Offer;
 import org.shareio.backend.core.model.OfferValidator;
 import org.shareio.backend.core.model.vo.Status;
@@ -10,7 +11,9 @@ import org.shareio.backend.core.usecases.port.out.GetAllOffersDaoInterface;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -23,7 +26,7 @@ public class GetNewestOffersUseCaseService implements GetNewestOffersUseCaseInte
 
     @Override
     public List<UUID> getNewestOffers() {
-        List<Offer> twoNewestOfferList;
+        List<Offer> backupNewestOfferList = new ArrayList<>();
         List<OfferGetDto> offerGetDtoList = getAllOffersDaoInterface.getAllOffers();
         offerGetDtoList = offerGetDtoList.stream().filter(offer -> {
             try {
@@ -36,22 +39,26 @@ public class GetNewestOffersUseCaseService implements GetNewestOffersUseCaseInte
         List<Offer> offerList = offerGetDtoList
                 .stream()
                 .map(Offer::fromDto)
-                .filter(offer -> !offer.getStatus().equals(Status.CANCELED))
+                .filter(offer -> offer.getStatus().equals(Status.CREATED))
                 .sorted(Comparator.comparing(Offer::getCreationDate))
                 .toList();
-        if(offerList.size() >=2) {
-            twoNewestOfferList = List.of(offerList.get(0), offerList.get(1));
+        if(offerList.size() >= Const.minOfferListSize) {
+            for(int i=0; i<Const.minOfferListSize;i++){
+                backupNewestOfferList.add(offerList.get(i));
+            }
 
         }
         else throw new IllegalArgumentException();
-
         offerList =
                 offerList
                 .stream()
-                .filter(offer -> offer.getCreationDate().plusDays(1).isBefore(LocalDateTime.now()))
+                .filter(offer -> {
+                    Duration d = Duration.between(offer.getCreationDate(),LocalDateTime.now());
+                    return d.toDays() <= 1;
+                })
                 .toList();
         if(offerList.isEmpty()){
-            return twoNewestOfferList
+            return backupNewestOfferList
                     .stream()
                     .map(Offer::toSnapshot)
                     .map(offer -> offer.offerId().getId())

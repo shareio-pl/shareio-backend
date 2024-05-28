@@ -38,7 +38,7 @@ public class PeriodicOfferReservationTimeoutReservationTimeoutUseCaseService imp
         List<Offer> offerToDereserveList = offerGetDtoList
                 .stream()
                 .map(Offer::fromDto)
-                .filter(offer -> !offer.getStatus().equals(Status.CANCELED))
+                .filter(offer -> offer.getStatus().equals(Status.RESERVED))
                 .filter(offer -> LocalDateTime.now().isAfter(offer.getReservationDate().plus(Const.offerReservationDuration)))
                 .toList();
         offerToDereserveList.forEach(offer -> {

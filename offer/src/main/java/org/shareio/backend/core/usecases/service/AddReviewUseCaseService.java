@@ -34,7 +34,7 @@ public class AddReviewUseCaseService implements AddReviewUseCaseInterface {
         OfferGetDto offerGetDto = getOfferDaoInterface.getOfferDto(offerReviewDto.offerId()).orElseThrow(NoSuchElementException::new);
         OfferValidator.validateOffer(offerGetDto);
         Offer offer = Optional.of(offerGetDto).map(Offer::fromDto).get();
-        if(offer.getStatus().equals(Status.CANCELED)){
+        if(!offer.getStatus().equals(Status.FINISHED)){
             throw new NoSuchElementException();
         }
         Review review = new Review(new ReviewId(reviewId), offerReviewDto.reviewValue(), offerReviewDto.reviewDate());
