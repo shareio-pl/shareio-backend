@@ -94,11 +94,6 @@ public class OfferValidator {
     public static void validateOffer(OfferSaveDto offerSaveDto) throws MultipleValidationException {
         Map<String, String> errorMap = new HashMap<>();
         try {
-            validateDate(offerSaveDto.creationDate());
-        } catch (ValidationException validationException) {
-            errorMap.put("CreationDate", validationException.getMessage());
-        }
-        try {
             validateCity(offerSaveDto.city());
         } catch (ValidationException validationException) {
             errorMap.put("City", validationException.getMessage());
