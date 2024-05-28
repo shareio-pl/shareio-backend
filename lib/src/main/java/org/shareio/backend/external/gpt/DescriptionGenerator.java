@@ -9,14 +9,20 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Objects;
 
 public class DescriptionGenerator implements DescriptionGeneratorInterface {
+    @Override
+    public String generateDescription(String title, String condition, String category, String additionalData) throws IOException, InterruptedException, DescriptionGenerationException {
+        String offerData = " Tytuł: " + title + ", Stan: " + condition + ", Kategoria: " + category;
+        if (Objects.nonNull(additionalData) && !additionalData.isBlank()) {
+            offerData += ", Dodatkowe informacje: " + additionalData;
+        }
 
-    private String generateDescription(String offerData) throws IOException, InterruptedException, DescriptionGenerationException {
         String gptUrl = EnvGetter.getGptApiUrl();
         String gptKey = EnvGetter.getGptApiKey();
         String gptPrompt = EnvGetter.getGptPrompt();
-        String requestBody = "{\"model\": \"gpt-3.5-turbo\", \"messages\": [{\"role\": \"user\", \"content\": \" " + gptPrompt + offerData + "\"}], \"temperature\": 1.0}";
+        String requestBody = "{\"model\": \"gpt-3.5-turbo\", \"messages\": [{\"role\": \"user\", \"content\": \" " + gptPrompt + " " + offerData + "\"}], \"temperature\": 1.0}";
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(gptUrl))
@@ -32,17 +38,5 @@ public class DescriptionGenerator implements DescriptionGeneratorInterface {
         } else {
             return json.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
         }
-    }
-
-    @Override
-    public String generateDescription(String title, String condition, String category, String additionalData) throws IOException, InterruptedException, DescriptionGenerationException {
-        String offerData = title + ", " + condition + ", " + category + ", " + additionalData;
-        return generateDescription(offerData);
-    }
-
-    @Override
-    public String generateDescription(String title, String condition, String category) throws IOException, InterruptedException, DescriptionGenerationException {
-        String offerData = title + ", " + condition + ", " + category;
-        return generateDescription(offerData);
     }
 }
