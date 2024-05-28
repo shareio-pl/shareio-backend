@@ -84,7 +84,7 @@ public class SearchOffersUseCaseService implements SearchOffersUseCaseInterface 
                 case OLDEST -> offers = offers.stream()
                         .sorted(Comparator.comparing(Offer::getCreationDate))
                         .toList().reversed();
-                case RATED -> offers = offers.stream()
+                case HIGHEST_RATED -> offers = offers.stream()
                         .sorted((o1, o2) ->
                                 getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(o1.getOwner().getUserId().getId())
                                         .compareTo(
