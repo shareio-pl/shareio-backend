@@ -17,7 +17,7 @@ import java.util.UUID;
 @Service
 public class UserAdapter implements GetUserProfileDaoInterface,
         GetUserProfileByEmailDaoInterface, RemoveUserCommandInterface, SaveUserCommandInterface,
-        UpdateUserChangeMetadataCommandInterface {
+        UpdateUserChangeMetadataCommandInterface, UpdateUserChangePasswordCommandInterface {
     final UserRepository userRepository;
 
     public UserAdapter(UserRepository userRepository) {
@@ -75,6 +75,14 @@ public class UserAdapter implements GetUserProfileDaoInterface,
         userEntityFromDb.getAddress().setPostCode(userSnapshot.address().getPostCode());
         userEntityFromDb.getAddress().setLatitude(userSnapshot.address().getLocation().getLatitude());
         userEntityFromDb.getAddress().setLongitude(userSnapshot.address().getLocation().getLongitude());
+        userRepository.save(userEntityFromDb);
+    }
+
+    @Override
+    public void updateUserPassword(UserSnapshot userSnapshot) {
+        Optional<UserEntity> userEntity = userRepository.findByUserId(userSnapshot.userId().getId());
+        UserEntity userEntityFromDb = userEntity.orElseThrow(NoSuchElementException::new);
+        userEntityFromDb.getSecurity().setPwHash(userSnapshot.security().getPwHash());
         userRepository.save(userEntityFromDb);
     }
 }

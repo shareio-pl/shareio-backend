@@ -2,15 +2,14 @@ package org.shareio.backend.core.usecases.service;
 
 import lombok.AllArgsConstructor;
 import org.shareio.backend.core.model.Offer;
-import org.shareio.backend.core.model.OfferSnapshot;
 import org.shareio.backend.core.model.OfferValidator;
+import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.core.usecases.port.in.GetOffersByNameUseCaseInterface;
 import org.shareio.backend.core.usecases.port.out.GetOffersByNameDaoInterface;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,9 +32,13 @@ public class GetOffersByNameUseCaseService implements GetOffersByNameUseCaseInte
                 }
             }
         });
-        List<OfferSnapshot> offerSnapshotList = getOfferDtoList.stream().map(Offer::fromDto).map(Offer::toSnapshot).toList();
-        List<UUID> offerUUIDList = new ArrayList<>();
-        offerSnapshotList.forEach(offer -> offerUUIDList.add(offer.offerId().getId()));
-        return offerUUIDList;
+        return getOfferDtoList
+                .stream()
+                .map(Offer::fromDto)
+                .filter(offer -> offer.getStatus().equals(Status.CREATED))
+                .map(Offer::toSnapshot)
+                .map(offer -> offer.offerId().getId())
+                .toList();
+
     }
 }

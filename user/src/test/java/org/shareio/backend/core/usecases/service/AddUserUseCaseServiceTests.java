@@ -54,7 +54,8 @@ public class AddUserUseCaseServiceTests {
                         LocalDate.now(),
                         UUID.randomUUID(),
                         UUID.randomUUID(),
-                        LocalDateTime.now()
+                        LocalDateTime.now(),
+                        null
                 ))
         );
         when(getUserProfileByEmailDaoInterface.getUserDto(not(eq(existingUserEmail)))).

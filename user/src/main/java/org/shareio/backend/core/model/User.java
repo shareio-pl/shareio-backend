@@ -48,7 +48,7 @@ public class User {
                         null
                 ),
                 new Security(
-                        null,
+                        userProfileGetDto.pwHash(),
                         null,
                         null,
                         userProfileGetDto.lastLoginDate()

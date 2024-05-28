@@ -13,6 +13,7 @@ import org.shareio.backend.core.usecases.port.out.GetUserProfileByEmailDaoInterf
 import org.shareio.backend.core.usecases.port.out.GetUserProfileDaoInterface;
 import org.shareio.backend.core.usecases.port.out.SaveUserCommandInterface;
 import org.shareio.backend.core.usecases.service.AddUserUseCaseService;
+import org.shareio.backend.core.usecases.service.ChangePasswordUserUseCaseService;
 import org.shareio.backend.core.usecases.service.GetUserProfileUseCaseService;
 import org.shareio.backend.core.usecases.service.ModifyUserUseCaseService;
 import org.shareio.backend.security.AuthenticationHandler;
@@ -59,6 +60,10 @@ public class UserRESTControllerTests {
     @InjectMocks
     private ModifyUserUseCaseService modifyUserUseCaseService;
 
+    @MockBean
+    @InjectMocks
+    private ChangePasswordUserUseCaseService changePasswordUseCaseService;
+
     @InjectMocks
     UserRESTController userRESTController;
 
@@ -75,6 +80,7 @@ public class UserRESTControllerTests {
         userRESTController = new UserRESTController(
                 authenticationHandler,
                 addUserUseCaseService,
+                changePasswordUseCaseService,
                 getUserProfileUseCaseService,
                 modifyUserUseCaseService
         );
@@ -88,7 +94,8 @@ public class UserRESTControllerTests {
                         LocalDate.now(),
                         UUID.randomUUID(),
                         UUID.randomUUID(),
-                        LocalDateTime.now()
+                        LocalDateTime.now(),
+                        null
                 ))
         );
 
@@ -101,7 +108,8 @@ public class UserRESTControllerTests {
                         LocalDate.now(),
                         UUID.randomUUID(),
                         UUID.randomUUID(),
-                        LocalDateTime.now()
+                        LocalDateTime.now(),
+                        null
                 ))
         );
 
@@ -114,7 +122,8 @@ public class UserRESTControllerTests {
                         LocalDate.now(),
                         UUID.randomUUID(),
                         UUID.randomUUID(),
-                        LocalDateTime.now()
+                        LocalDateTime.now(),
+                        null
                 ))
         );
 

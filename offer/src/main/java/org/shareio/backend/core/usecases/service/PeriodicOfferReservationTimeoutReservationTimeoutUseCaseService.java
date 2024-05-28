@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.shareio.backend.Const;
 import org.shareio.backend.core.model.Offer;
+import org.shareio.backend.core.model.OfferValidator;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.core.usecases.port.in.PeriodicOfferReservationTimeoutUseCaseInterface;
-import org.shareio.backend.core.usecases.port.out.GetAllOffersByStatusDaoInterface;
+import org.shareio.backend.core.usecases.port.out.GetAllOffersDaoInterface;
 import org.shareio.backend.core.usecases.port.out.UpdateOfferDereserveOfferCommandInterface;
+import org.shareio.backend.exceptions.MultipleValidationException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,13 +21,24 @@ import java.util.List;
 @Slf4j
 public class PeriodicOfferReservationTimeoutReservationTimeoutUseCaseService implements PeriodicOfferReservationTimeoutUseCaseInterface {
 
-    GetAllOffersByStatusDaoInterface getAllOffersByStatusDaoInterface;
+    GetAllOffersDaoInterface getAllOffersDaoInterface;
     UpdateOfferDereserveOfferCommandInterface updateOfferDereserveOfferCommandInterface;
 
     @Override
     public void periodicOfferReservationTimeoutHandler() {
-        List<OfferGetDto> offerGetDtoList = getAllOffersByStatusDaoInterface.getAllOffersByStatus(Status.RESERVED);
-        List<Offer> offerToDereserveList = offerGetDtoList.stream().map(Offer::fromDto)
+        List<OfferGetDto> offerGetDtoList = getAllOffersDaoInterface.getAllOffers();
+        offerGetDtoList = offerGetDtoList.stream().filter(offer -> {
+            try {
+                OfferValidator.validateOffer(offer);
+                return true;
+            } catch (MultipleValidationException e) {
+                return false;
+            }
+        }).toList();
+        List<Offer> offerToDereserveList = offerGetDtoList
+                .stream()
+                .map(Offer::fromDto)
+                .filter(offer -> offer.getStatus().equals(Status.RESERVED))
                 .filter(offer -> LocalDateTime.now().isAfter(offer.getReservationDate().plus(Const.offerReservationDuration)))
                 .toList();
         offerToDereserveList.forEach(offer -> {

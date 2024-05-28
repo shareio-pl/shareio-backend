@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.shareio.backend.core.model.Offer;
 import org.shareio.backend.core.model.OfferSnapshot;
 import org.shareio.backend.core.model.OfferValidator;
+import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.core.usecases.port.dto.OfferResponseDto;
 import org.shareio.backend.core.usecases.port.in.GetOfferUseCaseInterface;
@@ -12,6 +13,7 @@ import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.infrastructure.mappers.OfferInfrastructureMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,7 +26,11 @@ public class GetOfferUseCaseService implements GetOfferUseCaseInterface {
     public OfferResponseDto getOfferResponseDto(UUID id, Integer reviewCount, Double averageUserReviewValue) throws MultipleValidationException {
         Optional<OfferGetDto> getOfferDto = getOfferDaoInterface.getOfferDto(id);
         OfferValidator.validateOffer(getOfferDto.orElseThrow());
-        OfferSnapshot offerSnapshot = getOfferDto.map(Offer::fromDto).get().toSnapshot();
+        Offer offer = getOfferDto.map(Offer::fromDto).get();
+        if(offer.getStatus().equals(Status.CANCELED)){
+            throw new NoSuchElementException();
+        }
+        OfferSnapshot offerSnapshot = offer.toSnapshot();
         return OfferInfrastructureMapper.toDto(offerSnapshot, reviewCount, averageUserReviewValue);
     }
 }
