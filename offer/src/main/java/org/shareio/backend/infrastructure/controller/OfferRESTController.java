@@ -23,6 +23,7 @@ import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.external.gpt.DescriptionGenerator;
 import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
 import org.shareio.backend.security.AuthenticationHandler;
+import org.shareio.backend.security.IdentityHandler;
 import org.shareio.backend.security.RequestLogHandler;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -33,6 +34,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 
 @AllArgsConstructor
@@ -54,6 +56,7 @@ public class OfferRESTController {
     GetAverageUserReviewValueUseCaseInterface getAverageUserReviewValueUseCaseInterface;
     GetNewestOffersUseCaseService getNewestOffersUseCaseService;
     GetAllUserIdListUseCaseInterface getAllUserIdListUseCaseInterface;
+    SearchOffersUseCaseInterface searchOffersUseCaseInterface;
 
     ModifyOfferUseCaseInterface modifyOfferUseCaseInterface;
 
@@ -61,6 +64,7 @@ public class OfferRESTController {
 
     OfferRepository offerRepository;
     AuthenticationHandler authenticationHandler;
+    IdentityHandler identityHandler;
 
     // ------------------- GET -------------------
 
@@ -166,18 +170,41 @@ public class OfferRESTController {
     }
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> searchOffersForList(HttpServletRequest httpRequest) {
+    public ResponseEntity<Object> searchOffersForList(HttpServletRequest httpRequest,
+      @RequestParam(name = "title", required = false) String title,
+      @RequestParam(name = "category", required = false) String category,
+      @RequestParam(name = "condition", required = false) String condition,
+      @RequestParam(name = "distance", required = false) Double distance,
+      @RequestParam(name = "score", required = false) Double score,
+      @RequestParam(name = "endDate", required = false) LocalDate endDate
+    ) {
+        UUID userId = identityHandler.getUserIdFromHeader(httpRequest);
         RequestLogHandler.handleRequest(httpRequest);
-        //TODO
-        return new ErrorResponse(Const.NO_IMPL_ERR, HttpStatus.NOT_IMPLEMENTED);
-    }
+        List<UUID> userIdList = getAllUserIdListUseCaseInterface.getAllUserIdList();
+        List<UUID> sortedUserIdList = null;
+        Map<UUID, Double> userIdAndScoreMap = new HashMap<>();
+        userIdList.forEach(userIdLambda -> userIdAndScoreMap.put(userId, getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(userIdLambda)));
+        if(Objects.nonNull(score)){
+             sortedUserIdList = userIdAndScoreMap.entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByValue())
+                    .filter(user -> user.getValue()>score )
+                    .map(Map.Entry::getKey)
+                    .toList()
+                    .reversed();
+        }
+        List<UUID> foundOfferIdList = searchOffersUseCaseInterface.getOfferListMeetingCriteria(
+                userId,
+                title,
+                category,
+                condition,
+                distance,
+                endDate,
+                sortedUserIdList
+        );
+        RequestLogHandler.handleCorrectResponse(httpRequest);
 
-    @GetMapping(value = "/searchForMap", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> searchOffersForMap(HttpServletRequest httpRequest) {
-        RequestLogHandler.handleRequest(httpRequest);
-        //TODO: create this
-        RequestLogHandler.handleRequest(httpRequest);
-        return new ErrorResponse(Const.NO_IMPL_ERR, HttpStatus.NOT_IMPLEMENTED);
+        return new CorrectResponse(foundOfferIdList, Const.SUCC_ERR, HttpStatus.OK);
     }
 
     @GetMapping(value = "/generateDescription", produces = MediaType.APPLICATION_JSON_VALUE)
