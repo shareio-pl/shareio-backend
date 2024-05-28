@@ -184,6 +184,10 @@
                         <exclude>org/shareio/backend/controller/responses/*</exclude>
                         <exclude>org/shareio/backend/validators/*</exclude>
                         <exclude>org/shareio/backend/exceptions/*</exclude>
+                        <exclude>org/shareio/backend/security/*</exclude>
+                        <exclude>org/shareio/backend/infrastructure/email/*</exclude>
+                        <exclude>org/shareio/backend/external_API/**/*</exclude>
+                        <exclude>org/shareio/backend/EnvGetter.class</exclude>
                         <exclude>org/shareio/backend/controller/responses/*</exclude>
                     </excludes>
                 </configuration>
