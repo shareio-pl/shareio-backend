@@ -135,9 +135,6 @@ public class OfferRESTController {
             response.put("offerIds", getOffersByNameUseCaseInterface.getOfferResponseDtoListByName(name));
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(response, Const.SUCC_ERR, HttpStatus.OK);
-        } catch (MultipleValidationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.DATA_INTEGRITY_ERR);
-            return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException noSuchElementException) {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
             return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
@@ -176,31 +173,20 @@ public class OfferRESTController {
       @RequestParam(name = "condition", required = false) String condition,
       @RequestParam(name = "distance", required = false) Double distance,
       @RequestParam(name = "score", required = false) Double score,
-      @RequestParam(name = "endDate", required = false) LocalDate endDate
+      @RequestParam(name = "creationDate", required = false) LocalDate creationDate,
+      @RequestParam(name = "sortType", required = false) String sortType
     ) {
         UUID userId = identityHandler.getUserIdFromHeader(httpRequest);
         RequestLogHandler.handleRequest(httpRequest);
-        List<UUID> userIdList = getAllUserIdListUseCaseInterface.getAllUserIdList();
-        List<UUID> sortedUserIdList = null;
-        Map<UUID, Double> userIdAndScoreMap = new HashMap<>();
-        userIdList.forEach(userIdLambda -> userIdAndScoreMap.put(userId, getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(userIdLambda)));
-        if(Objects.nonNull(score)){
-             sortedUserIdList = userIdAndScoreMap.entrySet()
-                    .stream()
-                    .sorted(Map.Entry.comparingByValue())
-                    .filter(user -> user.getValue()>score )
-                    .map(Map.Entry::getKey)
-                    .toList()
-                    .reversed();
-        }
         List<UUID> foundOfferIdList = searchOffersUseCaseInterface.getOfferListMeetingCriteria(
                 userId,
                 title,
                 category,
                 condition,
                 distance,
-                endDate,
-                sortedUserIdList
+                score,
+                creationDate,
+                sortType
         );
         RequestLogHandler.handleCorrectResponse(httpRequest);
 
@@ -407,10 +393,6 @@ public class OfferRESTController {
             response.put("offerIds", getOffersByUserAndStatusUseCaseInterface.getOfferResponseDtoListByUser(id, status));
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(response, Const.SUCC_ERR, HttpStatus.OK);
-        } catch (MultipleValidationException e) {
-            response.put("error", e.getMessage());
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, Const.DATA_INTEGRITY_ERR);
-            return new ErrorResponse(e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException e) {
             response.put("error", e.getMessage());
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);

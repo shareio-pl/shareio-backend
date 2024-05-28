@@ -43,9 +43,6 @@ public class EmailController {
             }
         } else {
             return new ErrorResponse("NO PERMISSIONS", HttpStatus.FORBIDDEN);
-
         }
     }
-
-
 }

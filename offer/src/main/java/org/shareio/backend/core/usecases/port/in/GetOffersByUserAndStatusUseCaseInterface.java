@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface GetOffersByUserAndStatusUseCaseInterface {
-    List<UUID> getOfferResponseDtoListByUser(UUID id, Status status) throws MultipleValidationException;
+    List<UUID> getOfferResponseDtoListByUser(UUID id, Status status);
 }

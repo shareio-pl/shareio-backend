@@ -34,7 +34,7 @@ public class DebugRESTController {
     GetOffersByNameUseCaseInterface offersByNameUseCaseInterface;
 
 
-    @GetMapping(value = "/getOfferIds",  produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getOfferIds", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> debugGetOfferIds() {
         Map<String, Object> response = new HashMap<>();
         try {

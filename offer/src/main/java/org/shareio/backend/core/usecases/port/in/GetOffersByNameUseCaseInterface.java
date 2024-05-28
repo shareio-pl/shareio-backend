@@ -6,5 +6,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface GetOffersByNameUseCaseInterface {
-    List<UUID> getOfferResponseDtoListByName(String name) throws MultipleValidationException;
+    List<UUID> getOfferResponseDtoListByName(String name);
 }

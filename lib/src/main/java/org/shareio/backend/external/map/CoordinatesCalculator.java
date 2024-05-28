@@ -19,20 +19,18 @@ public class CoordinatesCalculator implements CoordinatesCalculatorInterface {
         String address = country + "," + city + "," + street + "," + houseNumber;
         String apiUrl = "https://nominatim.openstreetmap.org/search?q=" + address + "&format=json";
 
-        try(HttpClient client = HttpClient.newHttpClient()){
-            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(apiUrl)).GET().build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(apiUrl)).GET().build();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
-            JSONArray array = new JSONArray(response.body());
-            JSONObject object = array.getJSONObject(0);
-            if (object.has("place_id")) {
-                coordinates.put("lat", object.getDouble("lat"));
-                coordinates.put("lon", object.getDouble("lon"));
+        JSONArray array = new JSONArray(response.body());
+        JSONObject object = array.getJSONObject(0);
+        if (object.has("place_id")) {
+            coordinates.put("lat", object.getDouble("lat"));
+            coordinates.put("lon", object.getDouble("lon"));
 
-                return coordinates;
-            } else {
-                throw new LocationCalculationException("Couldn't determine coordinates for given address");
-            }
+            return coordinates;
+        } else {
+            throw new LocationCalculationException("Couldn't determine coordinates for given address");
         }
     }
 }

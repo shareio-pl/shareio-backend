@@ -11,20 +11,20 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class DescriptionGenerator implements DescriptionGeneratorInterface {
-    static final String PROMPT = "Wygeneruj opis przedmiotu oddawanego za darmo na podstawie jego tytułu, stanu, kategorii i dodatkowych informacji";
-    static final String APIURL = "https://api.openai.com/v1/chat/completions";
 
-    @Override
-    public String generateDescription(String title, String condition, String category, String additionalData) throws IOException, InterruptedException, DescriptionGenerationException {
-        String gptKey = EnvGetter.getGptApikey();
-        String offerData = title + ", " + condition + ", " + category + ", " + additionalData;
-        String requestBody = "{\"model\": \"gpt-3.5-turbo\", \"messages\": [{\"role\": \"user\", \"content\": \" " + PROMPT + offerData + "\"}], \"temperature\": 1.0}";
+    private String generateDescription(String offerData) throws IOException, InterruptedException, DescriptionGenerationException {
+        String gptUrl = EnvGetter.getGptApiUrl();
+        String gptKey = EnvGetter.getGptApiKey();
+        String gptPrompt = EnvGetter.getGptPrompt();
+        String requestBody = "{\"model\": \"gpt-3.5-turbo\", \"messages\": [{\"role\": \"user\", \"content\": \" " + gptPrompt + offerData + "\"}], \"temperature\": 1.0}";
 
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(APIURL)).POST(HttpRequest.BodyPublishers
-                        .ofString(requestBody)).header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + gptKey).build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(gptUrl))
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + gptKey)
+                .build();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
         JSONObject json = new JSONObject(response.body());
         if (json.isEmpty()) {
@@ -35,22 +35,14 @@ public class DescriptionGenerator implements DescriptionGeneratorInterface {
     }
 
     @Override
+    public String generateDescription(String title, String condition, String category, String additionalData) throws IOException, InterruptedException, DescriptionGenerationException {
+        String offerData = title + ", " + condition + ", " + category + ", " + additionalData;
+        return generateDescription(offerData);
+    }
+
+    @Override
     public String generateDescription(String title, String condition, String category) throws IOException, InterruptedException, DescriptionGenerationException {
-        String gptKey = EnvGetter.getGptApikey();
         String offerData = title + ", " + condition + ", " + category;
-        String requestBody = "{\"model\": \"gpt-3.5-turbo\", \"messages\": [{\"role\": \"user\", \"content\": \" " + PROMPT + offerData + "\"}], \"temperature\": 1.0}";
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(APIURL)).POST(HttpRequest.BodyPublishers
-                        .ofString(requestBody)).header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + gptKey).build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        JSONObject json = new JSONObject(response.body());
-        if (json.isEmpty()) {
-            throw new DescriptionGenerationException("Could not generate description");
-        } else {
-            return json.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
-        }
+        return generateDescription(offerData);
     }
 }
