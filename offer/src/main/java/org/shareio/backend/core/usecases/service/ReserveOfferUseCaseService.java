@@ -31,11 +31,10 @@ public class ReserveOfferUseCaseService implements ReserveOfferUseCaseInterface 
     @Override
     public UUID reserveOffer(OfferReserveDto offerReserveDto) throws MultipleValidationException {
         //TODO validate users reserved offer count
-        //TODO validate offer status
         OfferGetDto offerGetDto = getOfferDaoInterface.getOfferDto(offerReserveDto.offerId()).orElseThrow(NoSuchElementException::new);
         OfferValidator.validateOffer(offerGetDto);
         Offer offer = Optional.of(offerGetDto).map(Offer::fromDto).get();
-        if(offer.getStatus().equals(Status.CANCELED)){
+        if(!offer.getStatus().equals(Status.CREATED)){
             throw new NoSuchElementException();
         }
         UserProfileGetDto recieverProfileGetDto = getUserProfileDaoInterface.getUserDto(offerReserveDto.recieverId()).orElseThrow(NoSuchElementException::new);
