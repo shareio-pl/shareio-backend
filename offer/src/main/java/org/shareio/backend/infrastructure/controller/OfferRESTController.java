@@ -112,18 +112,18 @@ public class OfferRESTController {
 
     }
 
-    @GetMapping(value = "/getCreatedOffersByUser/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getCreatedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
+    @GetMapping(value = "/getCreatedOffersByUser/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getCreatedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID id) {
         return getOfferListBasedOnStatus(httpRequest, id, Status.CREATED);
     }
 
-    @GetMapping(value = "/getReservedOffersByUser/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getReservedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
+    @GetMapping(value = "/getReservedOffersByUser/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getReservedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID id) {
         return getOfferListBasedOnStatus(httpRequest, id, Status.RESERVED);
     }
 
-    @GetMapping(value = "/getFinishedOffersByUser/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getFinishedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
+    @GetMapping(value = "/getFinishedOffersByUser/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getFinishedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID id) {
         return getOfferListBasedOnStatus(httpRequest, id, Status.FINISHED);
     }
 
