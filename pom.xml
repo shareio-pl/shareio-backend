@@ -142,6 +142,13 @@
             <version>3.2.5</version>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.pitest/pitest-maven -->
+        <dependency>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-maven</artifactId>
+            <version>1.16.1</version>
+        </dependency>
+
 
         <!-- JACOCO -->
         <dependency>
