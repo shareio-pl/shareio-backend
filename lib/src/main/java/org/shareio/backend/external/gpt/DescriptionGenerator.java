@@ -14,7 +14,7 @@ import java.util.Objects;
 public class DescriptionGenerator implements DescriptionGeneratorInterface {
     @Override
     public String generateDescription(String title, String condition, String category, String additionalData) throws IOException, InterruptedException, DescriptionGenerationException {
-        String offerData = " Tytuł: " + title + ", Stan: " + condition + ", Kategoria: " + category;
+        String offerData = title + ", " + condition + ", " + category;
         if (Objects.nonNull(additionalData) && !additionalData.isBlank()) {
             offerData += ", Dodatkowe informacje: " + additionalData;
         }
