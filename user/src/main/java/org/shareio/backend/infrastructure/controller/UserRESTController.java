@@ -38,22 +38,7 @@ public class UserRESTController {
     ModifyUserUseCaseInterface modifyUserUseCaseInterface;
     GetAllUserIdListUseCaseInterface getAllUserIdListUseCaseInterface;
 
-    @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> addUser(HttpServletRequest httpRequest, @RequestBody UserSaveDto userSaveDto) {
-        RequestLogHandler.handleRequest(httpRequest);
-        try {
-            UserValidator.validateUserSaveDto(userSaveDto);
-            UUID createdUserUUID = addUserUseCaseInterface.addUser(userSaveDto);
-            RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new CorrectResponse(createdUserUUID, Const.SUCC_ERR, HttpStatus.OK);
-        } catch (MultipleValidationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, e.getMessage());
-            return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (IllegalArgumentException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, e.getMessage());
-            return new ErrorResponse(Const.ILL_ARG_ERR, HttpStatus.BAD_REQUEST);
-        }
-    }
+
 
     @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getUser(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
@@ -80,6 +65,22 @@ public class UserRESTController {
 
     }
 
+    @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> addUser(HttpServletRequest httpRequest, @RequestBody UserSaveDto userSaveDto) {
+        RequestLogHandler.handleRequest(httpRequest);
+        try {
+            UserValidator.validateUserSaveDto(userSaveDto);
+            UUID createdUserUUID = addUserUseCaseInterface.addUser(userSaveDto);
+            RequestLogHandler.handleCorrectResponse(httpRequest);
+            return new CorrectResponse(createdUserUUID, Const.SUCC_ERR, HttpStatus.OK);
+        } catch (MultipleValidationException e) {
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, e.getMessage());
+            return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (IllegalArgumentException e) {
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, e.getMessage());
+            return new ErrorResponse(Const.ILL_ARG_ERR, HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @PutMapping(value = "/modify/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> modifyUser(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID userId, @RequestBody UserModifyDto userModifyDto) {
