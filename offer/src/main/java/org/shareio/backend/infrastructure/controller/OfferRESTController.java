@@ -57,6 +57,7 @@ public class OfferRESTController {
     GetNewestOffersUseCaseService getNewestOffersUseCaseService;
     GetAllUserIdListUseCaseInterface getAllUserIdListUseCaseInterface;
     SearchOffersUseCaseInterface searchOffersUseCaseInterface;
+    GetOfferOwnerIdUseCaseInterface getOfferOwnerIdUseCaseInterface;
 
     ModifyOfferUseCaseInterface modifyOfferUseCaseInterface;
 
@@ -71,10 +72,15 @@ public class OfferRESTController {
     @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getOffer(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
         RequestLogHandler.handleRequest(httpRequest);
+        UUID userId = identityHandler.getUserIdFromHeader(httpRequest);
         try {
-            Integer reviewCount = getOwnerReviewCountUseCaseInterface.getUserReviewCount(id);
-            Double averageUserReviewValue = getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(id);
-            OfferResponseDto offerResponseDto = getOfferUseCaseInterface.getOfferResponseDto(id, reviewCount, averageUserReviewValue);
+            if(Objects.nonNull(userId)){
+                log.error(userId.toString());
+            }
+            UUID ownerId = getOfferOwnerIdUseCaseInterface.getOfferOwnerId(id);
+            Integer reviewCount = getOwnerReviewCountUseCaseInterface.getUserReviewCount(ownerId);
+            Double averageUserReviewValue = getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(ownerId);
+            OfferResponseDto offerResponseDto = getOfferUseCaseInterface.getOfferResponseDto(id, userId, reviewCount, averageUserReviewValue);
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(offerResponseDto, Const.SUCC_ERR, HttpStatus.OK);
         } catch (MultipleValidationException e) {

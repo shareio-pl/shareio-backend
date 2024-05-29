@@ -34,9 +34,6 @@ public class OfferDatabaseMapper {
                     offerEntity.getOwner().getSurname(),
                     offerEntity.getOwner().getPhotoId(),
 
-                    0.0,// TODO: offerEntity.getOwner().getRating()
-                    0, // TODO: offerEntity.getOwner().getReviewCount()
-
                     offerEntity.getReservationDate(),
                     offerEntity.getReview().getReviewId(),
                     offerEntity.getReview().getReviewValue(),
@@ -70,9 +67,6 @@ public class OfferDatabaseMapper {
                     offerEntity.getOwner().getName(),
                     offerEntity.getOwner().getSurname(),
                     offerEntity.getOwner().getPhotoId(),
-
-                    0.0,// TODO: offerEntity.getOwner().getRating()
-                    0, // TODO: offerEntity.getOwner().getReviewCount()
 
                     offerEntity.getReservationDate(),
                     null,
