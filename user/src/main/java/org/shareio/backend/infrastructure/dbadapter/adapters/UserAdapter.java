@@ -86,7 +86,7 @@ public class UserAdapter implements GetUserProfileDaoInterface,
 
     @Override
     public List<UserProfileGetDto> getAllUserProfileList() {
-        List<UserEntity> userEntityList = (ArrayList<UserEntity>) userRepository.findAll();
+        List<UserEntity> userEntityList = userRepository.findAll();
         return userEntityList.stream().map(UserDatabaseMapper::toDto).toList();
     }
 }

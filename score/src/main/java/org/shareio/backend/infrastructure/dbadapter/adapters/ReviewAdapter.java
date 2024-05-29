@@ -5,6 +5,7 @@ import org.shareio.backend.infrastructure.dbadapter.repositories.ReviewRepositor
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 
@@ -21,6 +22,6 @@ public class ReviewAdapter implements RemoveReviewCommandInterface {
     @Override
     @Modifying
     public void removeReview(UUID reviewId) {
-        reviewRepository.delete(reviewRepository.findByReviewId(reviewId).orElseThrow());
+        reviewRepository.delete(reviewRepository.findByReviewId(reviewId).orElseThrow(NoSuchElementException::new));
     }
 }

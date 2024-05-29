@@ -53,7 +53,7 @@ public class DeleteRESTController {
     public ResponseEntity<Object> deleteOffer(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
         try{
             RequestLogHandler.handleRequest(httpRequest);
-            getOfferUseCaseInterface.getOfferResponseDto(id, null, null);
+            getOfferUseCaseInterface.getOfferResponseDto(id, null, null, null);
         } catch (MultipleValidationException e) {
             RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, "Offer with id: "+id+" is malformed");
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);

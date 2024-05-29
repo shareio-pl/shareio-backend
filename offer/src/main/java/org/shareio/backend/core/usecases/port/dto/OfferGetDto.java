@@ -30,8 +30,6 @@ public record OfferGetDto(
         String ownerName,
         String ownerSurname,
         UUID ownerPhotoId,
-        Double ownerRating,
-        Integer ownerReviewCount,
 
         LocalDateTime reservationDate,
         UUID reviewId,

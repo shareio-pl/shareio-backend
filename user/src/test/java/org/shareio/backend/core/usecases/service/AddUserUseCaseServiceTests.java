@@ -2,12 +2,12 @@ package org.shareio.backend.core.usecases.service;
 
 import lombok.SneakyThrows;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
+import org.shareio.backend.core.model.UserSnapshot;
 import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
 import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
 import org.shareio.backend.core.usecases.port.out.GetUserProfileByEmailDaoInterface;
@@ -20,11 +20,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.AdditionalMatchers.not;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
-public class AddUserUseCaseServiceTests {
+@Slf4j
+class AddUserUseCaseServiceTests {
 
     AutoCloseable autoCloseable;
     final String existingUserEmail = "test@test.com";
@@ -36,8 +38,12 @@ public class AddUserUseCaseServiceTests {
     @Mock
     SaveUserCommandInterface saveUserCommandInterface;
 
+
     @InjectMocks
     AddUserUseCaseService addUserUseCaseService;
+
+    @Captor
+    ArgumentCaptor<Optional<UserSnapshot>> userSnapshotArgumentCaptor;
 
     @SneakyThrows
     @BeforeEach
@@ -60,10 +66,11 @@ public class AddUserUseCaseServiceTests {
         );
         when(getUserProfileByEmailDaoInterface.getUserDto(not(eq(existingUserEmail)))).
                 thenThrow(new NoSuchElementException());
+
     }
 
     @Test
-    public void add_user_with_existing_email_and_throw_IllegalArgumentException() {
+    void add_user_with_existing_email_and_throw_IllegalArgumentException() {
         userSaveDto = new UserSaveDto(
                 "Jan",
                 "Kowal",
@@ -82,7 +89,26 @@ public class AddUserUseCaseServiceTests {
     }
 
     @Test
-    public void add_correct_user_and_succeed() {
+    void add_user_with_no_password_and_fail() {
+        userSaveDto = new UserSaveDto(
+                "Jan",
+                "Kowal",
+                null,
+                "jankowal@gmail.com",
+                LocalDate.now(),
+                "Polska",
+                "Łódzkie",
+                "Łódź",
+                "95-000",
+                "Lutomierska",
+                "12",
+                "2"
+        );
+        Assertions.assertThrows(IllegalArgumentException.class, () -> addUserUseCaseService.addUser(userSaveDto));
+    }
+
+    @Test
+    void add_correct_user_and_succeed() {
         userSaveDto = new UserSaveDto(
                 "Jan",
                 "Kowal",
@@ -97,6 +123,13 @@ public class AddUserUseCaseServiceTests {
                 "12",
                 "2"
         );
-        Assertions.assertDoesNotThrow(() -> addUserUseCaseService.addUser(userSaveDto));
+        Assertions.assertAll(()-> {
+            UUID userId =  Assertions.assertDoesNotThrow(() -> addUserUseCaseService.addUser(userSaveDto));
+            Assertions.assertNotNull(userId);
+            verify(saveUserCommandInterface, atLeastOnce()).saveUser(any());
+            verify(saveUserCommandInterface).saveUser(userSnapshotArgumentCaptor.capture());
+            Assertions.assertNotNull(userSnapshotArgumentCaptor.getValue().get().security().getPwHash());
+        });
+
     }
 }

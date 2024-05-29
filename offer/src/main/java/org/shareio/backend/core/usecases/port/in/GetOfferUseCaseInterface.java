@@ -6,5 +6,5 @@ import org.shareio.backend.exceptions.MultipleValidationException;
 import java.util.UUID;
 
 public interface GetOfferUseCaseInterface {
-    OfferResponseDto getOfferResponseDto(UUID id, Integer reviewCount, Double averageUserReviewValue) throws MultipleValidationException;
+    OfferResponseDto getOfferResponseDto(UUID id, UUID userId, Integer reviewCount, Double averageUserReviewValue) throws MultipleValidationException;
 }
