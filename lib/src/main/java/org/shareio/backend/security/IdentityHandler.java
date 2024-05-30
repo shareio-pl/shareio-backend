@@ -19,7 +19,7 @@ public class IdentityHandler {
     }
 
     public UUID getUserIdFromHeader(HttpServletRequest httpRequest){
-        if(!httpRequest.getHeaders("role").asIterator().hasNext()){
+        if(!httpRequest.getHeaders("id").asIterator().hasNext()){
             return null;
         }
         return UUID.fromString(httpRequest.getHeaders("id").nextElement());
