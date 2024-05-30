@@ -36,6 +36,7 @@ public class OfferEntity {
     private Condition condition;
     @Enumerated(EnumType.STRING)
     private Category category;
+    @Column(name="description", length = 450)
     private String description;
     private UUID photoId;
     @OneToOne(cascade = CascadeType.ALL)
