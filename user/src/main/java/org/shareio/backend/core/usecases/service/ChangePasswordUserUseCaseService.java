@@ -35,7 +35,7 @@ public class ChangePasswordUserUseCaseService implements ChangePasswordUserUseCa
             updateUserChangePasswordCommandInterface.updateUserPassword(user.toSnapshot());
         }
         else {
-            throw new IllegalArgumentException("Password does not match!");
+            throw new IllegalArgumentException(Const.ILL_ARG_ERR +": Password does not match!");
         }
 
     }

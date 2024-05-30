@@ -19,10 +19,12 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 public class GetAddressUseCaseServiceTests {
-
+//TODO: cleanup
     private AutoCloseable closeable;
     AddressGetDto expectedCorrectAddressGetDto = null;
     AddressResponseDto expectedCorrectAddressResponseDto = null;
+    UUID test_correctUserId;
+    UUID test_failUserId;
     private GetAddressUseCaseService getAddressUseCaseService;
 
 
@@ -33,11 +35,12 @@ public class GetAddressUseCaseServiceTests {
     @BeforeEach
     public void setUp() {
         UUID incorrectUserId = UUID.randomUUID();
-        UUID addressId = UUID.randomUUID();
+        test_correctUserId = UUID.randomUUID();
+        test_failUserId = UUID.randomUUID();
         closeable = openMocks(this);
         getAddressUseCaseService = new GetAddressUseCaseService(getAddressDaoInterface);
         expectedCorrectAddressGetDto = new AddressGetDto(
-                addressId,
+                test_correctUserId,
                 "Polska",
                 "Łódzkie",
                 "Łódź",
@@ -56,7 +59,7 @@ public class GetAddressUseCaseServiceTests {
         );
 
 
-        when(getAddressDaoInterface.getAddressDto(addressId)).thenReturn(Optional.of(expectedCorrectAddressGetDto));
+        when(getAddressDaoInterface.getAddressDto(test_correctUserId)).thenReturn(Optional.of(expectedCorrectAddressGetDto));
         when(getAddressDaoInterface.getAddressDto(incorrectUserId)).thenThrow(new NoSuchElementException());
     }
 
@@ -66,12 +69,14 @@ public class GetAddressUseCaseServiceTests {
     }
 
     @Test
-    public void get_nonexistent_address_and_throw_NoSuchElementException() {
-        Assertions.assertThrows(NoSuchElementException.class, () -> getAddressUseCaseService.getAddressResponseDto(UUID.randomUUID()));
+    void get_nonexistent_address_and_throw_NoSuchElementException() {
+        Assertions.assertThrows(NoSuchElementException.class,
+                () -> getAddressUseCaseService.getAddressResponseDto(test_failUserId)
+        );
     }
 
     @Test
-    public void get_invalid_address_and_throw_MultipleValidationErrorException() {
+    void get_invalid_address_and_throw_MultipleValidationErrorException() {
         UUID incorrectStringId = UUID.randomUUID();
         AddressGetDto expectedIncorrectNameUserProfileGetDto = new AddressGetDto(
                 incorrectStringId,
@@ -93,5 +98,13 @@ public class GetAddressUseCaseServiceTests {
         Assertions.assertEquals("String is empty", multipleValidationException.getErrorMap().get("HouseNumber"));
     }
 
+    @Test
+    void get_valid_address_and_succeed(){
+        when(getAddressDaoInterface.getAddressDto(test_correctUserId)).thenReturn(Optional.of(expectedCorrectAddressGetDto));
+        AddressResponseDto addressResponseDto = Assertions.assertDoesNotThrow(
+                () -> getAddressUseCaseService.getAddressResponseDto(test_correctUserId)
+        );
+        Assertions.assertNotNull(addressResponseDto);
+    }
 }
 
