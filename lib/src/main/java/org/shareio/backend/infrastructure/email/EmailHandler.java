@@ -7,14 +7,18 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 
+
 @Service
 public class EmailHandler {
 
     @Value("${spring.mail.username}")
     String sender;
 
+    private final JavaMailSender emailSender;
 
-    private JavaMailSender emailSender;
+    public EmailHandler(JavaMailSender emailSender){
+        this.emailSender = emailSender;
+    }
 
     public void sendHelpdeskMessage(
             String reciever, String subject, String text) {
