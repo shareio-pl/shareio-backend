@@ -182,8 +182,11 @@ public class OfferRESTController {
                                                       @RequestParam(name = "creationDate", required = false) LocalDate creationDate,
                                                       @RequestParam(name = "sortType", required = false) String sortType
     ) {
-        UUID userId = identityHandler.getUserIdFromHeader(httpRequest);
         RequestLogHandler.handleRequest(httpRequest);
+        UUID userId = identityHandler.getUserIdFromHeader(httpRequest);
+        if(Objects.isNull(userId)){
+            return new ErrorResponse("UNAUTHORIZED", HttpStatus.FORBIDDEN);
+        }
         List<UUID> foundOfferIdList = searchOffersUseCaseInterface.getOfferListMeetingCriteria(
                 userId,
                 title,

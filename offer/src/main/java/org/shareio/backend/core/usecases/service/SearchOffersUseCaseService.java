@@ -5,13 +5,17 @@ import org.shareio.backend.core.model.Offer;
 import org.shareio.backend.core.model.User;
 import org.shareio.backend.core.model.vo.Category;
 import org.shareio.backend.core.model.vo.Condition;
+import org.shareio.backend.core.model.vo.Location;
 import org.shareio.backend.core.model.vo.OfferSortType;
+import org.shareio.backend.core.usecases.port.dto.LocationResponseDto;
 import org.shareio.backend.core.usecases.port.in.GetAllUserIdListUseCaseInterface;
 import org.shareio.backend.core.usecases.port.in.GetAverageUserReviewValueUseCaseInterface;
+import org.shareio.backend.core.usecases.port.in.GetLocationUseCaseInterface;
 import org.shareio.backend.core.usecases.port.in.SearchOffersUseCaseInterface;
 import org.shareio.backend.core.usecases.port.out.GetAllOffersDaoInterface;
 import org.shareio.backend.core.usecases.port.out.GetUserProfileDaoInterface;
 import org.shareio.backend.core.usecases.util.DistanceCalculator;
+import org.shareio.backend.exceptions.MultipleValidationException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -23,13 +27,59 @@ public class SearchOffersUseCaseService implements SearchOffersUseCaseInterface 
 
     GetUserProfileDaoInterface getUserProfileDaoInterface;
     GetAllOffersDaoInterface getAllOffersDaoInterface;
+    GetLocationUseCaseInterface getLocationUseCaseInterface;
     GetAllUserIdListUseCaseInterface getAllUserIdListUseCaseInterface;
     GetAverageUserReviewValueUseCaseInterface getAverageUserReviewValueUseCaseInterface;
 
     @Override
     public List<UUID> getOfferListMeetingCriteria(UUID userId, String title, String category, String condition, Double distance, Double score, LocalDate creationDate, String sortType) {
-        User user = getUserProfileDaoInterface.getUserDto(userId).map(User::fromDto).orElseThrow(NoSuchElementException::new);
         List<Offer> offers = getAllOffersDaoInterface.getAllOffers().stream().map(Offer::fromDto).toList();
+        User user = getUserProfileDaoInterface.getUserDto(userId).map(User::fromDto).orElseThrow(NoSuchElementException::new);
+        Location location;
+        try {
+            LocationResponseDto locationResponseDto = getLocationUseCaseInterface.getLocationResponseDto(user.getAddress().getAddressId().getId());
+            location = new Location(locationResponseDto.latitude(), locationResponseDto.longitude());
+        } catch (MultipleValidationException e) {
+            return offers.stream().map(offer -> offer.getOfferId().getId()).toList();
+        }
+        offers = filterOfferList(offers, title, category, condition, distance, score, creationDate, location);
+        offers = sortOfferList(sortType, offers, location);
+
+
+        return offers.stream().map(offer -> offer.getOfferId().getId()).toList();
+    }
+
+    private List<Offer> sortOfferList(String sortType, List<Offer> offers, Location location) {
+        if (Objects.nonNull(sortType)) {
+            switch (OfferSortType.valueOf(sortType)) {
+                case CLOSEST -> offers = offers.stream()
+                        .sorted(Comparator.comparingDouble(
+                                o -> DistanceCalculator.calculateDistance(
+                                        o.getAddress().getLocation(), location)))
+                        .toList();
+                case FURTHEST -> offers = offers.stream()
+                        .sorted(Comparator.comparingDouble(
+                                o -> DistanceCalculator.calculateDistance(
+                                        o.getAddress().getLocation(), location)))
+                        .toList().reversed();
+                case NEWEST -> offers = offers.stream()
+                        .sorted(Comparator.comparing(Offer::getCreationDate))
+                        .toList();
+                case OLDEST -> offers = offers.stream()
+                        .sorted(Comparator.comparing(Offer::getCreationDate))
+                        .toList().reversed();
+                case HIGHEST_RATED -> offers = offers.stream()
+                        .sorted((o1, o2) ->
+                                getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(o1.getOwner().getUserId().getId())
+                                        .compareTo(
+                                                getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(o2.getOwner().getUserId().getId())))
+                        .toList();
+            }
+        }
+        return offers;
+    }
+
+    private List<Offer> filterOfferList(List<Offer> offers, String title, String category, String condition, Double distance, Double score, LocalDate creationDate, Location location) {
 
         // FILTER
         if (Objects.nonNull(title) && !title.isBlank()) {
@@ -40,13 +90,13 @@ public class SearchOffersUseCaseService implements SearchOffersUseCaseInterface 
             offers = offers.stream()
                     .filter(offer -> Objects.equals(offer.getCategory(), Category.valueOf(category))).toList();
         }
-        if (Objects.nonNull(condition) && !category.isBlank()) {
+        if (Objects.nonNull(condition) && !condition.isBlank()) {
             offers = offers.stream()
                     .filter(offer -> Objects.equals(offer.getCondition(), Condition.valueOf(condition))).toList();
         }
         if (Objects.nonNull(distance)) {
             offers = offers.stream()
-                    .filter(offer -> DistanceCalculator.calculateDistance(offer.getAddress().getLocation(), user.getAddress().getLocation()) <= distance)
+                    .filter(offer -> DistanceCalculator.calculateDistance(offer.getAddress().getLocation(), location) <= distance)
                     .toList();
         }
         if (Objects.nonNull(score)) {
@@ -64,35 +114,6 @@ public class SearchOffersUseCaseService implements SearchOffersUseCaseInterface 
             offers = offers.stream()
                     .filter(offer -> offer.getCreationDate().isBefore(creationDate.atStartOfDay())).toList();
         }
-
-        // SORT
-        if (Objects.nonNull(sortType)) {
-            switch (OfferSortType.valueOf(sortType)) {
-                case CLOSEST -> offers = offers.stream()
-                        .sorted(Comparator.comparingDouble(
-                                o -> DistanceCalculator.calculateDistance(
-                                        o.getAddress().getLocation(), user.getAddress().getLocation())))
-                        .toList();
-                case FURTHEST -> offers = offers.stream()
-                        .sorted(Comparator.comparingDouble(
-                                o -> DistanceCalculator.calculateDistance(
-                                        o.getAddress().getLocation(), user.getAddress().getLocation())))
-                        .toList().reversed();
-                case NEWEST -> offers = offers.stream()
-                        .sorted(Comparator.comparing(Offer::getCreationDate))
-                        .toList();
-                case OLDEST -> offers = offers.stream()
-                        .sorted(Comparator.comparing(Offer::getCreationDate))
-                        .toList().reversed();
-                case HIGHEST_RATED -> offers = offers.stream()
-                        .sorted((o1, o2) ->
-                                getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(o1.getOwner().getUserId().getId())
-                                        .compareTo(
-                                                getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(o2.getOwner().getUserId().getId())))
-                        .toList();
-            }
-        }
-
-        return offers.stream().map(offer -> offer.getOfferId().getId()).toList();
+        return offers;
     }
 }
