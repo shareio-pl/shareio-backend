@@ -33,9 +33,9 @@ public class SearchOffersUseCaseService implements SearchOffersUseCaseInterface 
 
     @Override
     public List<UUID> getOfferListMeetingCriteria(UUID userId, String title, String category, String condition, Double distance, Double score, LocalDate creationDate, String sortType) {
-        List<Offer> offers = getAllOffersDaoInterface.getAllOffers().stream().map(Offer::fromDto).toList();
         User user = getUserProfileDaoInterface.getUserDto(userId).map(User::fromDto).orElseThrow(NoSuchElementException::new);
         Location location;
+        List<Offer> offers = getAllOffersDaoInterface.getAllOffers().stream().map(Offer::fromDto).toList();
         try {
             LocationResponseDto locationResponseDto = getLocationUseCaseInterface.getLocationResponseDto(user.getAddress().getAddressId().getId());
             location = new Location(locationResponseDto.latitude(), locationResponseDto.longitude());
@@ -43,13 +43,13 @@ public class SearchOffersUseCaseService implements SearchOffersUseCaseInterface 
             return offers.stream().map(offer -> offer.getOfferId().getId()).toList();
         }
         offers = filterOfferList(offers, title, category, condition, distance, score, creationDate, location);
-        offers = sortOfferList(sortType, offers, location);
+        offers = sortOfferList(offers, sortType, location);
 
 
         return offers.stream().map(offer -> offer.getOfferId().getId()).toList();
     }
 
-    private List<Offer> sortOfferList(String sortType, List<Offer> offers, Location location) {
+    private List<Offer> sortOfferList(List<Offer> offers, String sortType, Location location) {
         if (Objects.nonNull(sortType)) {
             switch (OfferSortType.valueOf(sortType)) {
                 case CLOSEST -> offers = offers.stream()
