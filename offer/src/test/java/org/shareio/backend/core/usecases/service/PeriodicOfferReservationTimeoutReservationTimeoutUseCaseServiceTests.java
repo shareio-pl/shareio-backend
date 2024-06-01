@@ -97,8 +97,6 @@ class PeriodicOfferReservationTimeoutReservationTimeoutUseCaseServiceTests {
                     UUID.randomUUID(),
                     4.5,
                     LocalDateTime.now()
-
-
             );
             utilities.when(() -> OfferValidator.validateOffer(test_offerGetDto2))
                     .thenThrow(MultipleValidationException.class);
@@ -138,9 +136,7 @@ class PeriodicOfferReservationTimeoutReservationTimeoutUseCaseServiceTests {
                     UUID.randomUUID(),
                     4.5,
                     LocalDateTime.now()
-
-
-            );
+      );
             utilities.when(() -> OfferValidator.validateOffer(test_offerGetDto2))
                     .thenThrow(MultipleValidationException.class);
             when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
@@ -179,9 +175,7 @@ class PeriodicOfferReservationTimeoutReservationTimeoutUseCaseServiceTests {
                     UUID.randomUUID(),
                     4.5,
                     LocalDateTime.now()
-
-
-            );
+          );
             utilities.when(() -> OfferValidator.validateOffer(test_offerGetDto2))
                     .thenThrow(MultipleValidationException.class);
             when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
@@ -194,6 +188,4 @@ class PeriodicOfferReservationTimeoutReservationTimeoutUseCaseServiceTests {
             Assertions.assertNull(captured_offerSnapshot.reservationDate());
         }
     }
-
-
 }
