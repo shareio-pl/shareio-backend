@@ -8,7 +8,7 @@ public interface SearchOffersUseCaseInterface {
     List<UUID> getOfferListMeetingCriteria(
             UUID userId,
             String title,
-            String category,
+            List<String> category,
             String condition,
             Double distance,
             Double score,

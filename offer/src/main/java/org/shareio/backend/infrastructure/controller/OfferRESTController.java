@@ -175,7 +175,7 @@ public class OfferRESTController {
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> searchOffersForList(HttpServletRequest httpRequest,
                                                       @RequestParam(name = "title", required = false) String title,
-                                                      @RequestParam(name = "category", required = false) String category,
+                                                      @RequestParam(name = "category", required = false) List<String> category,
                                                       @RequestParam(name = "condition", required = false) String condition,
                                                       @RequestParam(name = "distance", required = false) Double distance,
                                                       @RequestParam(name = "score", required = false) Double score,
