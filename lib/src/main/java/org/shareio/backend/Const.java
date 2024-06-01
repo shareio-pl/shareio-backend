@@ -17,7 +17,7 @@ public class Const {
     public static final Integer MIN_TITLE_LENGTH = 4;
     public static final Integer MAX_TITLE_LENGTH = 30;
     public static final Integer MIN_DESCRIPTION_LENGTH = 20;
-    public static final Integer MAX_DESCRIPTION_LENGTH = 255;
+    public static final Integer MAX_DESCRIPTION_LENGTH = 450;
 
     // ------------- VALIDATION REGEX -------------
     // borrowed from https://emailregex.com/index.html
