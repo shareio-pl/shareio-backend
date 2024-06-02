@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 
 @Slf4j
 class AddUserUseCaseServiceTests {
-
+    //TODO: fully cover this
     AutoCloseable autoCloseable;
     final String existingUserEmail = "test@test.com";
     UserSaveDto userSaveDto;
@@ -80,10 +80,10 @@ class AddUserUseCaseServiceTests {
                 "Polska",
                 "Łódzkie",
                 "Łódź",
-                "95-000",
                 "Lutomierska",
+                "31",
                 "12",
-                "2"
+                "95-000"
         );
         Assertions.assertThrows(IllegalArgumentException.class, () -> addUserUseCaseService.addUser(userSaveDto));
     }
@@ -99,10 +99,10 @@ class AddUserUseCaseServiceTests {
                 "Polska",
                 "Łódzkie",
                 "Łódź",
-                "95-000",
                 "Lutomierska",
+                "31",
                 "12",
-                "2"
+                "95-000"
         );
         Assertions.assertThrows(IllegalArgumentException.class, () -> addUserUseCaseService.addUser(userSaveDto));
     }
@@ -118,10 +118,10 @@ class AddUserUseCaseServiceTests {
                 "Polska",
                 "Łódzkie",
                 "Łódź",
-                "95-000",
                 "Lutomierska",
+                "31",
                 "12",
-                "2"
+                "95-000"
         );
         Assertions.assertAll(()-> {
             UUID userId =  Assertions.assertDoesNotThrow(() -> addUserUseCaseService.addUser(userSaveDto));
@@ -129,6 +129,8 @@ class AddUserUseCaseServiceTests {
             verify(saveUserCommandInterface, atLeastOnce()).saveUser(any());
             verify(saveUserCommandInterface).saveUser(userSnapshotArgumentCaptor.capture());
             Assertions.assertNotNull(userSnapshotArgumentCaptor.getValue().get().security().getPwHash());
+            Assertions.assertNotEquals(0.0, userSnapshotArgumentCaptor.getValue().get().address().getLocation().getLongitude(), 0.0);
+            Assertions.assertNotEquals(0.0, userSnapshotArgumentCaptor.getValue().get().address().getLocation().getLatitude(), 0.0);
         });
 
     }
