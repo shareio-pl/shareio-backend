@@ -3,7 +3,6 @@ package org.shareio.backend.core.usecases.service;
 import lombok.AllArgsConstructor;
 import org.shareio.backend.core.model.Offer;
 import org.shareio.backend.core.model.User;
-import org.shareio.backend.core.model.vo.Category;
 import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.core.model.vo.Location;
 import org.shareio.backend.core.model.vo.OfferSortType;
@@ -32,7 +31,7 @@ public class SearchOffersUseCaseService implements SearchOffersUseCaseInterface 
     GetAverageUserReviewValueUseCaseInterface getAverageUserReviewValueUseCaseInterface;
 
     @Override
-    public List<UUID> getOfferListMeetingCriteria(UUID userId, String title, String category, String condition, Double distance, Double score, LocalDate creationDate, String sortType) {
+    public List<UUID> getOfferListMeetingCriteria(UUID userId, String title, List<String> category, String condition, Double distance, Double score, LocalDate creationDate, String sortType) {
         User user = getUserProfileDaoInterface.getUserDto(userId).map(User::fromDto).orElseThrow(NoSuchElementException::new);
         Location location;
         List<Offer> offers = getAllOffersDaoInterface.getAllOffers().stream().map(Offer::fromDto).toList();
@@ -56,18 +55,18 @@ public class SearchOffersUseCaseService implements SearchOffersUseCaseInterface 
                         .sorted(Comparator.comparingDouble(
                                 o -> DistanceCalculator.calculateDistance(
                                         o.getAddress().getLocation(), location)))
-                        .toList();
+                        .toList().reversed();
                 case FURTHEST -> offers = offers.stream()
                         .sorted(Comparator.comparingDouble(
                                 o -> DistanceCalculator.calculateDistance(
                                         o.getAddress().getLocation(), location)))
-                        .toList().reversed();
+                        .toList();
                 case NEWEST -> offers = offers.stream()
                         .sorted(Comparator.comparing(Offer::getCreationDate))
-                        .toList();
+                        .toList().reversed();
                 case OLDEST -> offers = offers.stream()
                         .sorted(Comparator.comparing(Offer::getCreationDate))
-                        .toList().reversed();
+                        .toList();
                 case HIGHEST_RATED -> offers = offers.stream()
                         .sorted((o1, o2) ->
                                 getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(o1.getOwner().getUserId().getId())
@@ -79,16 +78,16 @@ public class SearchOffersUseCaseService implements SearchOffersUseCaseInterface 
         return offers;
     }
 
-    private List<Offer> filterOfferList(List<Offer> offers, String title, String category, String condition, Double distance, Double score, LocalDate creationDate, Location location) {
+    private List<Offer> filterOfferList(List<Offer> offers, String title, List<String> category, String condition, Double distance, Double score, LocalDate creationDate, Location location) {
 
         // FILTER
         if (Objects.nonNull(title) && !title.isBlank()) {
             offers = offers.stream()
                     .filter(offer -> offer.getTitle().toUpperCase().contains(title.toUpperCase())).toList();
         }
-        if (Objects.nonNull(category) && !category.isBlank()) {
+        if (Objects.nonNull(category) && !category.isEmpty()) {
             offers = offers.stream()
-                    .filter(offer -> Objects.equals(offer.getCategory(), Category.valueOf(category))).toList();
+                    .filter(offer -> category.contains(offer.getCategory().toString())).toList();
         }
         if (Objects.nonNull(condition) && !condition.isBlank()) {
             offers = offers.stream()
