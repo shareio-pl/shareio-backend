@@ -36,9 +36,9 @@ public class ReserveOfferUseCaseService implements ReserveOfferUseCaseInterface 
         if(!offer.getStatus().equals(Status.CREATED)){
             throw new NoSuchElementException();
         }
-        UserProfileGetDto recieverProfileGetDto = getUserProfileDaoInterface.getUserDto(offerReserveDto.recieverId()).orElseThrow(NoSuchElementException::new);
-        User reciever = Optional.of(recieverProfileGetDto).map(User::fromDto).orElseThrow(NoSuchElementException::new);
-        offer.setReceiver(reciever);
+        UserProfileGetDto receiverProfileGetDto = getUserProfileDaoInterface.getUserDto(offerReserveDto.receiverId()).orElseThrow(NoSuchElementException::new);
+        User receiver = Optional.of(receiverProfileGetDto).map(User::fromDto).orElseThrow(NoSuchElementException::new);
+        offer.setReceiver(receiver);
         offer.setReservationDate(LocalDateTime.now());
         offer.setStatus(Status.RESERVED);
         updateOfferReserveOfferCommandInterface.reserveOffer(offer.toSnapshot());
