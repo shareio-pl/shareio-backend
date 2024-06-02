@@ -250,15 +250,15 @@ public class OfferRESTController {
     public ResponseEntity<Object> getUserScore(HttpServletRequest httpRequest, @PathVariable(name = "userId") UUID userId) {
         RequestLogHandler.handleRequest(httpRequest);
         try {
-            UserProfileResponseDto userProfileResponseDto = getUserProfileUseCaseInterface.getUserProfileResponseDto(userId);
-            Double userScore = getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(userId);
-            UserScoreDto userScoreDto = new UserScoreDto(userId, userProfileResponseDto.email(), userScore);
+            List<UserScoreWithPositionDto> userScoreWithPositionDtoList = getAllUserListWithScoreAndPosition();
+            UserScoreWithPositionDto particularUserRecord = userScoreWithPositionDtoList
+                    .stream()
+                    .filter(userScoreDto ->userScoreDto.userId().equals(userId))
+                    .findFirst()
+                    .orElseThrow(NoSuchElementException::new);
             RequestLogHandler.handleCorrectResponse(httpRequest);
-            return new CorrectResponse(userScoreDto, Const.SUCC_ERR, HttpStatus.OK);
-        } catch (MultipleValidationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FAILED_DEPENDENCY, Const.DATA_INTEGRITY_ERR);
-            return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
-        } catch (NoSuchElementException noSuchElementException) {
+            return new CorrectResponse(particularUserRecord, Const.SUCC_ERR, HttpStatus.OK);
+        }  catch (NoSuchElementException noSuchElementException) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
             return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         }
@@ -268,17 +268,9 @@ public class OfferRESTController {
     @GetMapping(value = "/getTopScoreUserList", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getTopScoreUserList(HttpServletRequest httpRequest) {
         RequestLogHandler.handleRequest(httpRequest);
-        List<UUID> userIdList = getAllUserIdListUseCaseInterface.getAllUserIdList();
-        Map<UUID, Double> userIdAndScoreMap = new HashMap<>();
-        userIdList.forEach(userId -> userIdAndScoreMap.put(userId, getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(userId)));
-        List<UUID> sortedUserIdList = userIdAndScoreMap.entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .toList()
-                .reversed();
+        List<UserScoreWithPositionDto> userScoreWithPositionDtoList = getAllUserListWithScoreAndPosition();
         RequestLogHandler.handleCorrectResponse(httpRequest);
-        return new CorrectResponse(sortedUserIdList, Const.SUCC_ERR, HttpStatus.OK);
+        return new CorrectResponse(userScoreWithPositionDtoList, Const.SUCC_ERR, HttpStatus.OK);
 
     }
     // ------------------- POST -------------------
@@ -344,7 +336,7 @@ public class OfferRESTController {
                 return new CorrectResponse(offerId, Const.SUCC_ERR, HttpStatus.OK);
             } else {
                 RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FORBIDDEN, "NO PERMISSIONS");
-                return new ErrorResponse("NO PERMISSIONS", HttpStatus.FORBIDDEN);
+                return new ErrorResponse(Const.FORBIDDEN_ERR, HttpStatus.FORBIDDEN);
             }
         } catch (NoSuchElementException noSuchElementException) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
@@ -365,8 +357,8 @@ public class OfferRESTController {
                 RequestLogHandler.handleCorrectResponse(httpRequest);
                 return new CorrectResponse(offerId, Const.SUCC_ERR, HttpStatus.OK);
             } else {
-                RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FORBIDDEN, "NO PERMISSIONS");
-                return new ErrorResponse("NO PERMISSIONS", HttpStatus.FORBIDDEN);
+                RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FORBIDDEN, Const.FORBIDDEN_ERR);
+                return new ErrorResponse(Const.FORBIDDEN_ERR, HttpStatus.FORBIDDEN);
             }
         } catch (NoSuchElementException noSuchElementException) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
@@ -386,8 +378,8 @@ public class OfferRESTController {
                 RequestLogHandler.handleCorrectResponse(httpRequest);
                 return new CorrectResponse(offerId, Const.SUCC_ERR, HttpStatus.OK);
             } else {
-                RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FORBIDDEN, "NO PERMISSIONS");
-                return new ErrorResponse("NO PERMISSIONS", HttpStatus.FORBIDDEN);
+                RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FORBIDDEN, Const.FORBIDDEN_ERR);
+                return new ErrorResponse(Const.FORBIDDEN_ERR, HttpStatus.FORBIDDEN);
             }
         } catch (NoSuchElementException noSuchElementException) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
@@ -450,6 +442,41 @@ public class OfferRESTController {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
             return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         }
+    }
+
+    private List<UserScoreWithPositionDto> getAllUserListWithScoreAndPosition(){
+        List<UUID> userIdList = getAllUserIdListUseCaseInterface.getAllUserIdList();
+        List<UserScoreDto> userScoreDtoList = new ArrayList<>();
+        List<UserScoreDto> finalUserScoreDtoList = userScoreDtoList;
+        userIdList.forEach(userId -> {
+            UserProfileResponseDto userProfileResponseDto;
+            try {
+                userProfileResponseDto = getUserProfileUseCaseInterface.getUserProfileResponseDto(userId);
+            } catch (MultipleValidationException e) {
+                return;
+            }
+            finalUserScoreDtoList.add(new UserScoreDto(
+                    userId,
+                    userProfileResponseDto.name()+" "+userProfileResponseDto.surname(),
+                    getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(userId)
+            ));
+        });
+
+        userScoreDtoList = finalUserScoreDtoList
+                .stream()
+                .sorted(Comparator.comparing(UserScoreDto::score))
+                .toList()
+                .reversed();
+
+        List<UserScoreWithPositionDto> userScoreWithPositionDtoList = new ArrayList<>();
+        List<UserScoreDto> finalLambdaUserScoreDtoList = userScoreDtoList;
+        userScoreDtoList.forEach(userScoreDto -> userScoreWithPositionDtoList.add(new UserScoreWithPositionDto(
+                userScoreDto.userId(),
+                userScoreDto.nameAndSurname(),
+                userScoreDto.score(),
+                finalLambdaUserScoreDtoList.indexOf(userScoreDto)+1))
+        );
+        return userScoreWithPositionDtoList;
     }
 
 }
