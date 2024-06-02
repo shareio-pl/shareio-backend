@@ -2,9 +2,9 @@ package org.shareio.backend.core.usecases.port.dto;
 
 import java.util.UUID;
 
-public record OfferReserveDto
+public record OfferEndDto
         (
                 UUID offerId,
-                UUID receiverId
+                UUID userId
         ) {
 }

@@ -61,6 +61,8 @@ public class OfferRESTController {
 
     ModifyOfferUseCaseInterface modifyOfferUseCaseInterface;
 
+    CancelOfferUseCaseInterface cancelOfferUseCaseInterface;
+    FinishOfferUseCaseInterface finishOfferUseCaseInterface;
     ReserveOfferUseCaseInterface reserveOfferUseCaseInterface;
 
     OfferRepository offerRepository;
@@ -74,7 +76,7 @@ public class OfferRESTController {
         RequestLogHandler.handleRequest(httpRequest);
         UUID userId = identityHandler.getUserIdFromHeader(httpRequest);
         try {
-            if(Objects.nonNull(userId)){
+            if (Objects.nonNull(userId)) {
                 log.error(userId.toString());
             }
             UUID ownerId = getOfferOwnerIdUseCaseInterface.getOfferOwnerId(id);
@@ -184,7 +186,7 @@ public class OfferRESTController {
     ) {
         RequestLogHandler.handleRequest(httpRequest);
         UUID userId = identityHandler.getUserIdFromHeader(httpRequest);
-        if(Objects.isNull(userId)){
+        if (Objects.isNull(userId)) {
             return new ErrorResponse("UNAUTHORIZED", HttpStatus.FORBIDDEN);
         }
         List<UUID> foundOfferIdList = searchOffersUseCaseInterface.getOfferListMeetingCriteria(
@@ -336,7 +338,7 @@ public class OfferRESTController {
     public ResponseEntity<Object> reserveOffer(HttpServletRequest httpRequest, @RequestBody OfferReserveDto offerReserveDto) {
         RequestLogHandler.handleRequest(httpRequest);
         try {
-            if (authenticationHandler.authenticateRequestForUserIdentity(httpRequest, offerReserveDto.recieverId())) {
+            if (authenticationHandler.authenticateRequestForUserIdentity(httpRequest, offerReserveDto.receiverId())) {
                 UUID offerId = reserveOfferUseCaseInterface.reserveOffer(offerReserveDto);
                 RequestLogHandler.handleCorrectResponse(httpRequest);
                 return new CorrectResponse(offerId, Const.SUCC_ERR, HttpStatus.OK);
@@ -354,6 +356,47 @@ public class OfferRESTController {
 
     }
 
+    @PostMapping(value = "/cancel", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> cancelOffer(HttpServletRequest httpRequest, @RequestBody OfferEndDto offerEndDto) {
+        RequestLogHandler.handleRequest(httpRequest);
+        try {
+            if (authenticationHandler.authenticateRequestForUserIdentity(httpRequest, offerEndDto.userId())) {
+                UUID offerId = cancelOfferUseCaseInterface.cancelOffer(offerEndDto);
+                RequestLogHandler.handleCorrectResponse(httpRequest);
+                return new CorrectResponse(offerId, Const.SUCC_ERR, HttpStatus.OK);
+            } else {
+                RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FORBIDDEN, "NO PERMISSIONS");
+                return new ErrorResponse("NO PERMISSIONS", HttpStatus.FORBIDDEN);
+            }
+        } catch (NoSuchElementException noSuchElementException) {
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
+            return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
+        } catch (MultipleValidationException e) {
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FAILED_DEPENDENCY, Const.DATA_INTEGRITY_ERR);
+            return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
+        }
+    }
+
+    @PostMapping(value = "/finish", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> finishOffer(HttpServletRequest httpRequest, @RequestBody OfferEndDto offerEndDto) {
+        RequestLogHandler.handleRequest(httpRequest);
+        try {
+            if (authenticationHandler.authenticateRequestForUserIdentity(httpRequest, offerEndDto.userId())) {
+                UUID offerId = finishOfferUseCaseInterface.finishOffer(offerEndDto);
+                RequestLogHandler.handleCorrectResponse(httpRequest);
+                return new CorrectResponse(offerId, Const.SUCC_ERR, HttpStatus.OK);
+            } else {
+                RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FORBIDDEN, "NO PERMISSIONS");
+                return new ErrorResponse("NO PERMISSIONS", HttpStatus.FORBIDDEN);
+            }
+        } catch (NoSuchElementException noSuchElementException) {
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
+            return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
+        } catch (MultipleValidationException e) {
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FAILED_DEPENDENCY, Const.DATA_INTEGRITY_ERR);
+            return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
+        }
+    }
 
     @PostMapping(value = "/addReview", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> addReviewToOffer(HttpServletRequest httpRequest, @RequestBody OfferReviewDto offerReviewDto) {

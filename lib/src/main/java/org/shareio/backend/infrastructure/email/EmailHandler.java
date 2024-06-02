@@ -21,12 +21,12 @@ public class EmailHandler {
     }
 
     public void sendHelpdeskMessage(
-            String reciever, String subject, String text) {
+            String receiver, String subject, String text) {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(sender);
         message.setBcc(sender);
-        message.setTo(reciever);
+        message.setTo(receiver);
         message.setSubject(subject);
         message.setText(Const.MESSAGE_START + text + Const.MESSAGE_END);
         emailSender.send(message);

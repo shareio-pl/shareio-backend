@@ -18,8 +18,8 @@ import java.util.*;
 
 @Service
 public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterface, GetOffersByNameDaoInterface,
-        RemoveOfferCommandInterface, SaveOfferCommandInterface, UpdateOfferChangeMetadataCommandInterface, GetOffersByUserDaoInterface,
-        UpdateOfferSaveReviewCommandInterface, UpdateOfferReserveOfferCommandInterface, UpdateOfferDereserveOfferCommandInterface {
+        RemoveOfferCommandInterface, SaveOfferCommandInterface, UpdateOfferCancelOfferCommandInterface, UpdateOfferChangeMetadataCommandInterface, GetOffersByUserDaoInterface,
+        UpdateOfferSaveReviewCommandInterface, UpdateOfferFinishOfferCommandInterface, UpdateOfferReserveOfferCommandInterface, UpdateOfferDereserveOfferCommandInterface {
     final OfferRepository offerRepository;
     final UserRepository userRepository;
     final ReviewRepository reviewRepository;
@@ -107,8 +107,8 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
     public void reserveOffer(OfferSnapshot offerSnapshot) {
         Optional<OfferEntity> offerEntity = offerRepository.findByOfferId(offerSnapshot.offerId().getId());
         OfferEntity offerEntityFromDb = offerEntity.orElseThrow(NoSuchElementException::new);
-        UserEntity recieverEntityFromDb = userRepository.findByUserId(offerSnapshot.receiver().userId().getId()).orElseThrow(NoSuchElementException::new);
-        offerEntityFromDb.setReceiver(recieverEntityFromDb);
+        UserEntity receiverEntityFromDb = userRepository.findByUserId(offerSnapshot.receiver().userId().getId()).orElseThrow(NoSuchElementException::new);
+        offerEntityFromDb.setReceiver(receiverEntityFromDb);
         offerEntityFromDb.setStatus(offerSnapshot.status());
         offerEntityFromDb.setReservationDate(offerSnapshot.reservationDate());
         offerRepository.save(offerEntityFromDb);
@@ -121,6 +121,24 @@ public class OfferAdapter implements GetOfferDaoInterface, GetAllOffersDaoInterf
         offerEntityFromDb.setReceiver(null); // offerSnapshot.receiver()
         offerEntityFromDb.setStatus(offerSnapshot.status());
         offerEntityFromDb.setReservationDate(offerSnapshot.reservationDate());
+        offerRepository.save(offerEntityFromDb);
+    }
+
+    @Override
+    public void finishOffer(OfferSnapshot offerSnapshot) {
+        Optional<OfferEntity> offerEntity = offerRepository.findByOfferId(offerSnapshot.offerId().getId());
+        OfferEntity offerEntityFromDb = offerEntity.orElseThrow(NoSuchElementException::new);
+        offerEntityFromDb.setStatus(offerSnapshot.status());
+        offerRepository.save(offerEntityFromDb);
+    }
+
+    @Override
+    public void cancelOffer(OfferSnapshot offerSnapshot) {
+        Optional<OfferEntity> offerEntity = offerRepository.findByOfferId(offerSnapshot.offerId().getId());
+        OfferEntity offerEntityFromDb = offerEntity.orElseThrow(NoSuchElementException::new);
+        offerEntityFromDb.setReceiver(null); // offerSnapshot.receiver()
+        offerEntityFromDb.setReservationDate(offerSnapshot.reservationDate());
+        offerEntityFromDb.setStatus(offerSnapshot.status());
         offerRepository.save(offerEntityFromDb);
     }
 
