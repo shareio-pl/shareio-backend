@@ -1,7 +1,7 @@
 package org.shareio.backend.core.model.vo;
 
 public enum Category {
-    ELECTRONICS, LITERATURE, FURNITURE, CLOTHES, MUSIC, HOBBY, TOYS, MOTORIZATION, RAILWAY, OTHER;
+    ELECTRONICS, LITERATURE, FURNITURE, CLOTHES, MUSIC, HOBBY, TOYS, MOTORIZATION, UTENSILS, OTHER;
 
     public String polishName()
     {
@@ -14,7 +14,7 @@ public enum Category {
             case HOBBY -> "Hobby";
             case TOYS -> "Zabawki";
             case MOTORIZATION -> "Motoryzacja";
-            case RAILWAY -> "Infrastruktura kolejowa";
+            case UTENSILS -> "Utensylia kuchenne";
             case OTHER -> "Inne";
         };
     }
