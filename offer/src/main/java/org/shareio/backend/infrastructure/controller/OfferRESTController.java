@@ -364,6 +364,9 @@ public class OfferRESTController {
         } catch (MultipleValidationException e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FAILED_DEPENDENCY, Const.DATA_INTEGRITY_ERR);
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
+        } catch (IllegalArgumentException e) {
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, Const.ILL_ARG_ERR);
+            return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
     }
