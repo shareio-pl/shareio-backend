@@ -5,42 +5,44 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.shareio.backend.core.model.OfferSnapshot;
 import org.shareio.backend.core.model.OfferValidator;
-import org.shareio.backend.core.model.vo.Location;
 import org.shareio.backend.core.model.vo.Status;
+import org.shareio.backend.core.usecases.port.dto.OfferEndDto;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
-import org.shareio.backend.core.usecases.port.out.GetAllOffersDaoInterface;
-import org.shareio.backend.core.usecases.port.out.GetLocationDaoInterface;
-import org.shareio.backend.core.usecases.util.DistanceCalculator;
+import org.shareio.backend.core.usecases.port.out.GetOfferDaoInterface;
+import org.shareio.backend.core.usecases.port.out.UpdateOfferCancelOfferCommandInterface;
 import org.shareio.backend.exceptions.MultipleValidationException;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
-class GetClosestOfferUseCaseServiceTests {
+class CancelOfferUseCaseServiceTests {
+
     AutoCloseable test_autoCloseable;
 
     @Mock
-    GetAllOffersDaoInterface test_getAllOffersDaoInterface;
+    GetOfferDaoInterface test_getOfferDaoInterface;
 
     @Mock
-    GetLocationDaoInterface test_getLocationDaoInterface;
+    UpdateOfferCancelOfferCommandInterface test_updateOfferCancelOfferCommandInterface;
 
     @InjectMocks
-    GetClosestOfferUseCaseService test_getClosestOfferUseCaseService;
+    CancelOfferUseCaseService test_cancelOfferUseCaseService;
 
     @Mock
-    OfferGetDto test_offerGetDto1;
+    OfferGetDto test_offerGetDto;
 
     @Mock
-    OfferGetDto test_offerGetDto2;
+    OfferEndDto test_offerEndDto;
 
-    @Mock
-    Location test_location;
+    @Captor
+    ArgumentCaptor<OfferSnapshot> test_offerSnapshotCaptor;
+
 
     @BeforeEach
     void setUp() {
@@ -53,23 +55,26 @@ class GetClosestOfferUseCaseServiceTests {
     }
 
     @Test
-    void get_two_invalid_offers_and_throw_NoSuchElementException() {
+    void get_invalid_offer_and_throw_NoSuchElementException() {
+        UUID offerId = UUID.randomUUID();
+        when(test_offerEndDto.offerId()).thenReturn(offerId);
+        when(test_getOfferDaoInterface.getOfferDto(offerId)).thenReturn(Optional.of(
+                test_offerGetDto
+        ));
         try (MockedStatic<OfferValidator> utilities = Mockito.mockStatic(OfferValidator.class)) {
-            utilities.when(() -> OfferValidator.validateOffer(test_offerGetDto1))
+            utilities.when(() -> OfferValidator.validateOffer(test_offerGetDto))
                     .thenThrow(MultipleValidationException.class);
-            utilities.when(() -> OfferValidator.validateOffer(test_offerGetDto2))
-                    .thenThrow(MultipleValidationException.class);
-            when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
-            Assertions.assertThrows(NoSuchElementException.class,
-                    () -> test_getClosestOfferUseCaseService.getOfferResponseDto(test_location));
-
+            Assertions.assertThrows(MultipleValidationException.class,
+                    () -> test_cancelOfferUseCaseService.cancelOffer(test_offerEndDto)
+            );
         }
     }
 
     @Test
-    void get_one_valid_offer_not_CREATED_and_return_nothing() {
-        test_offerGetDto1 = new OfferGetDto(
-                UUID.randomUUID(),
+    void get_valid_offer_with_CANCELED_status_and_throw_NoSuchElementException() {
+        UUID offerId = UUID.randomUUID();
+        test_offerGetDto = new OfferGetDto(
+                offerId,
                 LocalDateTime.now(),
                 Status.CANCELED.toString(),
                 UUID.randomUUID(),
@@ -97,23 +102,24 @@ class GetClosestOfferUseCaseServiceTests {
                 4.5,
                 LocalDateTime.now()
         );
-        try (MockedStatic<OfferValidator> utilities = Mockito.mockStatic(OfferValidator.class)) {
-            utilities.when(() -> OfferValidator.validateOffer(test_offerGetDto2))
-                    .thenThrow(MultipleValidationException.class);
-            when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
-            UUID closestOfferId = Assertions.assertDoesNotThrow(
-                    () -> test_getClosestOfferUseCaseService.getOfferResponseDto(test_location));
+        when(test_offerEndDto.offerId()).thenReturn(offerId);
+        when(test_getOfferDaoInterface.getOfferDto(offerId)).thenReturn(Optional.of(
+                test_offerGetDto
+        ));
 
-            Assertions.assertNull(closestOfferId);
-        }
+        Assertions.assertThrows(NoSuchElementException.class,
+                () -> test_cancelOfferUseCaseService.cancelOffer(test_offerEndDto)
+        );
+
     }
 
     @Test
-    void get_one_valid_offer_CREATED_and_return_its_UUID() {
-        test_offerGetDto1 = new OfferGetDto(
-                UUID.randomUUID(),
+    void get_valid_offer_with_FINISHED_status_and_throw_NoSuchElementException() {
+        UUID offerId = UUID.randomUUID();
+        test_offerGetDto = new OfferGetDto(
+                offerId,
                 LocalDateTime.now(),
-                Status.CREATED.toString(),
+                Status.FINISHED.toString(),
                 UUID.randomUUID(),
                 "Polska",
                 "Łódzkie",
@@ -139,23 +145,23 @@ class GetClosestOfferUseCaseServiceTests {
                 4.5,
                 LocalDateTime.now()
         );
-        try (MockedStatic<OfferValidator> utilities = Mockito.mockStatic(OfferValidator.class)) {
-            utilities.when(() -> OfferValidator.validateOffer(test_offerGetDto2))
-                    .thenThrow(MultipleValidationException.class);
-            when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
-            UUID closestOfferId = Assertions.assertDoesNotThrow(
-                    () -> test_getClosestOfferUseCaseService.getOfferResponseDto(test_location));
+        when(test_offerEndDto.offerId()).thenReturn(offerId);
+        when(test_getOfferDaoInterface.getOfferDto(offerId)).thenReturn(Optional.of(
+                test_offerGetDto
+        ));
 
-            Assertions.assertEquals(test_offerGetDto1.offerId(), closestOfferId);
-        }
+        Assertions.assertThrows(NoSuchElementException.class,
+                () -> test_cancelOfferUseCaseService.cancelOffer(test_offerEndDto)
+        );
     }
 
     @Test
-    void get_two_valid_offers_CREATED_and_return_second_UUID() {
-        test_offerGetDto1 = new OfferGetDto(
-                UUID.randomUUID(),
+    void get_valid_offer_with_correct_status_and_wrong_userId_and_throw_NoSuchElementException() {
+        UUID offerId = UUID.randomUUID();
+        test_offerGetDto = new OfferGetDto(
+                offerId,
                 LocalDateTime.now(),
-                Status.CREATED.toString(),
+                Status.RESERVED.toString(),
                 UUID.randomUUID(),
                 "Polska",
                 "Łódzkie",
@@ -164,8 +170,8 @@ class GetClosestOfferUseCaseServiceTests {
                 "18",
                 "3",
                 "91-001",
-                5.0,
-                3.0,
+                51.78542745,
+                19.43777623530606,
                 "Mieszkanie",
                 "BROKEN",
                 "OTHER",
@@ -181,47 +187,65 @@ class GetClosestOfferUseCaseServiceTests {
                 4.5,
                 LocalDateTime.now()
         );
-        test_offerGetDto2 = new OfferGetDto(
-                UUID.randomUUID(),
-                LocalDateTime.now(),
-                Status.CREATED.toString(),
-                UUID.randomUUID(),
-                "Polska",
-                "Łódzkie",
-                "Łódź",
-                "Kołodziejska",
-                "18",
-                "3",
-                "91-001",
-                0.1,
-                0.1,
-                "Mieszkanie",
-                "BROKEN",
-                "OTHER",
-                "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
-                UUID.randomUUID(),
-                UUID.randomUUID(),
-                "Jan",
-                "Kowalski",
-                UUID.randomUUID(),
-                null,
-                null,
-                UUID.randomUUID(),
-                4.5,
-                LocalDateTime.now()
-        );
-        test_location = new Location(0.0, 0.0);
-        when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
-        try (MockedStatic<DistanceCalculator> distanceCalculator = Mockito.mockStatic(DistanceCalculator.class)) {
-            distanceCalculator.when(()->DistanceCalculator.calculateDistance(any(),any())).thenCallRealMethod();
-            UUID closestOfferId = Assertions.assertDoesNotThrow(
-                    () -> test_getClosestOfferUseCaseService.getOfferResponseDto(test_location));
+        when(test_offerEndDto.offerId()).thenReturn(offerId);
+        when(test_getOfferDaoInterface.getOfferDto(offerId)).thenReturn(Optional.of(
+                test_offerGetDto
+        ));
 
-            distanceCalculator.verify(
-                    () -> DistanceCalculator.calculateDistance(any(), any()),
-                    times(2)
-            );
-            Assertions.assertEquals(test_offerGetDto2.offerId(), closestOfferId);
-        }
+        Assertions.assertThrows(NoSuchElementException.class,
+                () -> test_cancelOfferUseCaseService.cancelOffer(test_offerEndDto)
+        );
+    }
+
+    @Test
+    void get_valid_offer_with_correct_status_and_succeed() {
+        UUID offerId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        test_offerGetDto = new OfferGetDto(
+                offerId,
+                LocalDateTime.now(),
+                Status.CREATED.toString(),
+                UUID.randomUUID(),
+                "Polska",
+                "Łódzkie",
+                "Łódź",
+                "Kołodziejska",
+                "18",
+                "3",
+                "91-001",
+                51.78542745,
+                19.43777623530606,
+                "Mieszkanie",
+                "BROKEN",
+                "OTHER",
+                "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
+                UUID.randomUUID(),
+                userId,
+                "Jan",
+                "Kowalski",
+                UUID.randomUUID(),
+                null,
+                null,
+                UUID.randomUUID(),
+                4.5,
+                LocalDateTime.now()
+        );
+        when(test_offerEndDto.offerId()).thenReturn(offerId);
+        when(test_offerEndDto.userId()).thenReturn(userId);
+        when(test_getOfferDaoInterface.getOfferDto(offerId)).thenReturn(Optional.of(
+                test_offerGetDto
+        ));
+
+        UUID offerResultId = Assertions.assertDoesNotThrow(
+                () -> test_cancelOfferUseCaseService.cancelOffer(test_offerEndDto)
+        );
+
+        verify(test_updateOfferCancelOfferCommandInterface, times(1)).cancelOffer(any());
+        verify(test_updateOfferCancelOfferCommandInterface).cancelOffer(test_offerSnapshotCaptor.capture());
+        OfferSnapshot test_offerSnapshotCaptorValue = test_offerSnapshotCaptor.getValue();
+        Assertions.assertEquals(Status.CANCELED, test_offerSnapshotCaptorValue.status());
+        Assertions.assertNull(test_offerSnapshotCaptorValue.reservationDate());
+        Assertions.assertNull(test_offerSnapshotCaptorValue.receiver());
+        Assertions.assertNotNull(offerResultId);
     }
 }

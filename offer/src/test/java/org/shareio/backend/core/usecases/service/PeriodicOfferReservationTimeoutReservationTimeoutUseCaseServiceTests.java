@@ -94,6 +94,7 @@ class PeriodicOfferReservationTimeoutReservationTimeoutUseCaseServiceTests {
                     "Kowalski",
                     UUID.randomUUID(),
                     null,
+                    null,
                     UUID.randomUUID(),
                     4.5,
                     LocalDateTime.now()
@@ -132,6 +133,8 @@ class PeriodicOfferReservationTimeoutReservationTimeoutUseCaseServiceTests {
                     "Jan",
                     "Kowalski",
                     UUID.randomUUID(),
+                    null,
+
                     LocalDateTime.now().plus(Const.OFFER_RESERVATION_DURATION),
                     UUID.randomUUID(),
                     4.5,
@@ -171,6 +174,7 @@ class PeriodicOfferReservationTimeoutReservationTimeoutUseCaseServiceTests {
                     "Jan",
                     "Kowalski",
                     UUID.randomUUID(),
+                    null,
                     LocalDateTime.now().minus(Const.OFFER_RESERVATION_DURATION.plus(Const.OFFER_RESERVATION_DURATION)),
                     UUID.randomUUID(),
                     4.5,
