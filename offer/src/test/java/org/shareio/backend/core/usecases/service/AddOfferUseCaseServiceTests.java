@@ -86,9 +86,7 @@ class AddOfferUseCaseServiceTests {
                 "Łódzkie",
                 "Łódź",
                 "Kołodziejska",
-                "18",
-                "3",
-                "91-001"
+                "18"
         );
         try (MockedStatic<LocationCalculator> locationCalculator = Mockito.mockStatic(LocationCalculator.class)) {
             Location location = new Location(1.0,1.0);
