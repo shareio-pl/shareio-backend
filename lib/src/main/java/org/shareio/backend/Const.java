@@ -38,6 +38,8 @@ public class Const {
     public static final String UNSUPP_MEDIA_TYPE_ERR = "UnsuppMediaTypeErr";
     public static final String DATA_INTEGRITY_ERR = "DataIntegrityErr";
     public static final String SERVER_ERR = "ServerErr";
+    public static final String FORBIDDEN_ERR = "NO PERMISSIONS";
+
 
 
     // ----------------- DEFAULTS ------------------

@@ -10,6 +10,7 @@ public record OfferResponseDto(
 
         String city,
         String street,
+        String houseNumber,
         String distance,
         Double latitude,
         Double longitude,
