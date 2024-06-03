@@ -11,7 +11,6 @@ import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.core.usecases.port.dto.OfferReviewDto;
 import org.shareio.backend.core.usecases.port.in.AddReviewUseCaseInterface;
 import org.shareio.backend.core.usecases.port.out.GetOfferDaoInterface;
-import org.shareio.backend.core.usecases.port.out.GetUserProfileDaoInterface;
 import org.shareio.backend.core.usecases.port.out.UpdateOfferSaveReviewCommandInterface;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,6 @@ import java.util.UUID;
 public class AddReviewUseCaseService implements AddReviewUseCaseInterface {
 
     GetOfferDaoInterface getOfferDaoInterface;
-    GetUserProfileDaoInterface getUserProfileDaoInterface;
     UpdateOfferSaveReviewCommandInterface updateOfferSaveReviewCommandInterface;
 
     @Override

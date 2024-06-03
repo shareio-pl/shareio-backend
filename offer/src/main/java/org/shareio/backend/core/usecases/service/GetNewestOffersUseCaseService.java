@@ -54,10 +54,11 @@ public class GetNewestOffersUseCaseService implements GetNewestOffersUseCaseInte
                 .stream()
                 .filter(offer -> {
                     Duration d = Duration.between(offer.getCreationDate(),LocalDateTime.now());
-                    return d.toDays() <= 1;
+                    return d.toDays() <= Const.OFFER_RESERVATION_DURATION.toDays();
                 })
                 .toList();
-        if(offerList.isEmpty()){
+
+        if(offerList.isEmpty() || offerList.size() < Const.MIN_OFFER_LIST_SIZE){
             return backupNewestOfferList
                     .stream()
                     .map(Offer::toSnapshot)
@@ -65,7 +66,8 @@ public class GetNewestOffersUseCaseService implements GetNewestOffersUseCaseInte
                     .toList();
         }
         else{
-            return offerList .stream()
+            return offerList
+                    .stream()
                     .map(Offer::toSnapshot)
                     .map(offer -> offer.offerId().getId())
                     .toList();

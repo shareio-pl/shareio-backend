@@ -37,6 +37,7 @@ public class GetAllOffersUseCaseService implements GetAllOffersUseCaseInterface 
                 .stream()
                 .map(Offer::fromDto)
                 .filter(offer -> !offer.getStatus().equals(Status.CANCELED))
+                .filter(offer -> !offer.getStatus().equals(Status.FINISHED))
                 .sorted(Comparator.comparing(Offer::getCreationDate))
                 .map(Offer::toSnapshot)
                 .map(offer -> offer.offerId().getId())
