@@ -78,7 +78,7 @@ public class UserRESTController {
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (IllegalArgumentException e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, e.getMessage());
-            return new ErrorResponse(Const.ILL_ARG_ERR, HttpStatus.BAD_REQUEST);
+            return new ErrorResponse(Const.ILL_ARG_ERR + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
