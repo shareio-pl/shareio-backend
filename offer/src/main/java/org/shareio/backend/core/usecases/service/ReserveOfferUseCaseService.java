@@ -36,6 +36,9 @@ public class ReserveOfferUseCaseService implements ReserveOfferUseCaseInterface 
         if(!offer.getStatus().equals(Status.CREATED)){
             throw new NoSuchElementException();
         }
+        if(offerReserveDto.receiverId().equals(offer.getOwner().getUserId().getId())){
+            throw new IllegalArgumentException("User is owner of this offer");
+        }
         UserProfileGetDto receiverProfileGetDto = getUserProfileDaoInterface.getUserDto(offerReserveDto.receiverId()).orElseThrow(NoSuchElementException::new);
         User receiver = Optional.of(receiverProfileGetDto).map(User::fromDto).orElseThrow(NoSuchElementException::new);
         offer.setReceiver(receiver);
