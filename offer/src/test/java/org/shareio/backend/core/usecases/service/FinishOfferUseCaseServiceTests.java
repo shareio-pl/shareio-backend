@@ -192,12 +192,13 @@ class FinishOfferUseCaseServiceTests {
         when(test_getOfferDaoInterface.getOfferDto(offerId)).thenReturn(Optional.of(
                 test_offerGetDto
         ));
-        Assertions.assertDoesNotThrow(
+        UUID finalOfferId = Assertions.assertDoesNotThrow(
                 () -> test_finishOfferUseCaseService.finishOffer(test_offerEndDto)
         );
         verify(test_updateOfferFinishOfferCommandInterface, times(1)).finishOffer(any());
         verify(test_updateOfferFinishOfferCommandInterface).finishOffer(test_offerSnapshotCaptor.capture());
         OfferSnapshot test_offerSnapshotCaptorValue = test_offerSnapshotCaptor.getValue();
         Assertions.assertEquals(Status.FINISHED, test_offerSnapshotCaptorValue.status());
+        Assertions.assertNotNull(finalOfferId);
     }
 }
