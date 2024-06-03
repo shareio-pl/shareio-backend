@@ -46,7 +46,7 @@ public class AddUserUseCaseService implements AddUserUseCaseInterface {
                         user.getAddress().getHouseNumber()
                 ));
             } catch (LocationCalculationException | IOException | InterruptedException | JSONException e) {
-                Thread.currentThread().interrupt();
+                Thread.currentThread().interrupt(); // TODO: handle JSONException
                 user.getAddress().setLocation(new Location(0.0, 0.0));
             }
 
