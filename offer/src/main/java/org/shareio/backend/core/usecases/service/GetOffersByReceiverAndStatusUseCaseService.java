@@ -5,7 +5,7 @@ import org.shareio.backend.core.model.Offer;
 import org.shareio.backend.core.model.OfferValidator;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
-import org.shareio.backend.core.usecases.port.in.GetReservedOffersByRecieverUseCaseInterface;
+import org.shareio.backend.core.usecases.port.in.GetOffersByReceiverAndStatusUseCaseInterface;
 import org.shareio.backend.core.usecases.port.out.GetAllOffersDaoInterface;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.springframework.stereotype.Service;
@@ -15,12 +15,12 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @Service
-public class GetReservedOffersByRecieverUseCaseService implements GetReservedOffersByRecieverUseCaseInterface {
+public class GetOffersByReceiverAndStatusUseCaseService implements GetOffersByReceiverAndStatusUseCaseInterface {
 
     GetAllOffersDaoInterface getAllOffersDaoInterface;
 
     @Override
-    public List<UUID> getReservedOffersByReciever(UUID recieverId) {
+    public List<UUID> getReservedOffersByRecieverAndStatus(UUID recieverId, Status status) {
         List<OfferGetDto> offerGetDtoList = getAllOffersDaoInterface.getAllOffers();
         offerGetDtoList = offerGetDtoList.stream().filter(offer -> {
             try {
@@ -38,7 +38,7 @@ public class GetReservedOffersByRecieverUseCaseService implements GetReservedOff
 
         return offerList
                 .stream()
-                .filter(offer-> offer.getStatus().equals(Status.RESERVED))
+                .filter(offer-> offer.getStatus().equals(status))
                 .filter(offer -> offer.getReceiver().getUserId().getId().equals(recieverId))
                 .map(Offer::toSnapshot)
                 .map(offer->offer.offerId().getId())

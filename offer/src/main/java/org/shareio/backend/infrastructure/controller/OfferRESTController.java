@@ -58,7 +58,7 @@ public class OfferRESTController {
     GetAllUserIdListUseCaseInterface getAllUserIdListUseCaseInterface;
     SearchOffersUseCaseInterface searchOffersUseCaseInterface;
     GetOfferOwnerIdUseCaseInterface getOfferOwnerIdUseCaseInterface;
-    GetReservedOffersByRecieverUseCaseInterface getReservedOffersByRecieverUseCaseInterface;
+    GetOffersByReceiverAndStatusUseCaseInterface getOffersByReceiverAndStatusUseCaseInterface;
 
     ModifyOfferUseCaseInterface modifyOfferUseCaseInterface;
 
@@ -278,7 +278,16 @@ public class OfferRESTController {
     @GetMapping(value="getReservedOffersByReciever/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getReservedOffersByReciever(HttpServletRequest httpRequest, @PathVariable(name="userId") UUID userId) {
         RequestLogHandler.handleRequest(httpRequest);
-        List<UUID> reservedOffersId = getReservedOffersByRecieverUseCaseInterface.getReservedOffersByReciever(userId);
+        List<UUID> reservedOffersId = getOffersByReceiverAndStatusUseCaseInterface.getReservedOffersByRecieverAndStatus(userId, Status.RESERVED);
+        RequestLogHandler.handleCorrectResponse(httpRequest);
+        return new CorrectResponse(reservedOffersId, Const.SUCC_ERR, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value="getFinishedOffersByReciever/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getFinishedOffersByReciever(HttpServletRequest httpRequest, @PathVariable(name="userId") UUID userId) {
+        RequestLogHandler.handleRequest(httpRequest);
+        List<UUID> reservedOffersId = getOffersByReceiverAndStatusUseCaseInterface.getReservedOffersByRecieverAndStatus(userId, Status.FINISHED);
         RequestLogHandler.handleCorrectResponse(httpRequest);
         return new CorrectResponse(reservedOffersId, Const.SUCC_ERR, HttpStatus.OK);
 

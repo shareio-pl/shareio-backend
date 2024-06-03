@@ -13,9 +13,7 @@ public record OfferSaveDto(
         String region,
         String city,
         String street,
-        String houseNumber,
-        String flatNumber,
-        String postCode
+        String houseNumber
 ) {
 
 }
