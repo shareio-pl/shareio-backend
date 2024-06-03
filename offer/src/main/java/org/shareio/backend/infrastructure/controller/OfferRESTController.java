@@ -58,6 +58,7 @@ public class OfferRESTController {
     GetAllUserIdListUseCaseInterface getAllUserIdListUseCaseInterface;
     SearchOffersUseCaseInterface searchOffersUseCaseInterface;
     GetOfferOwnerIdUseCaseInterface getOfferOwnerIdUseCaseInterface;
+    GetReservedOffersByRecieverUseCaseInterface getReservedOffersByRecieverUseCaseInterface;
 
     ModifyOfferUseCaseInterface modifyOfferUseCaseInterface;
 
@@ -273,7 +274,17 @@ public class OfferRESTController {
         return new CorrectResponse(userScoreWithPositionDtoList, Const.SUCC_ERR, HttpStatus.OK);
 
     }
-    // ------------------- POST -------------------
+
+    @GetMapping(value="getReservedOffersByReciever/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getReservedOffersByReciever(HttpServletRequest httpRequest, @PathVariable(name="userId") UUID userId) {
+        RequestLogHandler.handleRequest(httpRequest);
+        List<UUID> reservedOffersId = getReservedOffersByRecieverUseCaseInterface.getReservedOffersByReciever(userId);
+        RequestLogHandler.handleCorrectResponse(httpRequest);
+        return new CorrectResponse(reservedOffersId, Const.SUCC_ERR, HttpStatus.OK);
+
+    }
+
+        // ------------------- POST -------------------
 
 
     @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

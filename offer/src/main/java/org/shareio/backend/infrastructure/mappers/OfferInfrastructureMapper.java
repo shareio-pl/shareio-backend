@@ -32,6 +32,7 @@ public class OfferInfrastructureMapper {
                     offerSnapshot.address().getCity(),
                     offerSnapshot.address().getStreet(),
                     distance,
+                    offerSnapshot.address().getHouseNumber(),
                     offerSnapshot.address().getLocation().getLatitude(),
                     offerSnapshot.address().getLocation().getLongitude(),
 
@@ -63,6 +64,7 @@ public class OfferInfrastructureMapper {
                     offerSnapshot.address().getCity(),
                     offerSnapshot.address().getStreet(),
                     distance,
+                    offerSnapshot.address().getHouseNumber(),
                     offerSnapshot.address().getLocation().getLatitude(),
                     offerSnapshot.address().getLocation().getLongitude(),
 

@@ -4,8 +4,15 @@ import org.shareio.backend.core.model.OfferSnapshot;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.infrastructure.dbadapter.entities.OfferEntity;
 
+import java.util.Objects;
+import java.util.UUID;
+
 public class OfferDatabaseMapper {
     public static OfferGetDto toDto(final OfferEntity offerEntity) {
+        UUID recieverId = null;
+        if(Objects.nonNull(offerEntity.getReceiver())){
+            recieverId = offerEntity.getReceiver().getUserId();
+        }
         if(offerEntity.getReview() != null){
             return new OfferGetDto(
                     offerEntity.getOfferId(),
@@ -33,6 +40,8 @@ public class OfferDatabaseMapper {
                     offerEntity.getOwner().getName(),
                     offerEntity.getOwner().getSurname(),
                     offerEntity.getOwner().getPhotoId(),
+
+                    recieverId,
 
                     offerEntity.getReservationDate(),
                     offerEntity.getReview().getReviewId(),
@@ -67,6 +76,8 @@ public class OfferDatabaseMapper {
                     offerEntity.getOwner().getName(),
                     offerEntity.getOwner().getSurname(),
                     offerEntity.getOwner().getPhotoId(),
+
+                    recieverId,
 
                     offerEntity.getReservationDate(),
                     null,

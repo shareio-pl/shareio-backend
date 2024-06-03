@@ -31,6 +31,8 @@ public record OfferGetDto(
         String ownerSurname,
         UUID ownerPhotoId,
 
+        UUID recieverId,
+
         LocalDateTime reservationDate,
         UUID reviewId,
         Double revievValue,
