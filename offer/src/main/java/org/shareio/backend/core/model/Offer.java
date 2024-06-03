@@ -38,7 +38,7 @@ public class Offer {
         if (   Status.valueOf(offerGetDto.status()).equals(Status.RESERVED)
             || Status.valueOf(offerGetDto.status()).equals(Status.FINISHED)
             ) {
-            receiver = new User(null, null, null, null, null, null, null, null);
+            receiver = new User(new UserId(offerGetDto.recieverId()), null, null, null, null, null, null, null);
         }
         if(offerGetDto.reviewId() != null){
             review = new Review(new ReviewId(offerGetDto.reviewId()), offerGetDto.revievValue(), offerGetDto.reviewDate());
