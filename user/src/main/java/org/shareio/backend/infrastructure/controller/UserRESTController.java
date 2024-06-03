@@ -12,7 +12,6 @@ import org.shareio.backend.core.usecases.port.dto.UserPasswordDto;
 import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
 import org.shareio.backend.core.usecases.port.dto.UserProfileResponseDto;
 import org.shareio.backend.core.usecases.port.in.*;
-import org.shareio.backend.exceptions.LocationCalculationException;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.security.AuthenticationHandler;
 import org.shareio.backend.security.RequestLogHandler;
@@ -21,7 +20,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.*;
 
 @AllArgsConstructor
@@ -91,10 +89,6 @@ public class UserRESTController {
                 UserProfileResponseDto userProfileResponseDto = getUserProfileUseCaseInterface.getUserProfileResponseDto(userId);
                 RequestLogHandler.handleCorrectResponse(httpRequest);
                 return new CorrectResponse(userProfileResponseDto, Const.SUCC_ERR, HttpStatus.OK);
-            } catch (LocationCalculationException | IOException | InterruptedException e) {
-                Thread.currentThread().interrupt();
-                RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, e.getMessage());
-                return new ErrorResponse(Const.API_NOT_RESP_ERR, HttpStatus.BAD_REQUEST);
             } catch (NoSuchElementException e) {
                 RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, e.getMessage());
                 return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);

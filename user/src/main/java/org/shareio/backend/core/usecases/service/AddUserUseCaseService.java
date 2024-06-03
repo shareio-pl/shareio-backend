@@ -1,6 +1,7 @@
 package org.shareio.backend.core.usecases.service;
 
 import lombok.AllArgsConstructor;
+import org.json.JSONException;
 import org.shareio.backend.core.model.User;
 import org.shareio.backend.core.model.vo.Location;
 import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
@@ -44,8 +45,8 @@ public class AddUserUseCaseService implements AddUserUseCaseInterface {
                         user.getAddress().getStreet(),
                         user.getAddress().getHouseNumber()
                 ));
-            } catch (LocationCalculationException | IOException | InterruptedException e) {
-                Thread.currentThread().interrupt();
+            } catch (LocationCalculationException | IOException | InterruptedException | JSONException e) {
+                Thread.currentThread().interrupt(); // TODO: handle JSONException
                 user.getAddress().setLocation(new Location(0.0, 0.0));
             }
 
