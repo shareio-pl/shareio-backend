@@ -234,8 +234,8 @@ public class OfferRESTController {
             return new CorrectResponse(newestOfferIdList, Const.SUCC_ERR, HttpStatus.OK);
 
         } catch (IllegalArgumentException illegalArgumentException) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, illegalArgumentException.getMessage());
-            return new ErrorResponse(Const.ILL_ARG_ERR, HttpStatus.BAD_REQUEST);
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, illegalArgumentException.getMessage());
+            return new ErrorResponse(Const.ILL_ARG_ERR, HttpStatus.NOT_FOUND);
         }
     }
 
