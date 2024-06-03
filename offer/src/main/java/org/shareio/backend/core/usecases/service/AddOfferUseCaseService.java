@@ -1,10 +1,12 @@
 package org.shareio.backend.core.usecases.service;
 
 import lombok.AllArgsConstructor;
+import org.json.JSONException;
 import org.shareio.backend.core.model.Offer;
 import org.shareio.backend.core.model.OfferSnapshot;
 import org.shareio.backend.core.model.OfferValidator;
 import org.shareio.backend.core.model.User;
+import org.shareio.backend.core.model.vo.Location;
 import org.shareio.backend.core.model.vo.PhotoId;
 import org.shareio.backend.core.usecases.port.dto.OfferSaveDto;
 import org.shareio.backend.core.usecases.port.dto.OfferSaveResponseDto;
@@ -28,13 +30,19 @@ public class AddOfferUseCaseService implements AddOfferUseCaseInterface {
     SaveOfferCommandInterface saveOfferCommandInterface;
 
     @Override
-    public OfferSaveResponseDto addOffer(OfferSaveDto offerSaveDto, UUID photoId) throws LocationCalculationException, IOException, InterruptedException, MultipleValidationException {
+    public OfferSaveResponseDto addOffer(OfferSaveDto offerSaveDto, UUID photoId) throws MultipleValidationException {
         OfferValidator.validateOffer(offerSaveDto);
         Offer offer = Optional.of(offerSaveDto).map(Offer::fromDto).orElseThrow(NoSuchElementException::new);
         User owner = getUserProfileDaoInterface.getUserDto(offerSaveDto.ownerId()).map(User::fromDto).orElseThrow(NoSuchElementException::new);
         offer.setOwner(owner);
         offer.setPhotoId(new PhotoId(photoId));
-        offer.getAddress().setLocation(LocationCalculator.getLocationFromAddress(offerSaveDto.country(), offerSaveDto.city(), offerSaveDto.street(), offerSaveDto.houseNumber()));
+        try{
+            offer.getAddress().setLocation(LocationCalculator.getLocationFromAddress(offerSaveDto.country(), offerSaveDto.city(), offerSaveDto.street(), offerSaveDto.houseNumber()));
+        }
+        catch(LocationCalculationException | IOException | InterruptedException | JSONException e){
+            Thread.currentThread().interrupt();
+            offer.getAddress().setLocation(new Location(0.0, 0.0));
+        }
         OfferSnapshot offerSnapshot = offer.toSnapshot();
         saveOfferCommandInterface.saveOffer(offerSnapshot);
         return new OfferSaveResponseDto(offer.getOfferId().getId());

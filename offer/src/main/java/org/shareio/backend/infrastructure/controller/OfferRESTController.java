@@ -18,7 +18,6 @@ import org.shareio.backend.core.usecases.port.in.*;
 import org.shareio.backend.core.usecases.port.out.GetLocationDaoInterface;
 import org.shareio.backend.core.usecases.service.GetNewestOffersUseCaseService;
 import org.shareio.backend.exceptions.DescriptionGenerationException;
-import org.shareio.backend.exceptions.LocationCalculationException;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.external.gpt.DescriptionGenerator;
 import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
@@ -336,9 +335,6 @@ public class OfferRESTController {
         } catch (MultipleValidationException e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, "Validation error");
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (LocationCalculationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, "Location calculation error");
-            return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR +":  "+ e.getMessage());
             Thread.currentThread().interrupt();
@@ -446,10 +442,6 @@ public class OfferRESTController {
         } catch (MultipleValidationException e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, "Validation error");
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (LocationCalculationException | IOException | InterruptedException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, "Location calculation error");
-            Thread.currentThread().interrupt();
-            return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
