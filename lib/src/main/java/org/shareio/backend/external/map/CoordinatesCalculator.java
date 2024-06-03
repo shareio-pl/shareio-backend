@@ -6,9 +6,11 @@ import org.shareio.backend.exceptions.LocationCalculationException;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +19,7 @@ public class CoordinatesCalculator implements CoordinatesCalculatorInterface {
     public Map<String, Double> getCoordinatesFromAddress(String country, String city, String street, String houseNumber) throws LocationCalculationException, IOException, InterruptedException {
         Map<String, Double> coordinates = new HashMap<>();
         String address = country + "," + city + "," + street + "," + houseNumber;
-        String apiUrl = "https://nominatim.openstreetmap.org/search?q=" + address + "&format=json";
+        String apiUrl = "https://nominatim.openstreetmap.org/search?q=" + URLEncoder.encode(address, StandardCharsets.UTF_8) + "&format=json";
 
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(apiUrl)).GET().build();
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());

@@ -65,7 +65,8 @@ public class GetNewestOffersUseCaseService implements GetNewestOffersUseCaseInte
                     .toList();
         }
         else{
-            return offerList .stream()
+            return offerList
+                    .stream()
                     .map(Offer::toSnapshot)
                     .map(offer -> offer.offerId().getId())
                     .toList();
