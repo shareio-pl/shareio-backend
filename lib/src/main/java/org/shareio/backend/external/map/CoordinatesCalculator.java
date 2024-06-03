@@ -17,6 +17,7 @@ import java.util.Map;
 public class CoordinatesCalculator implements CoordinatesCalculatorInterface {
     @Override
     public Map<String, Double> getCoordinatesFromAddress(String country, String city, String street, String houseNumber) throws LocationCalculationException, IOException, InterruptedException {
+        // TODO: this should detect issues with API and throw ExternalServiceException
         Map<String, Double> coordinates = new HashMap<>();
         String address = country + "," + city + "," + street + "," + houseNumber;
         String apiUrl = "https://nominatim.openstreetmap.org/search?q=" + URLEncoder.encode(address, StandardCharsets.UTF_8) + "&format=json";

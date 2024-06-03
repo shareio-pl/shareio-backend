@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.shareio.backend.Const;
+import org.shareio.backend.EnvGetter;
 import org.shareio.backend.controller.responses.CorrectResponse;
 import org.shareio.backend.controller.responses.ErrorResponse;
 import org.shareio.backend.core.model.UserValidator;
@@ -15,10 +16,13 @@ import org.shareio.backend.core.usecases.port.in.*;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.security.AuthenticationHandler;
 import org.shareio.backend.security.RequestLogHandler;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.Resource;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -35,7 +39,7 @@ public class UserRESTController {
     GetUserProfileUseCaseInterface getUserProfileUseCaseInterface;
     ModifyUserUseCaseInterface modifyUserUseCaseInterface;
     GetAllUserIdListUseCaseInterface getAllUserIdListUseCaseInterface;
-
+    SetProfilePhotoUseCaseInterface setProfilePhotoUseCaseInterface;
 
 
     @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -80,6 +84,48 @@ public class UserRESTController {
         }
     }
 
+    @PostMapping(value = "/setPhoto/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Object> setUserProfilePhoto(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID userId, @RequestPart(value = "file") MultipartFile file) {
+        RequestLogHandler.handleRequest(httpRequest);
+        if (authenticationHandler.authenticateRequestForUserIdentity(httpRequest, userId)) {
+            UUID newPhotoId = UUID.randomUUID(); // TODO: I think everything that works with files and shareio-image should be extracted into a class in lib
+            String imageServiceUrl = EnvGetter.getImage();
+            Resource fileResource = file.getResource();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", fileResource);
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+            String serverUrl = imageServiceUrl + "/image/createPNG/"; // TODO: check file type and choose PNG or JPG endpoint
+
+            // Create new image
+            RestTemplate restTemplate = new RestTemplate();
+            try {
+                ResponseEntity<String> response = restTemplate.postForEntity(serverUrl + newPhotoId, requestEntity, String.class);
+
+                if (!response.getStatusCode().is2xxSuccessful()) {
+                    RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, "Photo could not be added");
+                    return new ErrorResponse(Const.API_NOT_RESP_ERR + ": Photo could not be added", HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            } catch (Exception e) {
+                RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, "Photo could not be added");
+                return new ErrorResponse(Const.API_NOT_RESP_ERR + ": Photo could not be added", HttpStatus.INTERNAL_SERVER_ERROR);
+
+            }
+
+            // Set photoId in user
+            UUID oldPhotoId = setProfilePhotoUseCaseInterface.setProfilePhoto(userId, newPhotoId);
+
+            // Delete old photo
+            // TODO: IMPORTANT!!! DELETE OLD PROFILE PHOTO
+            // Check if old photo isn't default profile photo (UUID = 0). If not, delete
+            return new CorrectResponse(userId, Const.SUCC_ERR, HttpStatus.OK);
+        } else {
+            return new ErrorResponse("Changing profile photo not allowed", HttpStatus.FORBIDDEN);
+        }
+    }
+
     @PutMapping(value = "/modify/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> modifyUser(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID userId, @RequestBody UserModifyDto userModifyDto) {
         RequestLogHandler.handleRequest(httpRequest);
@@ -99,7 +145,6 @@ public class UserRESTController {
         } else {
             return new ErrorResponse("Modification not allowed", HttpStatus.FORBIDDEN);
         }
-
     }
 
     @PutMapping(value = "/changePassword/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -121,7 +166,5 @@ public class UserRESTController {
             return new ErrorResponse("Modification not allowed", HttpStatus.FORBIDDEN);
         }
     }
-
-
 }
 

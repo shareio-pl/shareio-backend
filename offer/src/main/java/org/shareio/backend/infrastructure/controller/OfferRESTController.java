@@ -122,16 +122,19 @@ public class OfferRESTController {
 
     @GetMapping(value = "/getCreatedOffersByUser/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getCreatedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID id) {
+        RequestLogHandler.handleRequest(httpRequest);
         return getOfferListBasedOnStatus(httpRequest, id, Status.CREATED);
     }
 
     @GetMapping(value = "/getReservedOffersByUser/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getReservedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID id) {
+        RequestLogHandler.handleRequest(httpRequest);
         return getOfferListBasedOnStatus(httpRequest, id, Status.RESERVED);
     }
 
     @GetMapping(value = "/getFinishedOffersByUser/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getFinishedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID id) {
+        RequestLogHandler.handleRequest(httpRequest);
         return getOfferListBasedOnStatus(httpRequest, id, Status.FINISHED);
     }
 
@@ -147,7 +150,7 @@ public class OfferRESTController {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
             return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR +":  "+ e.getMessage());
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR + ":  " + e.getMessage());
             return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -218,7 +221,7 @@ public class OfferRESTController {
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(description, Const.SUCC_ERR, HttpStatus.OK);
         } catch (IOException | InterruptedException | DescriptionGenerationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR +":  "+ e.getMessage());
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR + ":  " + e.getMessage());
             Thread.currentThread().interrupt();
             return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -253,12 +256,12 @@ public class OfferRESTController {
             List<UserScoreWithPositionDto> userScoreWithPositionDtoList = getAllUserListWithScoreAndPosition();
             UserScoreWithPositionDto particularUserRecord = userScoreWithPositionDtoList
                     .stream()
-                    .filter(userScoreDto ->userScoreDto.userId().equals(userId))
+                    .filter(userScoreDto -> userScoreDto.userId().equals(userId))
                     .findFirst()
                     .orElseThrow(NoSuchElementException::new);
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(particularUserRecord, Const.SUCC_ERR, HttpStatus.OK);
-        }  catch (NoSuchElementException noSuchElementException) {
+        } catch (NoSuchElementException noSuchElementException) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
             return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         }
@@ -274,8 +277,8 @@ public class OfferRESTController {
 
     }
 
-    @GetMapping(value="getReservedOffersByReciever/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getReservedOffersByReciever(HttpServletRequest httpRequest, @PathVariable(name="userId") UUID userId) {
+    @GetMapping(value = "getReservedOffersByReciever/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getReservedOffersByReciever(HttpServletRequest httpRequest, @PathVariable(name = "userId") UUID userId) {
         RequestLogHandler.handleRequest(httpRequest);
         List<UUID> reservedOffersId = getOffersByReceiverAndStatusUseCaseInterface.getReservedOffersByRecieverAndStatus(userId, Status.RESERVED);
         RequestLogHandler.handleCorrectResponse(httpRequest);
@@ -283,8 +286,8 @@ public class OfferRESTController {
 
     }
 
-    @GetMapping(value="getFinishedOffersByReciever/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getFinishedOffersByReciever(HttpServletRequest httpRequest, @PathVariable(name="userId") UUID userId) {
+    @GetMapping(value = "getFinishedOffersByReciever/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getFinishedOffersByReciever(HttpServletRequest httpRequest, @PathVariable(name = "userId") UUID userId) {
         RequestLogHandler.handleRequest(httpRequest);
         List<UUID> reservedOffersId = getOffersByReceiverAndStatusUseCaseInterface.getReservedOffersByRecieverAndStatus(userId, Status.FINISHED);
         RequestLogHandler.handleCorrectResponse(httpRequest);
@@ -292,7 +295,7 @@ public class OfferRESTController {
 
     }
 
-        // ------------------- POST -------------------
+    // ------------------- POST -------------------
 
 
     @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -310,7 +313,7 @@ public class OfferRESTController {
         HttpEntity<MultiValueMap<String, Object>> requestEntity
                 = new HttpEntity<>(body, headers);
 
-        String serverUrl = imageServiceUrl + "/image/createPNG/" + photoId;
+        String serverUrl = imageServiceUrl + "/image/createPNG/" + photoId; // TODO: check file type and choose PNG or JPG endpoint
 
         RestTemplate restTemplate = new RestTemplate();
         try {
@@ -336,7 +339,7 @@ public class OfferRESTController {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, "Validation error");
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR +":  "+ e.getMessage());
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR + ":  " + e.getMessage());
             Thread.currentThread().interrupt();
             return new ErrorResponse(Const.API_NOT_RESP_ERR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -459,7 +462,7 @@ public class OfferRESTController {
         }
     }
 
-    private List<UserScoreWithPositionDto> getAllUserListWithScoreAndPosition(){
+    private List<UserScoreWithPositionDto> getAllUserListWithScoreAndPosition() {
         List<UUID> userIdList = getAllUserIdListUseCaseInterface.getAllUserIdList();
         List<UserScoreDto> userScoreDtoList = new ArrayList<>();
         List<UserScoreDto> finalUserScoreDtoList = userScoreDtoList;
@@ -472,7 +475,7 @@ public class OfferRESTController {
             }
             finalUserScoreDtoList.add(new UserScoreDto(
                     userId,
-                    userProfileResponseDto.name()+" "+userProfileResponseDto.surname(),
+                    userProfileResponseDto.name() + " " + userProfileResponseDto.surname(),
                     getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(userId)
             ));
         });
@@ -489,7 +492,7 @@ public class OfferRESTController {
                 userScoreDto.userId(),
                 userScoreDto.nameAndSurname(),
                 userScoreDto.score(),
-                finalLambdaUserScoreDtoList.indexOf(userScoreDto)+1))
+                finalLambdaUserScoreDtoList.indexOf(userScoreDto) + 1))
         );
         return userScoreWithPositionDtoList;
     }

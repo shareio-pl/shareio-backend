@@ -6,5 +6,4 @@ import java.util.UUID;
 
 public interface RemoveOfferUseCaseInterface {
     RemoveResponseDto removeOffer(UUID offerId, RemoveResponseDto removeResponseDto);
-
 }
