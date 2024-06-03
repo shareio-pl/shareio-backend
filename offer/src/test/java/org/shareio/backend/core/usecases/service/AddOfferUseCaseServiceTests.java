@@ -27,18 +27,33 @@ class AddOfferUseCaseServiceTests {
 
     @Mock
     GetUserProfileDaoInterface test_getUserProfileDaoInterface;
-
     @Mock
     SaveOfferCommandInterface test_saveOfferCommandInterface;
-
     @InjectMocks
     AddOfferUseCaseService test_addOfferUseCaseService;
-
     @Mock
     OfferSaveDto test_offerSaveDto;
-
     @Captor
     ArgumentCaptor<OfferSnapshot> test_offerSnapshotCaptor;
+
+    String testEmail = "test@gmail.com";
+    String testName = "John";
+    String testSurname = "Doe";
+    String testTitle = "Tytuł";
+    String testCondition = "BROKEN";
+    String testCategory = "OTHER";
+    String testDescription = "Testowy opis, który zawiera przynajmniej 20 znaków";
+    String testCountry = "Polska";
+    String testRegion = "łódzkie";
+    String testCity = "Łódź";
+    String testStreet = "Piotrkowska";
+    String testHouseNumber = "1";
+    Location testLocation = new Location(1.5, 1.0);
+
+    UUID testUserId = null;
+    UUID testOfferId = null;
+    UUID testPhotoId = null;
+    UUID testAddressId = null;
 
     @BeforeEach
     void setUp() {
@@ -63,52 +78,55 @@ class AddOfferUseCaseServiceTests {
 
     @Test
     void get_valid_dto_and_verify_setters_and_succeed() {
-        UUID userId =  UUID.randomUUID();
-        UUID photoId = UUID.randomUUID();
-        when(test_getUserProfileDaoInterface.getUserDto(userId)).thenReturn(Optional.of(new UserProfileGetDto(
-                userId,
-                "test@gmail.com",
-                "John",
-                "Doe",
+        testUserId = UUID.randomUUID();
+        testPhotoId = UUID.randomUUID();
+        testOfferId = UUID.randomUUID();
+        testAddressId = UUID.randomUUID();
+        when(test_getUserProfileDaoInterface.getUserDto(testUserId)).thenReturn(Optional.of(new UserProfileGetDto(
+                testUserId,
+                testEmail,
+                testName,
+                testSurname,
                 null,
-                UUID.randomUUID(),
-                UUID.randomUUID(),
+                testPhotoId,
+                testAddressId,
                 null,
                 null
         )));
         test_offerSaveDto = new OfferSaveDto(
-                userId,
-                "Mieszkanie",
-                "BROKEN",
-                "OTHER",
-                "MieszkanieMieszkanieMieszkanieMieszkanieMieszkanie",
-                "Polska",
-                "Łódzkie",
-                "Łódź",
-                "Kołodziejska",
-                "18"
+                testUserId,
+                testTitle,
+                testCondition,
+                testCategory,
+                testDescription,
+                testCountry,
+                testRegion,
+                testCity,
+                testStreet,
+                testHouseNumber
         );
         try (MockedStatic<LocationCalculator> locationCalculator = Mockito.mockStatic(LocationCalculator.class)) {
-            Location location = new Location(1.0,1.0);
-            locationCalculator.when(()->LocationCalculator.getLocationFromAddress(any(),any(), any(), any())).thenReturn(location);
+            locationCalculator.when(() -> LocationCalculator.getLocationFromAddress(any(), any(), any(), any())).thenReturn(testLocation);
+
             OfferSaveResponseDto offerSaveResponseDto = Assertions.assertDoesNotThrow(
-                    () -> test_addOfferUseCaseService.addOffer(test_offerSaveDto, photoId)
+                    () -> test_addOfferUseCaseService.addOffer(test_offerSaveDto, testPhotoId)
             );
             verify(test_saveOfferCommandInterface, times(1)).saveOffer(any());
             verify(test_saveOfferCommandInterface).saveOffer(test_offerSnapshotCaptor.capture());
+
             OfferSnapshot offerSnapshotCaptorValue = test_offerSnapshotCaptor.getValue();
             Assertions.assertNotNull(offerSnapshotCaptorValue.owner());
-            Assertions.assertEquals(userId, offerSnapshotCaptorValue.owner().userId().getId());
+            Assertions.assertEquals(testUserId, offerSnapshotCaptorValue.owner().userId().getId());
             Assertions.assertNotNull(offerSnapshotCaptorValue.photoId());
-            Assertions.assertEquals(photoId,offerSnapshotCaptorValue.photoId().getId());
-            Assertions.assertEquals(location, offerSnapshotCaptorValue.address().getLocation());
+            Assertions.assertEquals(testPhotoId, offerSnapshotCaptorValue.photoId().getId());
+            Assertions.assertEquals(testLocation, offerSnapshotCaptorValue.address().getLocation());
+
             locationCalculator.verify(
-                    () -> LocationCalculator.getLocationFromAddress(any(), any(),any(), any()),
+                    () -> LocationCalculator.getLocationFromAddress(any(), any(), any(), any()),
                     times(1)
             );
             Assertions.assertNotNull(offerSaveResponseDto);
         }
-
 
 
     }
