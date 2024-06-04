@@ -33,8 +33,8 @@ public class OfferInfrastructureMapper {
 
                     offerSnapshot.address().getCity(),
                     offerSnapshot.address().getStreet(),
-                    distance,
                     offerSnapshot.address().getHouseNumber(),
+                    distance,
                     offerSnapshot.address().getLocation().getLatitude(),
                     offerSnapshot.address().getLocation().getLongitude(),
 
