@@ -97,7 +97,7 @@ public class UserRESTController {
             body.add("file", fileResource);
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-            String serverUrl = imageServiceUrl + "/image/createPNG/"; // TODO: check file type and choose PNG or JPG endpoint
+            String serverUrl = imageServiceUrl + "/image/createPNG/"; // TODO: change endpoint to call
 
             // Create new image
             RestTemplate restTemplate = new RestTemplate();
@@ -118,8 +118,19 @@ public class UserRESTController {
             UUID oldPhotoId = setProfilePhotoUseCaseInterface.setProfilePhoto(userId, newPhotoId);
 
             // Delete old photo
-            // TODO: IMPORTANT!!! DELETE OLD PROFILE PHOTO
-            // Check if old photo isn't default profile photo (UUID = 0). If not, delete
+            if(oldPhotoId != Const.DEFAULT_PHOTO_ID){
+                restTemplate = new RestTemplate();
+                serverUrl = imageServiceUrl + "/image/delete/";
+                try {
+
+                    restTemplate.delete(serverUrl + oldPhotoId, String.class);
+
+                } catch (Exception e) {
+                    RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, "Photo could not be deleted");
+                    return new ErrorResponse(Const.API_NOT_RESP_ERR + ": Photo could not be deleted", HttpStatus.INTERNAL_SERVER_ERROR);
+
+                }
+            }
             return new CorrectResponse(userId, Const.SUCC_ERR, HttpStatus.OK);
         } else {
             return new ErrorResponse("Changing profile photo not allowed", HttpStatus.FORBIDDEN);
