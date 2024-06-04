@@ -472,10 +472,15 @@ public class OfferRESTController {
             } catch (MultipleValidationException e) {
                 return;
             }
+            Double score = 0.0;
+            Double scoreCalculated =  getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(userId);
+            if(!Double.isNaN( scoreCalculated)){
+                score = scoreCalculated;
+            }
             finalUserScoreDtoList.add(new UserScoreDto(
                     userId,
                     userProfileResponseDto.name()+" "+userProfileResponseDto.surname(),
-                    getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(userId)
+                    score
             ));
         });
 
@@ -488,7 +493,6 @@ public class OfferRESTController {
         List<UserScoreWithPositionDto> userScoreWithPositionDtoList = new ArrayList<>();
         List<UserScoreDto> finalLambdaUserScoreDtoList = userScoreDtoList;
         userScoreDtoList
-                .stream().filter(userScoreDto -> !Double.isNaN(userScoreDto.score()))
                 .forEach(userScoreDto -> userScoreWithPositionDtoList.add(new UserScoreWithPositionDto(
                 userScoreDto.userId(),
                 userScoreDto.nameAndSurname(),
