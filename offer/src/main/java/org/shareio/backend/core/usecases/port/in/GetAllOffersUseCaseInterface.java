@@ -4,5 +4,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface GetAllOffersUseCaseInterface {
-    List<UUID> getAllOfferIdList();
+    List<UUID> getAllOfferIdList(UUID userId);
 }
