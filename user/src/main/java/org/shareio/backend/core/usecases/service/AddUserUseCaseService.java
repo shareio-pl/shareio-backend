@@ -27,7 +27,7 @@ public class AddUserUseCaseService implements AddUserUseCaseInterface {
 
 
     @Override
-    public UUID addUser(UserSaveDto userAddDto)  {
+    public UUID addUser(UserSaveDto userAddDto) throws LocationCalculationException {
         try {
             getUserProfileByEmailDaoInterface.getUserDto(userAddDto.email());
 
@@ -46,8 +46,7 @@ public class AddUserUseCaseService implements AddUserUseCaseInterface {
                         user.getAddress().getHouseNumber()
                 ));
             } catch (LocationCalculationException | IOException | InterruptedException | JSONException e) {
-                Thread.currentThread().interrupt(); // TODO: handle JSONException
-                user.getAddress().setLocation(new Location(0.0, 0.0));
+                throw new LocationCalculationException("Nie udało się ustalić adresu, spróbuj ponownie");
             }
 
             saveUserCommandInterface.saveUser(Optional.of(user).map(User::toSnapshot));
