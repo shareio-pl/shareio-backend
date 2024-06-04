@@ -487,7 +487,9 @@ public class OfferRESTController {
 
         List<UserScoreWithPositionDto> userScoreWithPositionDtoList = new ArrayList<>();
         List<UserScoreDto> finalLambdaUserScoreDtoList = userScoreDtoList;
-        userScoreDtoList.forEach(userScoreDto -> userScoreWithPositionDtoList.add(new UserScoreWithPositionDto(
+        userScoreDtoList
+                .stream().filter(userScoreDto -> !Double.isNaN(userScoreDto.score()))
+                .forEach(userScoreDto -> userScoreWithPositionDtoList.add(new UserScoreWithPositionDto(
                 userScoreDto.userId(),
                 userScoreDto.nameAndSurname(),
                 userScoreDto.score(),
