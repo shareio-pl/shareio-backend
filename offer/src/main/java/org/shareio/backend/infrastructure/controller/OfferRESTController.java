@@ -110,7 +110,7 @@ public class OfferRESTController {
         }
         Optional<LocationGetDto> locationGetDto = getLocationDaoInterface.getLocationDto(userProfileResponseDto.address().getId());
         if (locationGetDto.map(Location::fromDto).isPresent()) {
-            UUID closestOfferId = getClosestOfferUseCaseInterface.getOfferResponseDto(locationGetDto.map(Location::fromDto).orElseThrow(NoSuchElementException::new));
+            UUID closestOfferId = getClosestOfferUseCaseInterface.getOfferResponseDto(locationGetDto.map(Location::fromDto).orElseThrow(NoSuchElementException::new), userProfileResponseDto.userId().getId());
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(closestOfferId, Const.SUCC_ERR, HttpStatus.OK);
         } else {
@@ -227,8 +227,9 @@ public class OfferRESTController {
     @GetMapping(value = "/getNewest", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getNewestOffers(HttpServletRequest httpRequest) {
         RequestLogHandler.handleRequest(httpRequest);
+        UUID userId = identityHandler.getUserIdFromHeader(httpRequest);
         try {
-            List<UUID> newestOfferIdList = getNewestOffersUseCaseService.getNewestOffers();
+            List<UUID> newestOfferIdList = getNewestOffersUseCaseService.getNewestOffers(userId);
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(newestOfferIdList, Const.SUCC_ERR, HttpStatus.OK);
 
@@ -241,7 +242,8 @@ public class OfferRESTController {
     @GetMapping(value = "/getAllOffers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getAllOffers(HttpServletRequest httpRequest) {
         RequestLogHandler.handleRequest(httpRequest);
-        List<UUID> allOfferIdList = getAllOffersUseCaseInterface.getAllOfferIdList();
+        UUID userId = identityHandler.getUserIdFromHeader(httpRequest);
+        List<UUID> allOfferIdList = getAllOffersUseCaseInterface.getAllOfferIdList(userId);
         RequestLogHandler.handleCorrectResponse(httpRequest);
         return new CorrectResponse(allOfferIdList, Const.SUCC_ERR, HttpStatus.OK);
     }

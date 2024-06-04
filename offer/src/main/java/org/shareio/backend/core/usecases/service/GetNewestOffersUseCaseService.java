@@ -25,7 +25,7 @@ public class GetNewestOffersUseCaseService implements GetNewestOffersUseCaseInte
     GetAllOffersDaoInterface getAllOffersDaoInterface;
 
     @Override
-    public List<UUID> getNewestOffers() {
+    public List<UUID> getNewestOffers(UUID userId) {
         List<Offer> backupNewestOfferList = new ArrayList<>();
         List<OfferGetDto> offerGetDtoList = getAllOffersDaoInterface.getAllOffers();
         offerGetDtoList = offerGetDtoList.stream().filter(offer -> {
@@ -40,6 +40,7 @@ public class GetNewestOffersUseCaseService implements GetNewestOffersUseCaseInte
                 .stream()
                 .map(Offer::fromDto)
                 .filter(offer -> offer.getStatus().equals(Status.CREATED))
+                .filter(offer -> !offer.getOwner().getUserId().getId().equals(userId))
                 .sorted(Comparator.comparing(Offer::getCreationDate))
                 .toList();
         if(offerList.size() >= Const.MIN_OFFER_LIST_SIZE) {

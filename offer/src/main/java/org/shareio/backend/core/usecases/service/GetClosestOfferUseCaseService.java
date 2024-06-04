@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -25,7 +26,7 @@ public class GetClosestOfferUseCaseService implements GetClosestOfferUseCaseInte
     GetLocationDaoInterface getLocationDaoInterface;
 
     @Override
-    public UUID getOfferResponseDto(Location location) throws NoSuchElementException {
+    public UUID getOfferResponseDto(Location location, UUID userId) throws NoSuchElementException {
         List<OfferGetDto> allOfferList = getAllOffersDaoInterface.getAllOffers();
         AtomicReference<UUID> closestOfferId = new AtomicReference<>();
         AtomicReference<Double> distance = new AtomicReference<>(Double.MAX_VALUE);
@@ -46,6 +47,7 @@ public class GetClosestOfferUseCaseService implements GetClosestOfferUseCaseInte
         List<Offer> offerList = allOfferList.stream().map(Offer::fromDto).toList();
         offerList = offerList
                 .stream()
+                .filter(offer-> !Objects.equals(offer.getOwner().getUserId().getId(), userId))
                 .filter(offer -> offer.getStatus().equals(Status.CREATED))
                 .toList();
         offerList.forEach(offer -> {

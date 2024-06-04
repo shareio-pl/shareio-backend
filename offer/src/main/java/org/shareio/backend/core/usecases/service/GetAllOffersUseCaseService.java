@@ -22,7 +22,7 @@ public class GetAllOffersUseCaseService implements GetAllOffersUseCaseInterface 
     GetAllOffersDaoInterface getAllOffersDaoInterface;
 
     @Override
-    public List<UUID> getAllOfferIdList() {
+    public List<UUID> getAllOfferIdList(UUID userId) {
         List<OfferGetDto> offerGetDtoList = getAllOffersDaoInterface.getAllOffers();
         offerGetDtoList = offerGetDtoList.stream().filter(offer -> {
             try {
@@ -36,6 +36,7 @@ public class GetAllOffersUseCaseService implements GetAllOffersUseCaseInterface 
         return offerGetDtoList
                 .stream()
                 .map(Offer::fromDto)
+                .filter(offer -> !offer.getOwner().getUserId().getId().equals(userId))
                 .filter(offer -> !offer.getStatus().equals(Status.CANCELED))
                 .filter(offer -> !offer.getStatus().equals(Status.FINISHED))
                 .sorted(Comparator.comparing(Offer::getCreationDate))
