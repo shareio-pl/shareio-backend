@@ -56,7 +56,7 @@ public class GetOfferUseCaseServiceTests {
     String testHouseNumber = "1";
     String testFlatNumber = "2";
     String testPostCode = "97-319";
-    String testDistance = "1";
+    String testDistance = "0"; // because the address is the same, it should return 0
     String testEmail = "qwe@gmail.com";
     String testPwHash = "qwerty";
 
@@ -372,7 +372,7 @@ public class GetOfferUseCaseServiceTests {
                 Status.CREATED.toString(),
                 testCity,
                 testStreet,
-                "0.0",
+                testHouseNumber,
                 testDistance,
                 testLatitude,
                 testLongitude,

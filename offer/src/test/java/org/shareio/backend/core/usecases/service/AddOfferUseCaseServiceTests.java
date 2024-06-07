@@ -14,8 +14,10 @@ import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
 import org.shareio.backend.core.usecases.port.out.GetUserProfileDaoInterface;
 import org.shareio.backend.core.usecases.port.out.SaveOfferCommandInterface;
 import org.shareio.backend.core.usecases.util.LocationCalculator;
+import org.shareio.backend.exceptions.LocationCalculationException;
 import org.shareio.backend.exceptions.MultipleValidationException;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -73,6 +75,44 @@ class AddOfferUseCaseServiceTests {
             Assertions.assertThrows(MultipleValidationException.class,
                     () -> test_addOfferUseCaseService.addOffer(test_offerSaveDto, UUID.randomUUID())
             );
+        }
+    }
+
+    @Test
+    void get_invalid_data_to_calculate_address_and_throw_location_calculation_exception() {
+        try (MockedStatic<LocationCalculator> locationCalculatorMockedStatic = Mockito.mockStatic(LocationCalculator.class)) {
+            testUserId = UUID.randomUUID();
+            testPhotoId = UUID.randomUUID();
+            testOfferId = UUID.randomUUID();
+            testAddressId = UUID.randomUUID();
+            when(test_getUserProfileDaoInterface.getUserDto(testUserId)).thenReturn(Optional.of(new UserProfileGetDto(
+                    testUserId,
+                    testEmail,
+                    testName,
+                    testSurname,
+                    null,
+                    testPhotoId,
+                    testAddressId,
+                    null,
+                    null
+            )));
+            test_offerSaveDto = new OfferSaveDto(
+                    testUserId,
+                    testTitle,
+                    testCondition,
+                    testCategory,
+                    testDescription,
+                    testCountry,
+                    testRegion,
+                    testCity,
+                    testStreet,
+                    testHouseNumber
+            );
+
+
+            locationCalculatorMockedStatic.when(() -> LocationCalculator.getLocationFromAddress(testCountry, testCity, testStreet, testHouseNumber))
+                    .thenThrow(LocationCalculationException.class);
+            Assertions.assertThrows(LocationCalculationException.class, () -> test_addOfferUseCaseService.addOffer(test_offerSaveDto, testPhotoId));
         }
     }
 

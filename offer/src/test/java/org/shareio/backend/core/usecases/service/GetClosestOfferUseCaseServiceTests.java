@@ -83,7 +83,7 @@ class GetClosestOfferUseCaseServiceTests {
                     .thenThrow(MultipleValidationException.class);
             when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
             Assertions.assertThrows(NoSuchElementException.class,
-                    () -> test_getClosestOfferUseCaseService.getOfferResponseDto(test_location));
+                    () -> test_getClosestOfferUseCaseService.getOfferResponseDto(test_location, testOwnerId));
 
         }
     }
@@ -130,9 +130,255 @@ class GetClosestOfferUseCaseServiceTests {
                     .thenThrow(MultipleValidationException.class);
             when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
             UUID closestOfferId = Assertions.assertDoesNotThrow(
-                    () -> test_getClosestOfferUseCaseService.getOfferResponseDto(test_location));
+                    () -> test_getClosestOfferUseCaseService.getOfferResponseDto(test_location, testOwnerId));
 
             Assertions.assertNull(closestOfferId);
+        }
+    }
+
+    @Test
+    void get_one_offer_CREATED_and_return_its_UUID()
+    {
+        testOwnerId = UUID.randomUUID();
+        test_offerGetDto1 = new OfferGetDto(
+                UUID.randomUUID(),
+                LocalDateTime.now(),
+                Status.CREATED.toString(),
+                UUID.randomUUID(),
+                "Polska",
+                "Łódzkie",
+                "Łódź",
+                "Kołodziejska",
+                "18",
+                "3",
+                "91-001",
+                5.0,
+                3.0,
+                "Mieszkanie",
+                "BROKEN",
+                "OTHER",
+                "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
+                UUID.randomUUID(),
+                testOwnerId,
+                "Jan",
+                "Kowalski",
+                UUID.randomUUID(),
+                null,
+                null,
+                UUID.randomUUID(),
+                4.5,
+                LocalDateTime.now()
+        );
+        test_offerGetDto2 = new OfferGetDto(
+                UUID.randomUUID(),
+                LocalDateTime.now(),
+                Status.RESERVED.toString(),
+                UUID.randomUUID(),
+                "Polska",
+                "Łódzkie",
+                "Łódź",
+                "Kołodziejska",
+                "18",
+                "3",
+                "91-001",
+                0.1,
+                0.1,
+                "Mieszkanie",
+                "BROKEN",
+                "OTHER",
+                "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
+                UUID.randomUUID(),
+                testOwnerId,
+                "Jan",
+                "Kowalski",
+                UUID.randomUUID(),
+                null,
+                null,
+                UUID.randomUUID(),
+                4.5,
+                LocalDateTime.now()
+        );
+        test_location = new Location(0.0, 0.0);
+        when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
+        try (MockedStatic<DistanceCalculator> distanceCalculator = Mockito.mockStatic(DistanceCalculator.class)) {
+            distanceCalculator.when(()->DistanceCalculator.calculateDistance(any(),any())).thenCallRealMethod();
+            UUID closestOfferId = Assertions.assertDoesNotThrow(
+                    () -> test_getClosestOfferUseCaseService.getOfferResponseDto(test_location, UUID.randomUUID()));
+
+            distanceCalculator.verify(
+                    () -> DistanceCalculator.calculateDistance(any(), any()),
+                    times(1)
+            );
+            Assertions.assertEquals(test_offerGetDto1.offerId(), closestOfferId);
+        }
+    }
+
+    @Test
+    void get_one_offer_not_belonging_to_user_and_return_tits_UUID()
+    {
+        testOwnerId = UUID.randomUUID();
+        test_offerGetDto1 = new OfferGetDto(
+                UUID.randomUUID(),
+                LocalDateTime.now(),
+                Status.CREATED.toString(),
+                UUID.randomUUID(),
+                "Polska",
+                "Łódzkie",
+                "Łódź",
+                "Kołodziejska",
+                "18",
+                "3",
+                "91-001",
+                5.0,
+                3.0,
+                "Mieszkanie",
+                "BROKEN",
+                "OTHER",
+                "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                "Jan",
+                "Kowalski",
+                UUID.randomUUID(),
+                null,
+                null,
+                UUID.randomUUID(),
+                4.5,
+                LocalDateTime.now()
+        );
+        test_offerGetDto2 = new OfferGetDto(
+                UUID.randomUUID(),
+                LocalDateTime.now(),
+                Status.CREATED.toString(),
+                UUID.randomUUID(),
+                "Polska",
+                "Łódzkie",
+                "Łódź",
+                "Kołodziejska",
+                "18",
+                "3",
+                "91-001",
+                0.1,
+                0.1,
+                "Mieszkanie",
+                "BROKEN",
+                "OTHER",
+                "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
+                UUID.randomUUID(),
+                testOwnerId,
+                "Jan",
+                "Kowalski",
+                UUID.randomUUID(),
+                null,
+                null,
+                UUID.randomUUID(),
+                4.5,
+                LocalDateTime.now()
+        );
+        test_location = new Location(0.0, 0.0);
+        when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
+        try (MockedStatic<DistanceCalculator> distanceCalculator = Mockito.mockStatic(DistanceCalculator.class)) {
+            distanceCalculator.when(()->DistanceCalculator.calculateDistance(any(),any())).thenCallRealMethod();
+            UUID closestOfferId = Assertions.assertDoesNotThrow(
+                    () -> test_getClosestOfferUseCaseService.getOfferResponseDto(test_location, testOwnerId));
+
+            distanceCalculator.verify(
+                    () -> DistanceCalculator.calculateDistance(any(), any()),
+                    times(1)
+            );
+            Assertions.assertEquals(test_offerGetDto1.offerId(), closestOfferId);
+        }
+    }
+
+    @Test
+    void get_closest_offer_at_exact_distance_boundary_and_return_its_id() {
+        UUID testOwnerId = UUID.randomUUID();
+        UUID closerOfferId = UUID.randomUUID();
+        UUID boundaryOfferId = UUID.randomUUID();
+
+        test_offerGetDto1 = new OfferGetDto(
+                closerOfferId,
+                LocalDateTime.now(),
+                Status.CREATED.toString(),
+                UUID.randomUUID(),
+                "Polska",
+                "Łódzkie",
+                "Łódź",
+                "Kołodziejska",
+                "18",
+                "3",
+                "91-001",
+                1.0,
+                1.0,
+                "Mieszkanie",
+                "BROKEN",
+                "OTHER",
+                "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                "Jan",
+                "Kowalski",
+                UUID.randomUUID(),
+                null,
+                null,
+                UUID.randomUUID(),
+                4.5,
+                LocalDateTime.now()
+        );
+        test_offerGetDto2 = new OfferGetDto(
+                boundaryOfferId,
+                LocalDateTime.now(),
+                Status.CREATED.toString(),
+                UUID.randomUUID(),
+                "Polska",
+                "Łódzkie",
+                "Łódź",
+                "Kołodziejska",
+                "18",
+                "3",
+                "91-001",
+                2.0,
+                2.0,
+                "Mieszkanie",
+                "BROKEN",
+                "OTHER",
+                "Klimatyczne mieszkanie w centrum Łodzi. Blisko manufaktury. W tradycyjnej Łódzkiej kamienicy.",
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                "Jan",
+                "Kowalski",
+                UUID.randomUUID(),
+                null,
+                null,
+                UUID.randomUUID(),
+                4.5,
+                LocalDateTime.now()
+        );
+        test_location = new Location(0.0, 0.0);
+
+        when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
+
+        try (MockedStatic<DistanceCalculator> distanceCalculator = Mockito.mockStatic(DistanceCalculator.class)) {
+            distanceCalculator.when(() -> DistanceCalculator.calculateDistance(eq(test_location), any(Location.class)))
+                    .thenAnswer(invocation -> {
+                        Location offerLocation = invocation.getArgument(1);
+                        if (offerLocation.getLatitude() == 1.0 && offerLocation.getLongitude() == 1.0) {
+                            return 1.0;
+                        } else if (offerLocation.getLatitude() == 2.0 && offerLocation.getLongitude() == 2.0) {
+                            return 2.0;
+                        } else {
+                            return 10.0;
+                        }
+                    });
+
+            UUID closestOfferId = Assertions.assertDoesNotThrow(
+                    () -> test_getClosestOfferUseCaseService.getOfferResponseDto(test_location, testOwnerId));
+
+            distanceCalculator.verify(
+                    () -> DistanceCalculator.calculateDistance(eq(test_location), any(Location.class)),
+                    times(2)
+            );
+            Assertions.assertEquals(closerOfferId, closestOfferId);
         }
     }
 
@@ -178,7 +424,7 @@ class GetClosestOfferUseCaseServiceTests {
                     .thenThrow(MultipleValidationException.class);
             when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
             UUID closestOfferId = Assertions.assertDoesNotThrow(
-                    () -> test_getClosestOfferUseCaseService.getOfferResponseDto(test_location));
+                    () -> test_getClosestOfferUseCaseService.getOfferResponseDto(test_location, UUID.randomUUID()));
 
             Assertions.assertEquals(test_offerGetDto1.offerId(), closestOfferId);
         }
@@ -249,7 +495,7 @@ class GetClosestOfferUseCaseServiceTests {
         try (MockedStatic<DistanceCalculator> distanceCalculator = Mockito.mockStatic(DistanceCalculator.class)) {
             distanceCalculator.when(()->DistanceCalculator.calculateDistance(any(),any())).thenCallRealMethod();
             UUID closestOfferId = Assertions.assertDoesNotThrow(
-                    () -> test_getClosestOfferUseCaseService.getOfferResponseDto(test_location));
+                    () -> test_getClosestOfferUseCaseService.getOfferResponseDto(test_location, testOwnerId));
 
             distanceCalculator.verify(
                     () -> DistanceCalculator.calculateDistance(any(), any()),

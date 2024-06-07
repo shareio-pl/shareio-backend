@@ -52,7 +52,7 @@ class GetNewestOffersUseCaseServiceTests {
                     .thenThrow(MultipleValidationException.class);
             when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
             Assertions.assertThrows(IllegalArgumentException.class,
-                    () -> test_getNewestOffersUseCaseService.getNewestOffers());
+                    () -> test_getNewestOffersUseCaseService.getNewestOffers(UUID.randomUUID()));
 
         }
     }
@@ -119,7 +119,7 @@ class GetNewestOffersUseCaseServiceTests {
         );
         when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
         List<UUID> offerList = Assertions.assertDoesNotThrow(
-                () -> test_getNewestOffersUseCaseService.getNewestOffers());
+                () -> test_getNewestOffersUseCaseService.getNewestOffers(UUID.randomUUID()));
         Assertions.assertEquals(2, offerList.size());
 
     }
@@ -215,7 +215,7 @@ class GetNewestOffersUseCaseServiceTests {
         );
         when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2, test_offerGetDto3));
         List<UUID> offerList = Assertions.assertDoesNotThrow(
-                () -> test_getNewestOffersUseCaseService.getNewestOffers());
+                () -> test_getNewestOffersUseCaseService.getNewestOffers(UUID.randomUUID()));
         Assertions.assertEquals(2, offerList.size());
         Assertions.assertFalse(offerList.contains(null));
     }
@@ -311,7 +311,7 @@ class GetNewestOffersUseCaseServiceTests {
         );
         when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2, test_offerGetDto3));
         List<UUID> offerList = Assertions.assertDoesNotThrow(
-                () -> test_getNewestOffersUseCaseService.getNewestOffers());
+                () -> test_getNewestOffersUseCaseService.getNewestOffers(UUID.randomUUID()));
         Assertions.assertEquals(2, offerList.size());
         Assertions.assertFalse(offerList.contains(null));
     }

@@ -63,7 +63,6 @@ class FinishOfferUseCaseServiceTests {
     UUID testAddressId = null;
     UUID testOwnerId = null;
     UUID testOwnerPhotoId = null;
-    UUID testReviewId = null;
     UUID testReceiverId = null;
 
     @BeforeEach

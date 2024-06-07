@@ -171,8 +171,8 @@ class AddReviewUseCaseServiceTests {
                 testOwnerPhotoId,
                 testReceiverId,
                 testDate,
-                testReviewId,
-                testReviewValue,
+                null,
+                null,
                 testDate
         );
         Mockito.when(test_offerReviewDto.offerId()).thenReturn(testOfferId);
