@@ -123,16 +123,19 @@ public class OfferRESTController {
 
     @GetMapping(value = "/getCreatedOffersByUser/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getCreatedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID id) {
+        RequestLogHandler.handleRequest(httpRequest);
         return getOfferListBasedOnStatus(httpRequest, id, Status.CREATED);
     }
 
     @GetMapping(value = "/getReservedOffersByUser/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getReservedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID id) {
+        RequestLogHandler.handleRequest(httpRequest);
         return getOfferListBasedOnStatus(httpRequest, id, Status.RESERVED);
     }
 
     @GetMapping(value = "/getFinishedOffersByUser/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getFinishedOffersByUser(HttpServletRequest httpRequest, @PathVariable(value = "userId") UUID id) {
+        RequestLogHandler.handleRequest(httpRequest);
         return getOfferListBasedOnStatus(httpRequest, id, Status.FINISHED);
     }
 
@@ -313,7 +316,7 @@ public class OfferRESTController {
         HttpEntity<MultiValueMap<String, Object>> requestEntity
                 = new HttpEntity<>(body, headers);
 
-        String serverUrl = imageServiceUrl + "/image/createPNG/" + photoId;
+        String serverUrl = imageServiceUrl + "/image/createPNG/" + photoId; // TODO: check file type and choose PNG or JPG endpoint
 
         RestTemplate restTemplate = new RestTemplate();
         try {
@@ -341,10 +344,6 @@ public class OfferRESTController {
         } catch (LocationCalculationException e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, "Location error");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR + ":  " + e.getMessage());
-            Thread.currentThread().interrupt();
-            return new ErrorResponse(Const.API_NOT_RESP_ERR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

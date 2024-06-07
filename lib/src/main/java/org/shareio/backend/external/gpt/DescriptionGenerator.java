@@ -14,6 +14,7 @@ import java.util.Objects;
 public class DescriptionGenerator implements DescriptionGeneratorInterface {
     @Override
     public String generateDescription(String title, String condition, String category, String additionalData) throws IOException, InterruptedException, DescriptionGenerationException {
+        // TODO: this should detect issues with API and throw ExternalServiceException
         String offerData = title + ", " + condition + ", " + category;
         if (Objects.nonNull(additionalData) && !additionalData.isBlank()) {
             offerData += ", Dodatkowe informacje: " + additionalData;
