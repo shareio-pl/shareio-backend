@@ -15,7 +15,7 @@ import java.util.*;
 @Service
 public class UserAdapter implements GetUserProfileDaoInterface,
         GetUserProfileByEmailDaoInterface, RemoveUserCommandInterface, SaveUserCommandInterface,
-        UpdateUserChangeMetadataCommandInterface, UpdateUserChangePasswordCommandInterface, GetAllUserProfileListDaoInterface {
+        UpdateUserChangeMetadataCommandInterface, UpdateUserChangePasswordCommandInterface, UpdateUserChangeProfilePhotoCommandInterface, GetAllUserProfileListDaoInterface {
     final UserRepository userRepository;
 
     public UserAdapter(UserRepository userRepository) {
@@ -56,6 +56,13 @@ public class UserAdapter implements GetUserProfileDaoInterface,
         userRepository.save(userEntity);
     }
 
+    @Override
+    public void updateUserProfilePhoto(UserSnapshot userSnapshot) {
+        Optional<UserEntity> userEntity = userRepository.findByUserId(userSnapshot.userId().getId());
+        UserEntity userEntityFromDb = userEntity.orElseThrow(NoSuchElementException::new);
+        userEntityFromDb.setPhotoId(userSnapshot.photoId().getId());
+        userRepository.save(userEntityFromDb);
+    }
 
     @Override
     public void updateUserMetadata(UserSnapshot userSnapshot) {
