@@ -6,5 +6,5 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public interface GetClosestOfferUseCaseInterface {
-    UUID getOfferResponseDto(Location location) throws NoSuchElementException;
+    UUID getOfferResponseDto(Location location, UUID userId) throws NoSuchElementException;
 }

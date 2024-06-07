@@ -13,6 +13,7 @@ import org.shareio.backend.core.usecases.port.dto.UserPasswordDto;
 import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
 import org.shareio.backend.core.usecases.port.dto.UserProfileResponseDto;
 import org.shareio.backend.core.usecases.port.in.*;
+import org.shareio.backend.exceptions.LocationCalculationException;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.security.AuthenticationHandler;
 import org.shareio.backend.security.RequestLogHandler;
@@ -81,6 +82,11 @@ public class UserRESTController {
         } catch (IllegalArgumentException e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, e.getMessage());
             return new ErrorResponse(Const.ILL_ARG_ERR + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        catch (LocationCalculationException e)
+        {
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, "Location error");
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 

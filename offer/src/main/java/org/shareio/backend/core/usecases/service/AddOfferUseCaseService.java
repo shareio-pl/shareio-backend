@@ -30,18 +30,16 @@ public class AddOfferUseCaseService implements AddOfferUseCaseInterface {
     SaveOfferCommandInterface saveOfferCommandInterface;
 
     @Override
-    public OfferSaveResponseDto addOffer(OfferSaveDto offerSaveDto, UUID photoId) throws MultipleValidationException {
+    public OfferSaveResponseDto addOffer(OfferSaveDto offerSaveDto, UUID photoId) throws MultipleValidationException, LocationCalculationException {
         OfferValidator.validateOffer(offerSaveDto);
         Offer offer = Optional.of(offerSaveDto).map(Offer::fromDto).orElseThrow(NoSuchElementException::new);
         User owner = getUserProfileDaoInterface.getUserDto(offerSaveDto.ownerId()).map(User::fromDto).orElseThrow(NoSuchElementException::new);
         offer.setOwner(owner);
         offer.setPhotoId(new PhotoId(photoId));
-        try{
+        try {
             offer.getAddress().setLocation(LocationCalculator.getLocationFromAddress(offerSaveDto.country(), offerSaveDto.city(), offerSaveDto.street(), offerSaveDto.houseNumber()));
-        }
-        catch(LocationCalculationException | IOException | InterruptedException | JSONException e){
-            Thread.currentThread().interrupt();
-            offer.getAddress().setLocation(new Location(0.0, 0.0));
+        } catch (LocationCalculationException | IOException | InterruptedException | JSONException e) {
+            throw new LocationCalculationException("Nie udało się ustalić adresu, spróbuj ponownie");
         }
         OfferSnapshot offerSnapshot = offer.toSnapshot();
         saveOfferCommandInterface.saveOffer(offerSnapshot);

@@ -18,6 +18,7 @@ import org.shareio.backend.core.usecases.port.in.*;
 import org.shareio.backend.core.usecases.port.out.GetLocationDaoInterface;
 import org.shareio.backend.core.usecases.service.GetNewestOffersUseCaseService;
 import org.shareio.backend.exceptions.DescriptionGenerationException;
+import org.shareio.backend.exceptions.LocationCalculationException;
 import org.shareio.backend.exceptions.MultipleValidationException;
 import org.shareio.backend.external.gpt.DescriptionGenerator;
 import org.shareio.backend.infrastructure.dbadapter.repositories.OfferRepository;
@@ -110,7 +111,7 @@ public class OfferRESTController {
         }
         Optional<LocationGetDto> locationGetDto = getLocationDaoInterface.getLocationDto(userProfileResponseDto.address().getId());
         if (locationGetDto.map(Location::fromDto).isPresent()) {
-            UUID closestOfferId = getClosestOfferUseCaseInterface.getOfferResponseDto(locationGetDto.map(Location::fromDto).orElseThrow(NoSuchElementException::new));
+            UUID closestOfferId = getClosestOfferUseCaseInterface.getOfferResponseDto(locationGetDto.map(Location::fromDto).orElseThrow(NoSuchElementException::new), userProfileResponseDto.userId().getId());
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(closestOfferId, Const.SUCC_ERR, HttpStatus.OK);
         } else {
@@ -230,8 +231,9 @@ public class OfferRESTController {
     @GetMapping(value = "/getNewest", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getNewestOffers(HttpServletRequest httpRequest) {
         RequestLogHandler.handleRequest(httpRequest);
+        UUID userId = identityHandler.getUserIdFromHeader(httpRequest);
         try {
-            List<UUID> newestOfferIdList = getNewestOffersUseCaseService.getNewestOffers();
+            List<UUID> newestOfferIdList = getNewestOffersUseCaseService.getNewestOffers(userId);
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(newestOfferIdList, Const.SUCC_ERR, HttpStatus.OK);
 
@@ -244,7 +246,8 @@ public class OfferRESTController {
     @GetMapping(value = "/getAllOffers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getAllOffers(HttpServletRequest httpRequest) {
         RequestLogHandler.handleRequest(httpRequest);
-        List<UUID> allOfferIdList = getAllOffersUseCaseInterface.getAllOfferIdList();
+        UUID userId = identityHandler.getUserIdFromHeader(httpRequest);
+        List<UUID> allOfferIdList = getAllOffersUseCaseInterface.getAllOfferIdList(userId);
         RequestLogHandler.handleCorrectResponse(httpRequest);
         return new CorrectResponse(allOfferIdList, Const.SUCC_ERR, HttpStatus.OK);
     }
@@ -338,10 +341,9 @@ public class OfferRESTController {
         } catch (MultipleValidationException e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, "Validation error");
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR + ":  " + e.getMessage());
-            Thread.currentThread().interrupt();
-            return new ErrorResponse(Const.API_NOT_RESP_ERR, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (LocationCalculationException e) {
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, "Location error");
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -473,10 +475,15 @@ public class OfferRESTController {
             } catch (MultipleValidationException e) {
                 return;
             }
+            Double score = 0.0;
+            Double scoreCalculated = getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(userId);
+            if (!Double.isNaN(scoreCalculated)) {
+                score = scoreCalculated;
+            }
             finalUserScoreDtoList.add(new UserScoreDto(
                     userId,
                     userProfileResponseDto.name() + " " + userProfileResponseDto.surname(),
-                    getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(userId)
+                    score
             ));
         });
 
@@ -488,12 +495,13 @@ public class OfferRESTController {
 
         List<UserScoreWithPositionDto> userScoreWithPositionDtoList = new ArrayList<>();
         List<UserScoreDto> finalLambdaUserScoreDtoList = userScoreDtoList;
-        userScoreDtoList.forEach(userScoreDto -> userScoreWithPositionDtoList.add(new UserScoreWithPositionDto(
-                userScoreDto.userId(),
-                userScoreDto.nameAndSurname(),
-                userScoreDto.score(),
-                finalLambdaUserScoreDtoList.indexOf(userScoreDto) + 1))
-        );
+        userScoreDtoList
+                .forEach(userScoreDto -> userScoreWithPositionDtoList.add(new UserScoreWithPositionDto(
+                        userScoreDto.userId(),
+                        userScoreDto.nameAndSurname(),
+                        userScoreDto.score(),
+                        finalLambdaUserScoreDtoList.indexOf(userScoreDto) + 1))
+                );
         return userScoreWithPositionDtoList;
     }
 

@@ -1,6 +1,7 @@
 package org.shareio.backend.external.map;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.shareio.backend.exceptions.LocationCalculationException;
 
@@ -25,7 +26,12 @@ public class CoordinatesCalculator implements CoordinatesCalculatorInterface {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(apiUrl)).GET().build();
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
-        JSONArray array = new JSONArray(response.body());
+        JSONArray array = null;
+        try {
+            array = new JSONArray(response.body());
+        } catch (JSONException e) {
+            throw new LocationCalculationException("Timeout on API!");
+        }
         JSONObject object = array.getJSONObject(0);
         if (object.has("place_id")) {
             coordinates.put("lat", object.getDouble("lat"));
