@@ -1,6 +1,7 @@
 package org.shareio.backend.core.usecases.service;
 
 import lombok.AllArgsConstructor;
+import org.json.JSONException;
 import org.shareio.backend.Const;
 import org.shareio.backend.core.model.Address;
 import org.shareio.backend.core.model.User;
@@ -29,7 +30,7 @@ public class ModifyUserUseCaseService implements ModifyUserUseCaseInterface {
     UpdateUserChangeMetadataCommandInterface updateUserChangeMetadataCommandInterface;
 
     @Override
-    public void modifyUser(UUID userId, UserModifyDto userModifyDto) throws LocationCalculationException, IOException, InterruptedException, MultipleValidationException {
+    public void modifyUser(UUID userId, UserModifyDto userModifyDto) throws MultipleValidationException {
         UserValidator.validateUserModifyDto(userModifyDto);
         UserProfileGetDto userProfileGetDto = getUserProfileDaoInterface.getUserDto(userId).orElseThrow(NoSuchElementException::new);
         User user = Optional.of(userProfileGetDto).map(User::fromDto).orElseThrow(NoSuchElementException::new);
@@ -38,7 +39,13 @@ public class ModifyUserUseCaseService implements ModifyUserUseCaseInterface {
         user.setSurname(userModifyDto.surname());
         user.setDateOfBirth(userModifyDto.dateOfBirth());
         user.setAddress(address);
-        user.getAddress().setLocation(LocationCalculator.getLocationFromAddress(userModifyDto.country(), userModifyDto.city(), userModifyDto.street(), userModifyDto.houseNumber()));
+        try{
+            user.getAddress().setLocation(LocationCalculator.getLocationFromAddress(userModifyDto.country(), userModifyDto.city(), userModifyDto.street(), userModifyDto.houseNumber()));
+        }
+        catch(LocationCalculationException | IOException | InterruptedException | JSONException e){
+            Thread.currentThread().interrupt();
+            user.getAddress().setLocation(new Location(0.0, 0.0));
+        }
         updateUserChangeMetadataCommandInterface.updateUserMetadata(user.toSnapshot());
     }
 }

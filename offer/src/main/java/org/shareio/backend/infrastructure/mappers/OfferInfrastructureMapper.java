@@ -18,7 +18,9 @@ public class OfferInfrastructureMapper {
             unreservationDate = offerSnapshot.reservationDate().plus(Const.OFFER_RESERVATION_DURATION);
         }
         if(!Objects.isNull(userLocation)){
-            distance = String.valueOf(DistanceCalculator.calculateDistance(offerSnapshot.address().getLocation(), userLocation));
+            distance = String.valueOf(
+                   Math.round(Math.ceil(DistanceCalculator.calculateDistance(offerSnapshot.address().getLocation(), userLocation))
+            ));
         }
         if(Double.isNaN(averageUserReviewValue)){
             averageUserReviewValue = 0.0;
@@ -31,8 +33,8 @@ public class OfferInfrastructureMapper {
 
                     offerSnapshot.address().getCity(),
                     offerSnapshot.address().getStreet(),
-                    distance,
                     offerSnapshot.address().getHouseNumber(),
+                    distance,
                     offerSnapshot.address().getLocation().getLatitude(),
                     offerSnapshot.address().getLocation().getLongitude(),
 
@@ -63,8 +65,8 @@ public class OfferInfrastructureMapper {
 
                     offerSnapshot.address().getCity(),
                     offerSnapshot.address().getStreet(),
-                    distance,
                     offerSnapshot.address().getHouseNumber(),
+                    distance,
                     offerSnapshot.address().getLocation().getLatitude(),
                     offerSnapshot.address().getLocation().getLongitude(),
 

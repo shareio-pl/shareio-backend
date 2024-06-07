@@ -111,7 +111,7 @@ public class SearchOffersUseCaseService implements SearchOffersUseCaseInterface 
         }
         if (Objects.nonNull(creationDate)) {
             offers = offers.stream()
-                    .filter(offer -> offer.getCreationDate().isBefore(creationDate.atStartOfDay())).toList();
+                    .filter(offer -> offer.getCreationDate().isAfter(creationDate.atStartOfDay())).toList();
         }
         return offers;
     }

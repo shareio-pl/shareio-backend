@@ -1,6 +1,7 @@
 package org.shareio.backend.core.usecases.service;
 
 import lombok.AllArgsConstructor;
+import org.json.JSONException;
 import org.shareio.backend.Const;
 import org.shareio.backend.core.model.Address;
 import org.shareio.backend.core.model.Offer;
@@ -31,7 +32,7 @@ public class ModifyOfferUseCaseService implements ModifyOfferUseCaseInterface {
     UpdateOfferChangeMetadataCommandInterface updateOfferChangeMetadataCommandInterface;
 
     @Override
-    public void modifyOffer(UUID offerId, OfferModifyDto offerModifyDto) throws LocationCalculationException, IOException, InterruptedException, MultipleValidationException {
+    public void modifyOffer(UUID offerId, OfferModifyDto offerModifyDto) throws MultipleValidationException {
         OfferGetDto offerGetDto = getOfferDaoInterface.getOfferDto(offerId).orElseThrow(NoSuchElementException::new);
         OfferValidator.validateOffer(offerGetDto);
         Offer offer = Optional.of(offerGetDto).map(Offer::fromDto).orElseThrow(NoSuchElementException::new);
@@ -42,8 +43,14 @@ public class ModifyOfferUseCaseService implements ModifyOfferUseCaseInterface {
         offer.setTitle(offerModifyDto.title());
         offer.setDescription(offerModifyDto.description());
         offer.setAddress(address);
-        offer.getAddress().setLocation(LocationCalculator.getLocationFromAddress(offerModifyDto.addressSaveDto().country(), offerModifyDto.addressSaveDto().city(), offerModifyDto.addressSaveDto().street(), offerModifyDto.addressSaveDto().houseNumber()));
-        offer.setCondition(Condition.valueOf(offerModifyDto.condition()));
+        try{
+            offer.getAddress().setLocation(LocationCalculator.getLocationFromAddress(offerModifyDto.addressSaveDto().country(), offerModifyDto.addressSaveDto().city(), offerModifyDto.addressSaveDto().street(), offerModifyDto.addressSaveDto().houseNumber()));
+        }
+        catch(LocationCalculationException | IOException | InterruptedException | JSONException e){
+            Thread.currentThread().interrupt();
+            offer.getAddress().setLocation(new Location(0.0, 0.0));
+        }
+        offer.setCondition(Condition.valueOf(offerModifyDto.title()));
         offer.setCategory(Category.valueOf(offerModifyDto.category()));
         updateOfferChangeMetadataCommandInterface.updateOfferMetadata(offer.toSnapshot());
     }

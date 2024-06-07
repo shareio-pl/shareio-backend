@@ -111,7 +111,7 @@ public class OfferRESTController {
         }
         Optional<LocationGetDto> locationGetDto = getLocationDaoInterface.getLocationDto(userProfileResponseDto.address().getId());
         if (locationGetDto.map(Location::fromDto).isPresent()) {
-            UUID closestOfferId = getClosestOfferUseCaseInterface.getOfferResponseDto(locationGetDto.map(Location::fromDto).orElseThrow(NoSuchElementException::new));
+            UUID closestOfferId = getClosestOfferUseCaseInterface.getOfferResponseDto(locationGetDto.map(Location::fromDto).orElseThrow(NoSuchElementException::new), userProfileResponseDto.userId().getId());
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(closestOfferId, Const.SUCC_ERR, HttpStatus.OK);
         } else {
@@ -148,7 +148,7 @@ public class OfferRESTController {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
             return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR +":  "+ e.getMessage());
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR + ":  " + e.getMessage());
             return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -219,7 +219,7 @@ public class OfferRESTController {
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(description, Const.SUCC_ERR, HttpStatus.OK);
         } catch (IOException | InterruptedException | DescriptionGenerationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR +":  "+ e.getMessage());
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR + ":  " + e.getMessage());
             Thread.currentThread().interrupt();
             return new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -228,8 +228,9 @@ public class OfferRESTController {
     @GetMapping(value = "/getNewest", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getNewestOffers(HttpServletRequest httpRequest) {
         RequestLogHandler.handleRequest(httpRequest);
+        UUID userId = identityHandler.getUserIdFromHeader(httpRequest);
         try {
-            List<UUID> newestOfferIdList = getNewestOffersUseCaseService.getNewestOffers();
+            List<UUID> newestOfferIdList = getNewestOffersUseCaseService.getNewestOffers(userId);
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(newestOfferIdList, Const.SUCC_ERR, HttpStatus.OK);
 
@@ -242,7 +243,8 @@ public class OfferRESTController {
     @GetMapping(value = "/getAllOffers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getAllOffers(HttpServletRequest httpRequest) {
         RequestLogHandler.handleRequest(httpRequest);
-        List<UUID> allOfferIdList = getAllOffersUseCaseInterface.getAllOfferIdList();
+        UUID userId = identityHandler.getUserIdFromHeader(httpRequest);
+        List<UUID> allOfferIdList = getAllOffersUseCaseInterface.getAllOfferIdList(userId);
         RequestLogHandler.handleCorrectResponse(httpRequest);
         return new CorrectResponse(allOfferIdList, Const.SUCC_ERR, HttpStatus.OK);
     }
@@ -254,12 +256,12 @@ public class OfferRESTController {
             List<UserScoreWithPositionDto> userScoreWithPositionDtoList = getAllUserListWithScoreAndPosition();
             UserScoreWithPositionDto particularUserRecord = userScoreWithPositionDtoList
                     .stream()
-                    .filter(userScoreDto ->userScoreDto.userId().equals(userId))
+                    .filter(userScoreDto -> userScoreDto.userId().equals(userId))
                     .findFirst()
                     .orElseThrow(NoSuchElementException::new);
             RequestLogHandler.handleCorrectResponse(httpRequest);
             return new CorrectResponse(particularUserRecord, Const.SUCC_ERR, HttpStatus.OK);
-        }  catch (NoSuchElementException noSuchElementException) {
+        } catch (NoSuchElementException noSuchElementException) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, Const.NO_ELEM_ERR);
             return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         }
@@ -275,8 +277,8 @@ public class OfferRESTController {
 
     }
 
-    @GetMapping(value="getReservedOffersByReciever/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getReservedOffersByReciever(HttpServletRequest httpRequest, @PathVariable(name="userId") UUID userId) {
+    @GetMapping(value = "getReservedOffersByReciever/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getReservedOffersByReciever(HttpServletRequest httpRequest, @PathVariable(name = "userId") UUID userId) {
         RequestLogHandler.handleRequest(httpRequest);
         List<UUID> reservedOffersId = getOffersByReceiverAndStatusUseCaseInterface.getReservedOffersByRecieverAndStatus(userId, Status.RESERVED);
         RequestLogHandler.handleCorrectResponse(httpRequest);
@@ -284,8 +286,8 @@ public class OfferRESTController {
 
     }
 
-    @GetMapping(value="getFinishedOffersByReciever/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getFinishedOffersByReciever(HttpServletRequest httpRequest, @PathVariable(name="userId") UUID userId) {
+    @GetMapping(value = "getFinishedOffersByReciever/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getFinishedOffersByReciever(HttpServletRequest httpRequest, @PathVariable(name = "userId") UUID userId) {
         RequestLogHandler.handleRequest(httpRequest);
         List<UUID> reservedOffersId = getOffersByReceiverAndStatusUseCaseInterface.getReservedOffersByRecieverAndStatus(userId, Status.FINISHED);
         RequestLogHandler.handleCorrectResponse(httpRequest);
@@ -293,7 +295,7 @@ public class OfferRESTController {
 
     }
 
-        // ------------------- POST -------------------
+    // ------------------- POST -------------------
 
 
     @PostMapping(value = "/add", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -337,10 +339,10 @@ public class OfferRESTController {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, "Validation error");
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (LocationCalculationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, "Location calculation error");
-            return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, "Location error");
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR +":  "+ e.getMessage());
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, Const.SERVER_ERR + ":  " + e.getMessage());
             Thread.currentThread().interrupt();
             return new ErrorResponse(Const.API_NOT_RESP_ERR, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -364,6 +366,9 @@ public class OfferRESTController {
         } catch (MultipleValidationException e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FAILED_DEPENDENCY, Const.DATA_INTEGRITY_ERR);
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
+        } catch (IllegalArgumentException e) {
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, Const.ILL_ARG_ERR);
+            return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
     }
@@ -443,10 +448,6 @@ public class OfferRESTController {
         } catch (MultipleValidationException e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, "Validation error");
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (LocationCalculationException | IOException | InterruptedException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, "Location calculation error");
-            Thread.currentThread().interrupt();
-            return new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -464,7 +465,7 @@ public class OfferRESTController {
         }
     }
 
-    private List<UserScoreWithPositionDto> getAllUserListWithScoreAndPosition(){
+    private List<UserScoreWithPositionDto> getAllUserListWithScoreAndPosition() {
         List<UUID> userIdList = getAllUserIdListUseCaseInterface.getAllUserIdList();
         List<UserScoreDto> userScoreDtoList = new ArrayList<>();
         List<UserScoreDto> finalUserScoreDtoList = userScoreDtoList;
@@ -475,10 +476,15 @@ public class OfferRESTController {
             } catch (MultipleValidationException e) {
                 return;
             }
+            Double score = 0.0;
+            Double scoreCalculated = getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(userId);
+            if (!Double.isNaN(scoreCalculated)) {
+                score = scoreCalculated;
+            }
             finalUserScoreDtoList.add(new UserScoreDto(
                     userId,
-                    userProfileResponseDto.name()+" "+userProfileResponseDto.surname(),
-                    getAverageUserReviewValueUseCaseInterface.getAverageUserReviewValue(userId)
+                    userProfileResponseDto.name() + " " + userProfileResponseDto.surname(),
+                    score
             ));
         });
 
@@ -490,12 +496,13 @@ public class OfferRESTController {
 
         List<UserScoreWithPositionDto> userScoreWithPositionDtoList = new ArrayList<>();
         List<UserScoreDto> finalLambdaUserScoreDtoList = userScoreDtoList;
-        userScoreDtoList.forEach(userScoreDto -> userScoreWithPositionDtoList.add(new UserScoreWithPositionDto(
-                userScoreDto.userId(),
-                userScoreDto.nameAndSurname(),
-                userScoreDto.score(),
-                finalLambdaUserScoreDtoList.indexOf(userScoreDto)+1))
-        );
+        userScoreDtoList
+                .forEach(userScoreDto -> userScoreWithPositionDtoList.add(new UserScoreWithPositionDto(
+                        userScoreDto.userId(),
+                        userScoreDto.nameAndSurname(),
+                        userScoreDto.score(),
+                        finalLambdaUserScoreDtoList.indexOf(userScoreDto) + 1))
+                );
         return userScoreWithPositionDtoList;
     }
 
