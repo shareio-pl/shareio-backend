@@ -8,7 +8,7 @@ import org.mockito.*;
 import org.shareio.backend.core.model.OfferValidator;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
-import org.shareio.backend.core.usecases.port.out.GetOffersByNameDaoInterface;
+import org.shareio.backend.core.usecases.port.out.GetAllOffersDaoInterface;
 import org.shareio.backend.exceptions.MultipleValidationException;
 
 import java.time.LocalDateTime;
@@ -17,17 +17,17 @@ import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
-public class GetOffersByNameUseCaseServiceTests {
+public class GetAllOffersUseCaseServiceTests {
     AutoCloseable test_autoCloseable;
 
     @Mock
-    GetOffersByNameDaoInterface test_getOffersByNameDaoInterface;
+    GetAllOffersDaoInterface test_getAllOffersDaoInterface;
     @Mock
     OfferGetDto test_offerGetDto1;
     @Mock
     OfferGetDto test_offerGetDto2;
     @InjectMocks
-    GetOffersByNameUseCaseService test_getOffersByNameUseCaseService;
+    GetAllOffersUseCaseService test_getAllOffersUseCaseService;
 
     String testName = "John";
     String testSurname = "Doe";
@@ -67,9 +67,10 @@ public class GetOffersByNameUseCaseServiceTests {
     }
 
     @Test
-    void get_invalid_offer_with_matching_name_and_return_empty_list() {
+    void get_invalid_offers_and_return_empty_list() {
         try (MockedStatic<OfferValidator> utilities = Mockito.mockStatic(OfferValidator.class)) {
             testOfferId1 = UUID.randomUUID();
+            testOfferId2 = UUID.randomUUID();
             testPhotoId = UUID.randomUUID();
             testAddressId = UUID.randomUUID();
             testOwnerId = UUID.randomUUID();
@@ -104,15 +105,122 @@ public class GetOffersByNameUseCaseServiceTests {
                     testReviewValue,
                     testDate
             );
+            test_offerGetDto2 = new OfferGetDto(
+                    testOfferId2,
+                    testDate,
+                    Status.CREATED.toString(),
+                    testAddressId,
+                    testCountry,
+                    testRegion,
+                    testCity,
+                    testStreet,
+                    testHouseNumber,
+                    testFlatNumber,
+                    testPostCode,
+                    testLatitude,
+                    testLongitude,
+                    testTitle2,
+                    testCondition,
+                    testCategory,
+                    testDescription,
+                    testPhotoId,
+                    testOwnerId,
+                    testName,
+                    testSurname,
+                    testOwnerPhotoId,
+                    null,
+                    null,
+                    null,
+                    testReviewValue,
+                    testDate
+            );
 
             utilities.when(() -> OfferValidator.validateOffer(test_offerGetDto1)).thenThrow(MultipleValidationException.class);
-            when(test_getOffersByNameDaoInterface.getOffersByName(testTitle1)).thenReturn(List.of(test_offerGetDto1));
-            Assertions.assertEquals(0, test_getOffersByNameUseCaseService.getOfferResponseDtoListByName(testTitle1).size());
+            utilities.when(() -> OfferValidator.validateOffer(test_offerGetDto2)).thenThrow(MultipleValidationException.class);
+            when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
+
+            Assertions.assertEquals(0, test_getAllOffersUseCaseService.getAllOfferIdList().size());
         }
     }
 
     @Test
-    void get_no_offers_with_matching_name_and_return_empty_list() {
+    void get_one_valid_and_one_invalid_offer_and_return_one_id() {
+        try (MockedStatic<OfferValidator> utilities = Mockito.mockStatic(OfferValidator.class)) {
+            testOfferId1 = UUID.randomUUID();
+            testOfferId2 = UUID.randomUUID();
+            testPhotoId = UUID.randomUUID();
+            testAddressId = UUID.randomUUID();
+            testOwnerId = UUID.randomUUID();
+            testOwnerPhotoId = UUID.randomUUID();
+
+            test_offerGetDto1 = new OfferGetDto(
+                    testOfferId1,
+                    testDate,
+                    Status.CREATED.toString(),
+                    testAddressId,
+                    testCountry,
+                    testRegion,
+                    testCity,
+                    testStreet,
+                    testHouseNumber,
+                    testFlatNumber,
+                    testPostCode,
+                    testLatitude,
+                    testLongitude,
+                    testTitle1,
+                    testCondition,
+                    testCategory,
+                    testDescription,
+                    testPhotoId,
+                    testOwnerId,
+                    testName,
+                    testSurname,
+                    testOwnerPhotoId,
+                    null,
+                    null,
+                    null,
+                    testReviewValue,
+                    testDate
+            );
+            test_offerGetDto2 = new OfferGetDto(
+                    testOfferId2,
+                    testDate,
+                    Status.CREATED.toString(),
+                    testAddressId,
+                    testCountry,
+                    testRegion,
+                    testCity,
+                    testStreet,
+                    testHouseNumber,
+                    testFlatNumber,
+                    testPostCode,
+                    testLatitude,
+                    testLongitude,
+                    testTitle2,
+                    testCondition,
+                    testCategory,
+                    testDescription,
+                    testPhotoId,
+                    testOwnerId,
+                    testName,
+                    testSurname,
+                    testOwnerPhotoId,
+                    null,
+                    null,
+                    null,
+                    testReviewValue,
+                    testDate
+            );
+
+            utilities.when(() -> OfferValidator.validateOffer(test_offerGetDto1)).thenThrow(MultipleValidationException.class);
+            when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
+
+            Assertions.assertEquals(1, test_getAllOffersUseCaseService.getAllOfferIdList().size());
+        }
+    }
+
+    @Test
+    void get_one_valid_and_one_with_CANCELED_status_offers_and_return_one_id() {
         testOfferId1 = UUID.randomUUID();
         testOfferId2 = UUID.randomUUID();
         testPhotoId = UUID.randomUUID();
@@ -149,52 +257,8 @@ public class GetOffersByNameUseCaseServiceTests {
                 testReviewValue,
                 testDate
         );
-
         test_offerGetDto2 = new OfferGetDto(
                 testOfferId2,
-                testDate,
-                Status.CREATED.toString(),
-                testAddressId,
-                testCountry,
-                testRegion,
-                testCity,
-                testStreet,
-                testHouseNumber,
-                testFlatNumber,
-                testPostCode,
-                testLatitude,
-                testLongitude,
-                testTitle2,
-                testCondition,
-                testCategory,
-                testDescription,
-                testPhotoId,
-                testOwnerId,
-                testName,
-                testSurname,
-                testOwnerPhotoId,
-                null,
-                null,
-                null,
-                testReviewValue,
-                testDate
-        );
-
-        when(test_getOffersByNameDaoInterface.getOffersByName("test")).thenReturn(List.of());
-        Assertions.assertEquals(0, test_getOffersByNameUseCaseService.getOfferResponseDtoListByName(testTitle1).size());
-    }
-
-    @Test
-    void get_one_offer_with_matching_name_but_not_CREATED_and_return_empty_list() {
-        testOfferId1 = UUID.randomUUID();
-        testOfferId2 = UUID.randomUUID();
-        testPhotoId = UUID.randomUUID();
-        testAddressId = UUID.randomUUID();
-        testOwnerId = UUID.randomUUID();
-        testOwnerPhotoId = UUID.randomUUID();
-
-        test_offerGetDto1 = new OfferGetDto(
-                testOfferId1,
                 testDate,
                 Status.CANCELED.toString(),
                 testAddressId,
@@ -207,36 +271,6 @@ public class GetOffersByNameUseCaseServiceTests {
                 testPostCode,
                 testLatitude,
                 testLongitude,
-                testTitle1,
-                testCondition,
-                testCategory,
-                testDescription,
-                testPhotoId,
-                testOwnerId,
-                testName,
-                testSurname,
-                testOwnerPhotoId,
-                null,
-                null,
-                null,
-                testReviewValue,
-                testDate
-        );
-
-        test_offerGetDto2 = new OfferGetDto(
-                testOfferId2,
-                testDate,
-                Status.CREATED.toString(),
-                testAddressId,
-                testCountry,
-                testRegion,
-                testCity,
-                testStreet,
-                testHouseNumber,
-                testFlatNumber,
-                testPostCode,
-                testLatitude,
-                testLongitude,
                 testTitle2,
                 testCondition,
                 testCategory,
@@ -253,12 +287,13 @@ public class GetOffersByNameUseCaseServiceTests {
                 testDate
         );
 
-        when(test_getOffersByNameDaoInterface.getOffersByName(testTitle1)).thenReturn(List.of(test_offerGetDto1));
-        Assertions.assertEquals(0, test_getOffersByNameUseCaseService.getOfferResponseDtoListByName(testTitle1).size());
+        when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
+
+        Assertions.assertEquals(1, test_getAllOffersUseCaseService.getAllOfferIdList().size());
     }
 
     @Test
-    void get_one_offer_with_matching_name_and_return_its_id() {
+    void get_one_valid_and_one_with_FINISHED_status_offers_and_return_one_id() {
         testOfferId1 = UUID.randomUUID();
         testOfferId2 = UUID.randomUUID();
         testPhotoId = UUID.randomUUID();
@@ -295,11 +330,10 @@ public class GetOffersByNameUseCaseServiceTests {
                 testReviewValue,
                 testDate
         );
-
         test_offerGetDto2 = new OfferGetDto(
                 testOfferId2,
                 testDate,
-                Status.CREATED.toString(),
+                Status.FINISHED.toString(),
                 testAddressId,
                 testCountry,
                 testRegion,
@@ -326,13 +360,13 @@ public class GetOffersByNameUseCaseServiceTests {
                 testDate
         );
 
-        when(test_getOffersByNameDaoInterface.getOffersByName(testTitle1)).thenReturn(List.of(test_offerGetDto1));
-        UUID matchingNameId = Assertions.assertDoesNotThrow(() -> test_getOffersByNameUseCaseService.getOfferResponseDtoListByName(testTitle1).getFirst());
-        Assertions.assertNotNull(matchingNameId);
+        when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
+
+        Assertions.assertEquals(1, test_getAllOffersUseCaseService.getAllOfferIdList().size());
     }
 
     @Test
-    void get_two_offers_with_matching_name_and_return_two_ids()
+    void get_two_valid_offers_and_return_two_ids()
     {
         testOfferId1 = UUID.randomUUID();
         testOfferId2 = UUID.randomUUID();
@@ -370,7 +404,6 @@ public class GetOffersByNameUseCaseServiceTests {
                 testReviewValue,
                 testDate
         );
-
         test_offerGetDto2 = new OfferGetDto(
                 testOfferId2,
                 testDate,
@@ -385,7 +418,7 @@ public class GetOffersByNameUseCaseServiceTests {
                 testPostCode,
                 testLatitude,
                 testLongitude,
-                testTitle1,
+                testTitle2,
                 testCondition,
                 testCategory,
                 testDescription,
@@ -401,7 +434,9 @@ public class GetOffersByNameUseCaseServiceTests {
                 testDate
         );
 
-        when(test_getOffersByNameDaoInterface.getOffersByName(testTitle1)).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
-        Assertions.assertEquals(2, test_getOffersByNameUseCaseService.getOfferResponseDtoListByName(testTitle1).size());
+        when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
+
+        Assertions.assertEquals(2, test_getAllOffersUseCaseService.getAllOfferIdList().size());
+        Assertions.assertNotNull(test_getAllOffersUseCaseService.getAllOfferIdList().getFirst());
     }
 }

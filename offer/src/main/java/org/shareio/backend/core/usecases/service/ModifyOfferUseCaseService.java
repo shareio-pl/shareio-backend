@@ -43,7 +43,7 @@ public class ModifyOfferUseCaseService implements ModifyOfferUseCaseInterface {
         offer.setDescription(offerModifyDto.description());
         offer.setAddress(address);
         offer.getAddress().setLocation(LocationCalculator.getLocationFromAddress(offerModifyDto.addressSaveDto().country(), offerModifyDto.addressSaveDto().city(), offerModifyDto.addressSaveDto().street(), offerModifyDto.addressSaveDto().houseNumber()));
-        offer.setCondition(Condition.valueOf(offerModifyDto.title()));
+        offer.setCondition(Condition.valueOf(offerModifyDto.condition()));
         offer.setCategory(Category.valueOf(offerModifyDto.category()));
         updateOfferChangeMetadataCommandInterface.updateOfferMetadata(offer.toSnapshot());
     }

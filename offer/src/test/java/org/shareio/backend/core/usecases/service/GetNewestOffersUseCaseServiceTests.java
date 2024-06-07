@@ -24,18 +24,14 @@ class GetNewestOffersUseCaseServiceTests {
 
     @Mock
     GetAllOffersDaoInterface test_getAllOffersDaoInterface;
-
-    @InjectMocks
-    GetNewestOffersUseCaseService test_getNewestOffersUseCaseService;
-
     @Mock
     OfferGetDto test_offerGetDto1;
-
     @Mock
     OfferGetDto test_offerGetDto2;
-
     @Mock
     OfferGetDto test_offerGetDto3;
+    @InjectMocks
+    GetNewestOffersUseCaseService test_getNewestOffersUseCaseService;
 
     @BeforeEach
     void setUp() {

@@ -65,6 +65,7 @@ class AddReviewUseCaseServiceTests {
     UUID testOwnerId = null;
     UUID testOwnerPhotoId = null;
     UUID testReviewId = null;
+    UUID testReceiverId = null;
 
     @BeforeEach
     void setUp() {
@@ -98,7 +99,6 @@ class AddReviewUseCaseServiceTests {
         testPhotoId = UUID.randomUUID();
         testOwnerId = UUID.randomUUID();
         testOwnerPhotoId = UUID.randomUUID();
-        testReviewId = UUID.randomUUID();
 
         test_offerGetDto = new OfferGetDto(
                 testOfferId,
@@ -125,7 +125,7 @@ class AddReviewUseCaseServiceTests {
                 testOwnerPhotoId,
                 null,
                 null,
-                testReviewId,
+                null,
                 testReviewValue,
                 testDate
         );
@@ -144,6 +144,7 @@ class AddReviewUseCaseServiceTests {
         testOwnerId = UUID.randomUUID();
         testOwnerPhotoId = UUID.randomUUID();
         testReviewId = UUID.randomUUID();
+        testReceiverId = UUID.randomUUID();
 
         test_offerGetDto = new OfferGetDto(
                 testOfferId,
@@ -168,8 +169,8 @@ class AddReviewUseCaseServiceTests {
                 testName,
                 testSurname,
                 testOwnerPhotoId,
-                null, // TODO: if this is finished, this shouldn't be null
-                null,
+                testReceiverId,
+                testDate,
                 testReviewId,
                 testReviewValue,
                 testDate

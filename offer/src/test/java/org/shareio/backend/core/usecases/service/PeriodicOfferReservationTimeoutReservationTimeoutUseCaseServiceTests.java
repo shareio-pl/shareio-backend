@@ -23,7 +23,6 @@ import static org.mockito.Mockito.*;
 
 class PeriodicOfferReservationTimeoutReservationTimeoutUseCaseServiceTests {
 
-
     AutoCloseable test_autoCloseable;
 
     @Mock
