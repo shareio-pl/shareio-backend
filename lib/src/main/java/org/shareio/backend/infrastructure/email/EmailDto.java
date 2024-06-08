@@ -4,5 +4,4 @@ public record EmailDto(
         String messageTitle,
         String messageBody
 ) {
-
 }

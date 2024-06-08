@@ -3,7 +3,6 @@ package org.shareio.backend;
 
 public class EnvGetter {
 
-
     public static String getImage() {
         if (System.getenv("IMAGE_ADDRESS").isBlank()) {
             throw new IllegalStateException("Could not load IMAGE_ADDRESS from envs!");

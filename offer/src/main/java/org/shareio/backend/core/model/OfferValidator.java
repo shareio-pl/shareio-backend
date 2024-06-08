@@ -153,8 +153,6 @@ public class OfferValidator {
     }
 
 
-
-
     public static void validateCondition(String condition) throws ValidationException {
         ObjectValidator.validateObjectIsNotNull(condition);
         try {
@@ -179,7 +177,7 @@ public class OfferValidator {
         StringValidator.validateStringLength(description, Const.MIN_DESCRIPTION_LENGTH, Const.MAX_DESCRIPTION_LENGTH);
     }
 
-    private OfferValidator(){
+    private OfferValidator() {
         throw new IllegalArgumentException("Utility class");
     }
 

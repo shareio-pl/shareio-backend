@@ -21,6 +21,6 @@ public class HealthCheckController {
 
     @GetMapping(value = "/health", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> healthcheck() {
-        return ResponseEntity.ok("Ok, profile: "+authenticationHandler.getActiveProfile());
+        return ResponseEntity.ok("Ok, profile: " + authenticationHandler.getActiveProfile());
     }
 }

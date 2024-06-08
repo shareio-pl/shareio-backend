@@ -13,16 +13,16 @@ import org.shareio.backend.core.usecases.port.dto.UserPasswordDto;
 import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
 import org.shareio.backend.core.usecases.port.dto.UserProfileResponseDto;
 import org.shareio.backend.core.usecases.port.in.*;
+import org.shareio.backend.exceptions.ImageException;
 import org.shareio.backend.exceptions.LocationCalculationException;
 import org.shareio.backend.exceptions.MultipleValidationException;
+import org.shareio.backend.external.image.ImageStore;
+import org.shareio.backend.external.image.ImageStoreInterface;
 import org.shareio.backend.security.AuthenticationHandler;
 import org.shareio.backend.security.RequestLogHandler;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -41,7 +41,6 @@ public class UserRESTController {
     ModifyUserUseCaseInterface modifyUserUseCaseInterface;
     GetAllUserIdListUseCaseInterface getAllUserIdListUseCaseInterface;
     SetProfilePhotoUseCaseInterface setProfilePhotoUseCaseInterface;
-
 
     @GetMapping(value = "/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> getUser(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
@@ -82,9 +81,7 @@ public class UserRESTController {
         } catch (IllegalArgumentException e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, e.getMessage());
             return new ErrorResponse(Const.ILL_ARG_ERR + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-        catch (LocationCalculationException e)
-        {
+        } catch (LocationCalculationException e) {
             RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.BAD_REQUEST, "Location error");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -97,46 +94,27 @@ public class UserRESTController {
             UUID newPhotoId = UUID.randomUUID(); // TODO: I think everything that works with files and shareio-image should be extracted into a class in lib
             String imageServiceUrl = EnvGetter.getImage();
             Resource fileResource = file.getResource();
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("file", fileResource);
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-            String serverUrl = imageServiceUrl + "/image/createPNG/"; // TODO: change endpoint to call
+            ImageStoreInterface imageStore = new ImageStore(imageServiceUrl);
 
             // Create new image
-            RestTemplate restTemplate = new RestTemplate();
             try {
-                ResponseEntity<String> response = restTemplate.postForEntity(serverUrl + newPhotoId, requestEntity, String.class);
-
-                if (!response.getStatusCode().is2xxSuccessful()) {
-                    RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, "Photo could not be added");
-                    return new ErrorResponse(Const.API_NOT_RESP_ERR + ": Photo could not be added", HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-            } catch (Exception e) {
-                RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, "Photo could not be added");
-                return new ErrorResponse(Const.API_NOT_RESP_ERR + ": Photo could not be added", HttpStatus.INTERNAL_SERVER_ERROR);
-
+                imageStore.CreateImage(newPhotoId, fileResource);
+            } catch (ImageException e) {
+                RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FAILED_DEPENDENCY, "Photo could not be added");
+                return new ErrorResponse(Const.API_NOT_RESP_ERR + ": Photo could not be added", HttpStatus.FAILED_DEPENDENCY);
             }
 
             // Set photoId in user
             UUID oldPhotoId = setProfilePhotoUseCaseInterface.setProfilePhoto(userId, newPhotoId);
 
             // Delete old photo
-            if(oldPhotoId != Const.DEFAULT_PHOTO_ID){
-                restTemplate = new RestTemplate();
-                serverUrl = imageServiceUrl + "/image/delete/";
-                try {
-
-                    restTemplate.delete(serverUrl + oldPhotoId, String.class);
-
-                } catch (Exception e) {
-                    RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.INTERNAL_SERVER_ERROR, "Photo could not be deleted");
-                    return new ErrorResponse(Const.API_NOT_RESP_ERR + ": Photo could not be deleted", HttpStatus.INTERNAL_SERVER_ERROR);
-
-                }
+            try {
+                imageStore.DeleteImage(oldPhotoId);
+            } catch (Exception e) {
+                RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FAILED_DEPENDENCY, "Photo could not be deleted");
+                return new ErrorResponse(Const.API_NOT_RESP_ERR + ": Photo could not be deleted", HttpStatus.FAILED_DEPENDENCY);
             }
+
             return new CorrectResponse(userId, Const.SUCC_ERR, HttpStatus.OK);
         } else {
             return new ErrorResponse("Changing profile photo not allowed", HttpStatus.FORBIDDEN);

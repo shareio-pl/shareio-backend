@@ -6,7 +6,6 @@ import org.shareio.backend.core.model.Offer;
 import org.shareio.backend.core.model.OfferSnapshot;
 import org.shareio.backend.core.model.OfferValidator;
 import org.shareio.backend.core.model.User;
-import org.shareio.backend.core.model.vo.Location;
 import org.shareio.backend.core.model.vo.PhotoId;
 import org.shareio.backend.core.usecases.port.dto.OfferSaveDto;
 import org.shareio.backend.core.usecases.port.dto.OfferSaveResponseDto;

@@ -35,12 +35,12 @@ public class Offer {
     public static Offer fromDto(OfferGetDto offerGetDto) {
         User receiver = null;
         Review review = null;
-        if (   Status.valueOf(offerGetDto.status()).equals(Status.RESERVED)
-            || Status.valueOf(offerGetDto.status()).equals(Status.FINISHED)
-            ) {
+        if (Status.valueOf(offerGetDto.status()).equals(Status.RESERVED)
+                || Status.valueOf(offerGetDto.status()).equals(Status.FINISHED)
+        ) {
             receiver = new User(new UserId(offerGetDto.recieverId()), null, null, null, null, null, null, null);
         }
-        if(offerGetDto.reviewId() != null){
+        if (offerGetDto.reviewId() != null) {
             review = new Review(new ReviewId(offerGetDto.reviewId()), offerGetDto.revievValue(), offerGetDto.reviewDate());
 
         }
@@ -85,7 +85,7 @@ public class Offer {
         if (this.status.equals(Status.RESERVED) && this.receiver != null) {
             receiverSnapshot = new UserSnapshot(this.receiver);
         }
-        if(this.review != null){
+        if (this.review != null) {
             reviewSnapshot = new ReviewSnapshot(this.review);
         }
         return new OfferSnapshot(this, receiverSnapshot, reviewSnapshot);

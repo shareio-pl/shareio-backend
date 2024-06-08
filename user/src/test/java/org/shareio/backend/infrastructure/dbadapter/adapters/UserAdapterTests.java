@@ -21,7 +21,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -48,12 +47,12 @@ class UserAdapterTests {
 
     UUID test_fail_user_id;
     UUID test_correct_user_id;
-    String test_email = "test@test.com";
+    final String test_email = "test@test.com";
     UserEntity test_userEntity;
-    String test_pw_value="1234";
-    String test_string = "test";
-    Double test_double = 1.0;
-    LocalDate test_LocalDate = LocalDate.MIN;
+    final String test_pw_value="1234";
+    final String test_string = "test";
+    final Double test_double = 1.0;
+    final LocalDate test_LocalDate = LocalDate.MIN;
 
     @BeforeEach
     public void setUp() {

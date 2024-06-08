@@ -12,14 +12,14 @@ import java.util.UUID;
 public class IdentityHandler {
 
     public boolean isSameUser(HttpServletRequest httpRequest, UUID userId) {
-        if(!httpRequest.getHeaders("role").asIterator().hasNext()){
+        if (!httpRequest.getHeaders("role").asIterator().hasNext()) {
             return false;
         }
-        return Objects.equals(httpRequest.getHeaders("id").nextElement(),userId.toString());
+        return Objects.equals(httpRequest.getHeaders("id").nextElement(), userId.toString());
     }
 
-    public UUID getUserIdFromHeader(HttpServletRequest httpRequest){
-        if(!httpRequest.getHeaders("id").asIterator().hasNext()){
+    public UUID getUserIdFromHeader(HttpServletRequest httpRequest) {
+        if (!httpRequest.getHeaders("id").asIterator().hasNext()) {
             return null;
         }
         return UUID.fromString(httpRequest.getHeaders("id").nextElement());
