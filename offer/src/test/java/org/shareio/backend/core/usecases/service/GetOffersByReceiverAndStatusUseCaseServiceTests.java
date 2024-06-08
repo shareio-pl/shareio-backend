@@ -15,10 +15,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static java.lang.Double.NaN;
 import static org.mockito.Mockito.*;
-
-public class GetAverageUserReviewUseCaseServiceTests {
+public class GetOffersByReceiverAndStatusUseCaseServiceTests {
     AutoCloseable test_autoCloseable;
 
     @Mock
@@ -28,7 +26,7 @@ public class GetAverageUserReviewUseCaseServiceTests {
     @Mock
     OfferGetDto test_offerGetDto2;
     @InjectMocks
-    GetAverageUserReviewValueUseCaseService test_getAverageUserReviewValueUseCaseService;
+    GetOffersByReceiverAndStatusUseCaseService test_getOffersByReceiverAndStatusUseCaseService;
 
     String testName = "John";
     String testSurname = "Doe";
@@ -48,17 +46,16 @@ public class GetAverageUserReviewUseCaseServiceTests {
     Double testLatitude = 1.5;
     Double testLongitude = 1.0;
     LocalDateTime testDate = LocalDateTime.now();
-    Double testReviewValue1 = 3.5;
-    Double testReviewValue2 = 2.5;
+    Double testReviewValue = 3.5;
 
     UUID testOfferId1 = null;
     UUID testOfferId2 = null;
     UUID testPhotoId = null;
     UUID testAddressId = null;
-    UUID testOwnerId = null;
+    UUID testOwnerId1 = null;
     UUID testOwnerPhotoId = null;
-    UUID testReviewId1 = null;
-    UUID testReviewId2 = null;
+    UUID testReceiverId1 = null;
+    UUID testReceiverId2 = null;
 
     @BeforeEach
     void setUp() {
@@ -71,21 +68,21 @@ public class GetAverageUserReviewUseCaseServiceTests {
     }
 
     @Test
-    void get_invalid_offers_and_return_NaN() {
+    void get_invalid_offers_matching_criteria_and_return_empty_list() {
         try (MockedStatic<OfferValidator> utilities = Mockito.mockStatic(OfferValidator.class)) {
             testOfferId1 = UUID.randomUUID();
             testOfferId2 = UUID.randomUUID();
             testPhotoId = UUID.randomUUID();
             testAddressId = UUID.randomUUID();
-            testOwnerId = UUID.randomUUID();
+            testOwnerId1 = UUID.randomUUID();
             testOwnerPhotoId = UUID.randomUUID();
-            testReviewId1 = UUID.randomUUID();
-            testReviewId2 = UUID.randomUUID();
+            testReceiverId1 = UUID.randomUUID();
+            testReceiverId2 = UUID.randomUUID();
 
             test_offerGetDto1 = new OfferGetDto(
                     testOfferId1,
                     testDate,
-                    Status.FINISHED.toString(),
+                    Status.RESERVED.toString(),
                     testAddressId,
                     testCountry,
                     testRegion,
@@ -101,20 +98,21 @@ public class GetAverageUserReviewUseCaseServiceTests {
                     testCategory,
                     testDescription,
                     testPhotoId,
-                    testOwnerId,
+                    testOwnerId1,
                     testName,
                     testSurname,
                     testOwnerPhotoId,
+                    testReceiverId1,
+                    testDate,
                     null,
-                    null,
-                    testReviewId1,
-                    testReviewValue1,
+                    testReviewValue,
                     testDate
             );
+
             test_offerGetDto2 = new OfferGetDto(
                     testOfferId2,
                     testDate,
-                    Status.FINISHED.toString(),
+                    Status.RESERVED.toString(),
                     testAddressId,
                     testCountry,
                     testRegion,
@@ -130,40 +128,40 @@ public class GetAverageUserReviewUseCaseServiceTests {
                     testCategory,
                     testDescription,
                     testPhotoId,
-                    testOwnerId,
+                    testOwnerId1,
                     testName,
                     testSurname,
                     testOwnerPhotoId,
+                    testReceiverId2,
+                    testDate,
                     null,
-                    null,
-                    testReviewId2,
-                    testReviewValue2,
+                    testReviewValue,
                     testDate
             );
 
             utilities.when(() -> OfferValidator.validateOffer(test_offerGetDto1)).thenThrow(MultipleValidationException.class);
             utilities.when(() -> OfferValidator.validateOffer(test_offerGetDto2)).thenThrow(MultipleValidationException.class);
             when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
-
-            Assertions.assertEquals(NaN, test_getAverageUserReviewValueUseCaseService.getAverageUserReviewValue(testOwnerId));
+            Assertions.assertEquals(0, test_getOffersByReceiverAndStatusUseCaseService.getReservedOffersByRecieverAndStatus(testReceiverId1, Status.RESERVED).size());
         }
     }
 
     @Test
-    void get_one_offer_belonging_and_one_not_to_the_user_and_return_first_review_value() {
+    void get_one_offer_belonging_to_user_but_with_wrong_status_and_return_empty_list()
+    {
         testOfferId1 = UUID.randomUUID();
         testOfferId2 = UUID.randomUUID();
         testPhotoId = UUID.randomUUID();
         testAddressId = UUID.randomUUID();
-        testOwnerId = UUID.randomUUID();
+        testOwnerId1 = UUID.randomUUID();
         testOwnerPhotoId = UUID.randomUUID();
-        testReviewId1 = UUID.randomUUID();
-        testReviewId2 = UUID.randomUUID();
+        testReceiverId1 = UUID.randomUUID();
+        testReceiverId2 = UUID.randomUUID();
 
         test_offerGetDto1 = new OfferGetDto(
                 testOfferId1,
                 testDate,
-                Status.FINISHED.toString(),
+                Status.CREATED.toString(),
                 testAddressId,
                 testCountry,
                 testRegion,
@@ -179,20 +177,21 @@ public class GetAverageUserReviewUseCaseServiceTests {
                 testCategory,
                 testDescription,
                 testPhotoId,
-                testOwnerId,
+                testOwnerId1,
                 testName,
                 testSurname,
                 testOwnerPhotoId,
+                testReceiverId1,
+                testDate,
                 null,
-                null,
-                testReviewId1,
-                testReviewValue1,
+                testReviewValue,
                 testDate
         );
+
         test_offerGetDto2 = new OfferGetDto(
                 testOfferId2,
                 testDate,
-                Status.FINISHED.toString(),
+                Status.RESERVED.toString(),
                 testAddressId,
                 testCountry,
                 testRegion,
@@ -208,36 +207,37 @@ public class GetAverageUserReviewUseCaseServiceTests {
                 testCategory,
                 testDescription,
                 testPhotoId,
-                UUID.randomUUID(),
+                testOwnerId1,
                 testName,
                 testSurname,
                 testOwnerPhotoId,
+                testReceiverId2,
+                testDate,
                 null,
-                null,
-                testReviewId2,
-                testReviewValue2,
+                testReviewValue,
                 testDate
         );
 
         when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
-        Assertions.assertEquals(testReviewValue1, test_getAverageUserReviewValueUseCaseService.getAverageUserReviewValue(testOwnerId));
+        Assertions.assertEquals(0, test_getOffersByReceiverAndStatusUseCaseService.getReservedOffersByRecieverAndStatus(testReceiverId1, Status.RESERVED).size());
     }
 
     @Test
-    void get_two_offers_belonging_to_user_but_one_with_null_review_id_and_return_first_review_value() {
+    void get_one_one_correct_offers_belonging_to_user_and_return_list_with_its_id()
+    {
         testOfferId1 = UUID.randomUUID();
         testOfferId2 = UUID.randomUUID();
         testPhotoId = UUID.randomUUID();
         testAddressId = UUID.randomUUID();
-        testOwnerId = UUID.randomUUID();
+        testOwnerId1 = UUID.randomUUID();
         testOwnerPhotoId = UUID.randomUUID();
-        testReviewId1 = UUID.randomUUID();
-        testReviewId2 = UUID.randomUUID();
+        testReceiverId1 = UUID.randomUUID();
+        testReceiverId2 = UUID.randomUUID();
 
         test_offerGetDto1 = new OfferGetDto(
                 testOfferId1,
                 testDate,
-                Status.FINISHED.toString(),
+                Status.RESERVED.toString(),
                 testAddressId,
                 testCountry,
                 testRegion,
@@ -253,20 +253,21 @@ public class GetAverageUserReviewUseCaseServiceTests {
                 testCategory,
                 testDescription,
                 testPhotoId,
-                testOwnerId,
+                testOwnerId1,
                 testName,
                 testSurname,
                 testOwnerPhotoId,
+                testReceiverId1,
+                testDate,
                 null,
-                null,
-                testReviewId1,
-                testReviewValue1,
+                testReviewValue,
                 testDate
         );
+
         test_offerGetDto2 = new OfferGetDto(
                 testOfferId2,
                 testDate,
-                Status.FINISHED.toString(),
+                Status.RESERVED.toString(),
                 testAddressId,
                 testCountry,
                 testRegion,
@@ -282,166 +283,19 @@ public class GetAverageUserReviewUseCaseServiceTests {
                 testCategory,
                 testDescription,
                 testPhotoId,
-                testOwnerId,
+                testOwnerId1,
                 testName,
                 testSurname,
                 testOwnerPhotoId,
+                testReceiverId2,
+                testDate,
                 null,
-                null,
-                null,
-                testReviewValue2,
+                testReviewValue,
                 testDate
         );
 
         when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
-        Assertions.assertEquals(testReviewValue1, test_getAverageUserReviewValueUseCaseService.getAverageUserReviewValue(testOwnerId));
-    }
-
-    @Test
-    void get_two_offers_belonging_to_user_but_one_with_wrong_status_and_return_first_review_value() {
-        testOfferId1 = UUID.randomUUID();
-        testOfferId2 = UUID.randomUUID();
-        testPhotoId = UUID.randomUUID();
-        testAddressId = UUID.randomUUID();
-        testOwnerId = UUID.randomUUID();
-        testOwnerPhotoId = UUID.randomUUID();
-        testReviewId1 = UUID.randomUUID();
-        testReviewId2 = UUID.randomUUID();
-
-        test_offerGetDto1 = new OfferGetDto(
-                testOfferId1,
-                testDate,
-                Status.FINISHED.toString(),
-                testAddressId,
-                testCountry,
-                testRegion,
-                testCity,
-                testStreet,
-                testHouseNumber,
-                testFlatNumber,
-                testPostCode,
-                testLatitude,
-                testLongitude,
-                testTitle1,
-                testCondition,
-                testCategory,
-                testDescription,
-                testPhotoId,
-                testOwnerId,
-                testName,
-                testSurname,
-                testOwnerPhotoId,
-                null,
-                null,
-                testReviewId1,
-                testReviewValue1,
-                testDate
-        );
-        test_offerGetDto2 = new OfferGetDto(
-                testOfferId2,
-                testDate,
-                Status.CANCELED.toString(),
-                testAddressId,
-                testCountry,
-                testRegion,
-                testCity,
-                testStreet,
-                testHouseNumber,
-                testFlatNumber,
-                testPostCode,
-                testLatitude,
-                testLongitude,
-                testTitle2,
-                testCondition,
-                testCategory,
-                testDescription,
-                testPhotoId,
-                testOwnerId,
-                testName,
-                testSurname,
-                testOwnerPhotoId,
-                null,
-                null,
-                testReviewId2,
-                testReviewValue2,
-                testDate
-        );
-
-        when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
-        Assertions.assertEquals(testReviewValue1, test_getAverageUserReviewValueUseCaseService.getAverageUserReviewValue(testOwnerId));
-    }
-
-    @Test
-    void get_two_valid_offers_belonging_to_user_and_return_calculated_value() {
-        testOfferId1 = UUID.randomUUID();
-        testOfferId2 = UUID.randomUUID();
-        testPhotoId = UUID.randomUUID();
-        testAddressId = UUID.randomUUID();
-        testOwnerId = UUID.randomUUID();
-        testOwnerPhotoId = UUID.randomUUID();
-        testReviewId1 = UUID.randomUUID();
-        testReviewId2 = UUID.randomUUID();
-
-        test_offerGetDto1 = new OfferGetDto(
-                testOfferId1,
-                testDate,
-                Status.FINISHED.toString(),
-                testAddressId,
-                testCountry,
-                testRegion,
-                testCity,
-                testStreet,
-                testHouseNumber,
-                testFlatNumber,
-                testPostCode,
-                testLatitude,
-                testLongitude,
-                testTitle1,
-                testCondition,
-                testCategory,
-                testDescription,
-                testPhotoId,
-                testOwnerId,
-                testName,
-                testSurname,
-                testOwnerPhotoId,
-                null,
-                null,
-                testReviewId1,
-                testReviewValue1,
-                testDate
-        );
-        test_offerGetDto2 = new OfferGetDto(
-                testOfferId2,
-                testDate,
-                Status.FINISHED.toString(),
-                testAddressId,
-                testCountry,
-                testRegion,
-                testCity,
-                testStreet,
-                testHouseNumber,
-                testFlatNumber,
-                testPostCode,
-                testLatitude,
-                testLongitude,
-                testTitle2,
-                testCondition,
-                testCategory,
-                testDescription,
-                testPhotoId,
-                testOwnerId,
-                testName,
-                testSurname,
-                testOwnerPhotoId,
-                null,
-                null,
-                testReviewId2,
-                testReviewValue2,
-                testDate
-        );
-
-        when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
-        Assertions.assertEquals((testReviewValue1 + testReviewValue2) / 2, test_getAverageUserReviewValueUseCaseService.getAverageUserReviewValue(testOwnerId));
+        Assertions.assertEquals(1, test_getOffersByReceiverAndStatusUseCaseService.getReservedOffersByRecieverAndStatus(testReceiverId1, Status.RESERVED).size());
+        Assertions.assertEquals(testOfferId1, test_getOffersByReceiverAndStatusUseCaseService.getReservedOffersByRecieverAndStatus(testReceiverId1, Status.RESERVED).getFirst());
     }
 }
