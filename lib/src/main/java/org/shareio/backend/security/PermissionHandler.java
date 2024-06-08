@@ -10,18 +10,18 @@ import java.util.Objects;
 @Service
 public class PermissionHandler {
 
-    public boolean isUser(HttpServletRequest httpRequest){
+    public boolean isUser(HttpServletRequest httpRequest) {
 
-        if(!httpRequest.getHeaders("role").asIterator().hasNext()){
+        if (!httpRequest.getHeaders("role").asIterator().hasNext()) {
             return false;
         }
-        return Objects.equals(httpRequest.getHeaders("role").nextElement(),"USER");
+        return Objects.equals(httpRequest.getHeaders("role").nextElement(), "USER");
     }
 
-    public boolean isAdmin(HttpServletRequest httpRequest){
-        if(!httpRequest.getHeaders("role").asIterator().hasNext()){
+    public boolean isAdmin(HttpServletRequest httpRequest) {
+        if (!httpRequest.getHeaders("role").asIterator().hasNext()) {
             return false;
         }
-        return Objects.equals(httpRequest.getHeaders("role").nextElement(),"ADMIN");
+        return Objects.equals(httpRequest.getHeaders("role").nextElement(), "ADMIN");
     }
 }

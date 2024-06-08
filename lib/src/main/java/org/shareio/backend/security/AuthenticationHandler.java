@@ -30,21 +30,21 @@ public class AuthenticationHandler {
 
     public boolean authenticateRequestForUserIdentity(HttpServletRequest httpRequest, UUID userId) {
         String logMessage = "\n------- AUTHENTICATE REQUEST -------\n";
-        if(checkIfTestProfile()){
+        if (checkIfTestProfile()) {
             return true;
         }
         if (checkAdminRole(httpRequest)) {
             return true;
         }
-        logMessage+=("IsSameUser: "+ identityHandler.isSameUser(httpRequest, userId)+"\n");
+        logMessage += ("IsSameUser: " + identityHandler.isSameUser(httpRequest, userId) + "\n");
         if (permissionHandler.isUser(httpRequest) && identityHandler.isSameUser(httpRequest, userId)) {
-            logMessage+=("Authentication sucessful for user "+ userId+"\n");
-            logMessage+=(ME);
+            logMessage += ("Authentication sucessful for user " + userId + "\n");
+            logMessage += (ME);
             log.error(logMessage);
             return true;
         } else {
-            logMessage+=("Authentication failed for user "+ httpRequest.getHeaders("id").nextElement()+": Identity mismatch!\n");
-            logMessage+=(ME);
+            logMessage += ("Authentication failed for user " + httpRequest.getHeaders("id").nextElement() + ": Identity mismatch!\n");
+            logMessage += (ME);
             log.error(logMessage);
             return false;
         }
@@ -53,26 +53,25 @@ public class AuthenticationHandler {
 
     public boolean authenticateRequest(HttpServletRequest httpRequest, UUID userId) {
         String logMessage = "\n------- AUTHENTICATE REQUEST -------\n";
-        logMessage+= "Requested endpoint: " + httpRequest.getRequestURI() + "\n";
-        if(checkIfTestProfile()){
+        logMessage += "Requested endpoint: " + httpRequest.getRequestURI() + "\n";
+        if (checkIfTestProfile()) {
             return true;
         }
-        if(checkAdminRole(httpRequest)){
+        if (checkAdminRole(httpRequest)) {
             return true;
         }
-        if(permissionHandler.isUser(httpRequest)){
-            logMessage+=("Authentication sucessful for user "+ userId+"\n");
-            logMessage+=(ME);
+        if (permissionHandler.isUser(httpRequest)) {
+            logMessage += ("Authentication sucessful for user " + userId + "\n");
+            logMessage += (ME);
             log.error(logMessage);
             return true;
-        }
-        else {
-            logMessage+=("Authentication failed for user "+ userId+"\n");
-            logMessage+=(ME);
+        } else {
+            logMessage += ("Authentication failed for user " + userId + "\n");
+            logMessage += (ME);
             log.error(logMessage);
             return false;
         }
-        }
+    }
 
     private boolean checkIfTestProfile() {
         String logMessage = "\n------- VERIFY PROFILE -------\n";
@@ -83,9 +82,7 @@ public class AuthenticationHandler {
             logMessage += (ME);
             log.error(logMessage);
             return true;
-        }
-
-        else {
+        } else {
             logMessage += ("Production profile" + "\n");
             logMessage += (ME);
             log.error(logMessage);
@@ -93,19 +90,18 @@ public class AuthenticationHandler {
         }
     }
 
-    private boolean checkAdminRole(HttpServletRequest httpRequest){
+    private boolean checkAdminRole(HttpServletRequest httpRequest) {
         String logMessage = "\n------- VERIFY PERMISSION -------\n";
-        logMessage+=("IsAdmin: "+ permissionHandler.isAdmin(httpRequest)+"\n");
-        logMessage+=("IsUser: "+ permissionHandler.isUser(httpRequest)+"\n");
-        if (permissionHandler.isAdmin(httpRequest)){
-            logMessage+=("Admin permission - skipping authentication\n");
-            logMessage+=(ME);
+        logMessage += ("IsAdmin: " + permissionHandler.isAdmin(httpRequest) + "\n");
+        logMessage += ("IsUser: " + permissionHandler.isUser(httpRequest) + "\n");
+        if (permissionHandler.isAdmin(httpRequest)) {
+            logMessage += ("Admin permission - skipping authentication\n");
+            logMessage += (ME);
             log.error(logMessage);
             return true;
-        }
-        else {
-            logMessage+=("Non-admin permission\n");
-            logMessage+=(ME);
+        } else {
+            logMessage += ("Non-admin permission\n");
+            logMessage += (ME);
             log.error(logMessage);
             return false;
         }

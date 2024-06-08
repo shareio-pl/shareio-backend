@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.json.JSONException;
 import org.shareio.backend.core.model.User;
 import org.shareio.backend.core.model.vo.AccountType;
-import org.shareio.backend.core.model.vo.Location;
 import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
 import org.shareio.backend.core.usecases.port.in.AddUserUseCaseInterface;
 import org.shareio.backend.core.usecases.port.out.GetUserProfileByEmailDaoInterface;

@@ -7,6 +7,6 @@ import java.util.Objects;
 public class ObjectValidator {
 
     public static void validateObjectIsNotNull(Object object) throws ValidationException {
-        if(Objects.isNull(object)) throw new ValidationException("Object is null");
+        if (Objects.isNull(object)) throw new ValidationException("Object is null");
     }
 }

@@ -161,7 +161,7 @@ public class AddressValidator {
         DoubleValidator.validateDoubleNotEmpty(latOrLon);
     }
 
-    private AddressValidator(){
+    private AddressValidator() {
         throw new IllegalArgumentException("Utility class");
     }
 }
