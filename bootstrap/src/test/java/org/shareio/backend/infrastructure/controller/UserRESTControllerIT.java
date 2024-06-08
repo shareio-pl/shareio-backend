@@ -7,6 +7,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.shareio.backend.core.model.vo.AccountType;
+import org.shareio.backend.core.usecases.port.dto.UserModifyDto;
+import org.shareio.backend.core.usecases.port.dto.UserPasswordDto;
 import org.shareio.backend.core.usecases.port.dto.UserSaveDto;
 import org.shareio.backend.infrastructure.dbadapter.entities.AddressEntity;
 import org.shareio.backend.infrastructure.dbadapter.entities.SecurityEntity;
@@ -17,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -55,6 +58,7 @@ public class UserRESTControllerIT {
     }
 
     private UserEntity generateUserEntity(UUID userId) {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         return new UserEntity(null, userId, "jan.kowalski@poczta.pl", "J", "K",
                 LocalDate.of(2000, 12, 31),
                 UUID.randomUUID(),
@@ -62,7 +66,7 @@ public class UserRESTControllerIT {
                         "Wólczańska", "215", "1", "91-001",
                         51.7467613, 19.4530878),
                 new SecurityEntity(null,
-                        "aa", AccountType.USER,
+                        bCryptPasswordEncoder.encode("aa"), AccountType.USER,
                         LocalDateTime.now(), LocalDateTime.now()));
     }
 
@@ -171,6 +175,178 @@ public class UserRESTControllerIT {
 
     }
 
+    @Test
+    public void get_all_valid_users_and_get_200() throws Exception {
+        UUID userId = UUID.randomUUID();
+        UUID userIdSecond = UUID.randomUUID();
+        UserEntity correctUserEntity = generateUserEntity(userId);
+        UserEntity correctUserEntitySecond = generateUserEntity(userIdSecond);
+        correctUserEntity.setName("Jan");
+        correctUserEntity.setSurname("Kowal");
+        correctUserEntitySecond.setName("Janek");
+        correctUserEntitySecond.setSurname("Kowalek");
+        userRepository.save(correctUserEntity);
+        userRepository.save(correctUserEntitySecond);
+        mvc.perform(MockMvcRequestBuilders
+                        .get("/user/getAll")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void modify_nonexistent_user_and_get_404() throws Exception {
+        configureObjectMapper();
+        UUID userId = UUID.randomUUID();
+        UUID nonexistent_userId = UUID.randomUUID();
+        UserEntity correctUserEntity = generateUserEntity(userId);
+        correctUserEntity.setName("Jan");
+        correctUserEntity.setSurname("Kowal");
+        userRepository.save(correctUserEntity);
+
+        UserModifyDto userModifyDto = new UserModifyDto(
+                "Jan",
+                "Kowal",
+                LocalDate.now(),
+                "Polska",
+                "Łódzkie",
+                "Łódź",
+                "Lutomierska",
+                "15",
+                "12",
+                "95-000"
+        );
+
+        String requestJson = objectWriter.writeValueAsString(userModifyDto);
+
+        mvc.perform(MockMvcRequestBuilders
+                        .put("/user/modify/"+nonexistent_userId)
+                        .header("id",nonexistent_userId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(requestJson)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void modify_user_and_get_400() throws Exception {
+        configureObjectMapper();
+        UUID userId = UUID.randomUUID();
+        UserEntity correctUserEntity = generateUserEntity(userId);
+        correctUserEntity.setName("Jan");
+        correctUserEntity.setSurname("Kowal");
+        userRepository.save(correctUserEntity);
+
+        UserModifyDto userModifyDto = new UserModifyDto(
+                "J",
+                "K",
+                LocalDate.now(),
+                "Polska",
+                null,
+                "Łódź",
+                "Lutomierska",
+                "15",
+                "12",
+                "95-000"
+        );
+
+        String requestJson = objectWriter.writeValueAsString(userModifyDto);
+
+        mvc.perform(MockMvcRequestBuilders
+                        .put("/user/modify/"+userId)
+                        .header("id",userId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(requestJson)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void change_nonexistent_user_password_and_get_404() throws Exception {
+        configureObjectMapper();
+        UUID userId = UUID.randomUUID();
+        UUID nonexistent_userId = UUID.randomUUID();
+        UserEntity correctUserEntity = generateUserEntity(userId);
+        correctUserEntity.setName("Jan");
+        correctUserEntity.setSurname("Kowal");
+        userRepository.save(correctUserEntity);
+
+        UserPasswordDto userPasswordDto = new UserPasswordDto(
+                "aa",
+                "ab"
+        );
+
+        String requestJson = objectWriter.writeValueAsString(userPasswordDto);
+
+        mvc.perform(MockMvcRequestBuilders
+                        .put("/user/changePassword/"+nonexistent_userId)
+                        .header("id",userId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(requestJson)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void change_user_password_bad_request_and_get_400() throws Exception {
+        configureObjectMapper();
+        UUID userId = UUID.randomUUID();
+        UserEntity correctUserEntity = generateUserEntity(userId);
+        correctUserEntity.setName("Jan");
+        correctUserEntity.setSurname("Kowal");
+        userRepository.save(correctUserEntity);
+
+        UserPasswordDto userPasswordDto = new UserPasswordDto(
+                "aa",
+                "aa"
+        );
+
+        String requestJson = objectWriter.writeValueAsString(userPasswordDto);
+
+        mvc.perform(MockMvcRequestBuilders
+                        .put("/user/changePassword/"+userId)
+                        .header("id",userId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(requestJson)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void change_user_password_and_get_200() throws Exception {
+        configureObjectMapper();
+        UUID userId = UUID.randomUUID();
+        UserEntity correctUserEntity = generateUserEntity(userId);
+        correctUserEntity.setName("Jan");
+        correctUserEntity.setSurname("Kowal");
+        userRepository.save(correctUserEntity);
+
+        UserPasswordDto userPasswordDto = new UserPasswordDto(
+                "aa",
+                "ab"
+        );
+
+        String requestJson = objectWriter.writeValueAsString(userPasswordDto);
+
+        mvc.perform(MockMvcRequestBuilders
+                        .put("/user/changePassword/"+userId)
+                        .header("id",userId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(requestJson)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+    }
 
 }
 

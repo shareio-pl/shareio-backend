@@ -32,14 +32,14 @@ public class DeleteRESTController {
 
     @DeleteMapping(value = "/user/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> deleteUser(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
-        try{
-            RequestLogHandler.handleRequest(httpRequest);
+        RequestLogHandler.handleRequest(httpRequest);
+        try {
             getUserProfileUseCase.getUserProfileResponseDto(id);
         } catch (MultipleValidationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, "User with id: "+id+" is malformed");
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FAILED_DEPENDENCY, "User with id: " + id + " is malformed");
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "User with id: "+id+" not found");
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, "User with id: " + id + " not found");
             return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         }
         RemoveResponseDto removeResponseDto = new RemoveResponseDto();
@@ -49,16 +49,16 @@ public class DeleteRESTController {
         return new CorrectResponse(removeResponseDto, Const.SUCC_ERR, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/offer/delete/{id}",  produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/offer/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> deleteOffer(HttpServletRequest httpRequest, @PathVariable(value = "id") UUID id) {
-        try{
-            RequestLogHandler.handleRequest(httpRequest);
+        RequestLogHandler.handleRequest(httpRequest);
+        try {
             getOfferUseCaseInterface.getOfferResponseDto(id, null, null, null);
         } catch (MultipleValidationException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.FAILED_DEPENDENCY, "Offer with id: "+id+" is malformed");
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.FAILED_DEPENDENCY, "Offer with id: " + id + " is malformed");
             return new ErrorResponse(e.getErrorMap(), e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
         } catch (NoSuchElementException e) {
-            RequestLogHandler.handleErrorResponse(httpRequest,HttpStatus.NOT_FOUND, "Offer with id: "+id+" not found");
+            RequestLogHandler.handleErrorResponse(httpRequest, HttpStatus.NOT_FOUND, "Offer with id: " + id + " not found");
             return new ErrorResponse(Const.NO_ELEM_ERR, HttpStatus.NOT_FOUND);
         }
         RemoveResponseDto removeResponseDto = new RemoveResponseDto();

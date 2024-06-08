@@ -1,11 +1,13 @@
 package org.shareio.backend.infrastructure.controller;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.shareio.backend.Const;
 import org.shareio.backend.core.usecases.port.in.GetOffersByNameUseCaseInterface;
 import org.shareio.backend.infrastructure.dbadapter.entities.*;
 import org.shareio.backend.infrastructure.dbadapter.repositories.*;
+import org.shareio.backend.security.RequestLogHandler;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ public class DebugRESTController {
     ENDPOINTS:
     localhost:8082/debug/getOfferIds
     localhost:8082/debug/getOffersByName
+    localhost:8082/debug/nuke
     */
 
     AddressRepository addressRepository;
@@ -35,7 +38,8 @@ public class DebugRESTController {
 
 
     @GetMapping(value = "/getOfferIds", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> debugGetOfferIds() {
+    public ResponseEntity<Object> debugGetOfferIds(HttpServletRequest httpRequest) {
+        RequestLogHandler.handleRequest(httpRequest);
         Map<String, Object> response = new HashMap<>();
         try {
             List<UUID> offerIds = new ArrayList<>();
@@ -54,7 +58,8 @@ public class DebugRESTController {
     }
 
     @GetMapping(value = "/createReview/{offerId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> debugCreateReview(@PathVariable(value = "offerId") UUID offerId) {
+    public ResponseEntity<Object> debugCreateReview(HttpServletRequest httpRequest, @PathVariable(value = "offerId") UUID offerId) {
+        RequestLogHandler.handleRequest(httpRequest);
         Map<String, Object> response = new HashMap<>();
         UUID reviewId = UUID.randomUUID();
         OfferEntity offerEntity;
@@ -73,7 +78,8 @@ public class DebugRESTController {
     }
 
     @GetMapping(value = "/nuke", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> debugPurifyTheUnclean() {
+    public ResponseEntity<Object> debugPurifyTheUnclean(HttpServletRequest httpRequest) {
+        RequestLogHandler.handleRequest(httpRequest);
         Map<String, Object> response = new HashMap<>();
         try {
             userRepository.truncateTable();

@@ -4,5 +4,4 @@ import org.shareio.backend.core.model.UserSnapshot;
 
 public interface UpdateUserChangeMetadataCommandInterface {
     void updateUserMetadata(UserSnapshot userSnapshot);
-
 }
