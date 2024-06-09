@@ -7,17 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.shareio.backend.core.model.OfferSnapshot;
 import org.shareio.backend.core.model.OfferValidator;
-import org.shareio.backend.core.model.vo.Category;
-import org.shareio.backend.core.model.vo.Condition;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
-import org.shareio.backend.core.usecases.port.dto.OfferModifyDto;
 import org.shareio.backend.core.usecases.port.dto.OfferReserveDto;
 import org.shareio.backend.core.usecases.port.dto.UserProfileGetDto;
 import org.shareio.backend.core.usecases.port.out.GetOfferDaoInterface;
 import org.shareio.backend.core.usecases.port.out.GetUserProfileDaoInterface;
 import org.shareio.backend.core.usecases.port.out.UpdateOfferReserveOfferCommandInterface;
-import org.shareio.backend.core.usecases.port.out.UpdateOfferSaveReviewCommandInterface;
 import org.shareio.backend.exceptions.MultipleValidationException;
 
 import java.time.LocalDate;
