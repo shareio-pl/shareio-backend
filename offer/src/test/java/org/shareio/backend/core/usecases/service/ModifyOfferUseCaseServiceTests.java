@@ -17,6 +17,7 @@ import org.shareio.backend.core.usecases.port.dto.OfferModifyDto;
 import org.shareio.backend.core.usecases.port.out.GetOfferDaoInterface;
 import org.shareio.backend.core.usecases.port.out.UpdateOfferChangeMetadataCommandInterface;
 import org.shareio.backend.core.usecases.util.LocationCalculator;
+import org.shareio.backend.exceptions.LocationCalculationException;
 import org.shareio.backend.exceptions.MultipleValidationException;
 
 import java.time.LocalDateTime;
@@ -239,6 +240,73 @@ public class ModifyOfferUseCaseServiceTests {
 
         when(test_getOfferDaoInterface.getOfferDto(testOfferId)).thenReturn(Optional.of(test_offerGetDto));
         Assertions.assertThrows(NoSuchElementException.class, () -> test_modifyOfferUseCaseService.modifyOffer(testOfferId, test_offerModifyDto));
+    }
+
+    @Test
+    void unable_to_calculate_location_interrupt_thread() {
+        try (MockedStatic<LocationCalculator> locationCalculator = Mockito.mockStatic(LocationCalculator.class)) {
+            testOfferId = UUID.randomUUID();
+            testPhotoId = UUID.randomUUID();
+            testAddressId = UUID.randomUUID();
+            testOwnerId = UUID.randomUUID();
+            testOwnerPhotoId = UUID.randomUUID();
+
+            test_offerGetDto = new OfferGetDto(
+                    testOfferId,
+                    testDate,
+                    Status.CREATED.toString(),
+                    testAddressId,
+                    testCountry,
+                    testRegion,
+                    testCity,
+                    testStreet,
+                    testHouseNumber,
+                    testFlatNumber,
+                    testPostCode,
+                    testLatitude,
+                    testLongitude,
+                    testTitle,
+                    testCondition,
+                    testCategory,
+                    testDescription,
+                    testPhotoId,
+                    testOwnerId,
+                    testName,
+                    testSurname,
+                    testOwnerPhotoId,
+                    null,
+                    null,
+                    null,
+                    testReviewValue,
+                    testDate
+            );
+
+            test_offerModifyDto = new OfferModifyDto(
+                    test_changedAddressSaveDto,
+                    testChangedTitle,
+                    testChangedCondition,
+                    testChangedCategory,
+                    testChangedDescription
+            );
+
+            when(test_getOfferDaoInterface.getOfferDto(testOfferId)).thenReturn(Optional.of(test_offerGetDto));
+            locationCalculator.when(() -> LocationCalculator.getLocationFromAddress(
+                    test_changedAddressSaveDto.country(),
+                    test_changedAddressSaveDto.city(),
+                    test_changedAddressSaveDto.street(),
+                    test_changedAddressSaveDto.houseNumber())).thenThrow(LocationCalculationException.class);
+            try {
+                test_modifyOfferUseCaseService.modifyOffer(testOfferId, test_offerModifyDto);
+            } catch (MultipleValidationException e) {
+                Assertions.fail();
+            }
+
+            Assertions.assertTrue(Thread.currentThread().isInterrupted());
+
+            verify(test_updateOfferChangeMetadataCommandInterface).updateOfferMetadata(test_offerSnapshotCaptor.capture());
+            OfferSnapshot modifiedOffer = test_offerSnapshotCaptor.getValue();
+            Assertions.assertEquals(0.0, modifiedOffer.address().getLocation().getLatitude());
+        }
     }
 
     @Test
