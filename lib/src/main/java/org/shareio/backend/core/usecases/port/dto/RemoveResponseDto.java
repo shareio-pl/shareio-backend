@@ -23,8 +23,8 @@ public class RemoveResponseDto {
         this.deletedReviewCount = 0L;
     }
 
-    public void increment(RemoveResponseFieldName removeResponseFieldName){
-        switch (removeResponseFieldName){
+    public void increment(RemoveResponseFieldName removeResponseFieldName) {
+        switch (removeResponseFieldName) {
             case USERCOUNT -> this.deletedUserCount = this.deletedUserCount + 1;
             case ADDRESSCOUNT -> this.deletedAddressCount = this.deletedAddressCount + 1;
             case SECURITYCOUNT -> this.deletedSecurityCount = this.deletedSecurityCount + 1;

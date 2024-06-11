@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 public class Const {
     // -------------- CONFIGURATION ---------------
     public static final Duration OFFER_RESERVATION_DURATION = Duration.ofDays(1);
-    public static final int OFFER_RESERVATION_CHECK_RATE = 1000*60*5;
+    public static final int OFFER_RESERVATION_CHECK_RATE = 1000 * 60 * 5;
     public static final Double DEFAULT_ADDRESS_CENTER_LAT = 0.0;
     public static final Double DEFAULT_ADDRESS_CENTER_LON = 0.0;
 
@@ -41,7 +41,6 @@ public class Const {
     public static final String FORBIDDEN_ERR = "NO PERMISSIONS";
 
 
-
     // ----------------- DEFAULTS ------------------
 
     public static final UUID DEFAULT_PHOTO_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
@@ -52,7 +51,7 @@ public class Const {
     public static final String MESSAGE_START = "Zgłoszony problem:\n";
     public static final String MESSAGE_END = "\nDziękujemy za skorzystanie z naszego panelu pomocy technicznej! \nZespół Shareio";
 
-    private Const(){
+    private Const() {
         throw new IllegalArgumentException("Utility class");
     }
 }

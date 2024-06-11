@@ -26,7 +26,7 @@ public class CoordinatesCalculator implements CoordinatesCalculatorInterface {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(apiUrl)).GET().build();
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
-        JSONArray array = null;
+        JSONArray array;
         try {
             array = new JSONArray(response.body());
         } catch (JSONException e) {

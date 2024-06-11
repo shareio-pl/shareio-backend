@@ -18,10 +18,10 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 
+@SuppressWarnings("CanBeFinal")
 class ChangePasswordUserUseCaseServiceTests {
 
     AutoCloseable test_autoCloseable;
@@ -29,11 +29,11 @@ class ChangePasswordUserUseCaseServiceTests {
     UUID test_correct_user_id;
     UserProfileGetDto test_userProfileGetDto;
     BCryptPasswordEncoder test_bcryptPasswordEncoder;
-    String test_password_first = "1234";
-    String test_password_second = "123";
-    String test_password_third = "1233";
-    String test_exceptionMessage_first = "IllArgErr: New password must differ from the old password!";
-    String test_exceptionMessage_second = "IllArgErr: Password does not match!";
+    final String test_password_first = "1234";
+    final String test_password_second = "123";
+    final String test_password_third = "1233";
+    final String test_exceptionMessage_first = "IllArgErr: New password must differ from the old password!";
+    final String test_exceptionMessage_second = "IllArgErr: Password does not match!";
 
     @Mock
     GetUserProfileDaoInterface test_getUserProfileDaoInterface;

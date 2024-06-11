@@ -6,7 +6,6 @@ import org.shareio.backend.core.model.OfferValidator;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferEndDto;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
-import org.shareio.backend.core.usecases.port.in.CancelOfferUseCaseInterface;
 import org.shareio.backend.core.usecases.port.in.FinishOfferUseCaseInterface;
 import org.shareio.backend.core.usecases.port.out.GetOfferDaoInterface;
 import org.shareio.backend.core.usecases.port.out.UpdateOfferFinishOfferCommandInterface;

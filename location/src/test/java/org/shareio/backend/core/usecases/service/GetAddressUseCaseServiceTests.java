@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 public class GetAddressUseCaseServiceTests {
-//TODO: cleanup
+    //TODO: cleanup
     private AutoCloseable closeable;
     AddressGetDto expectedCorrectAddressGetDto = null;
     AddressResponseDto expectedCorrectAddressResponseDto = null;
@@ -99,7 +99,7 @@ public class GetAddressUseCaseServiceTests {
     }
 
     @Test
-    void get_valid_address_and_succeed(){
+    void get_valid_address_and_succeed() {
         when(getAddressDaoInterface.getAddressDto(test_correctUserId)).thenReturn(Optional.of(expectedCorrectAddressGetDto));
         AddressResponseDto addressResponseDto = Assertions.assertDoesNotThrow(
                 () -> getAddressUseCaseService.getAddressResponseDto(test_correctUserId)

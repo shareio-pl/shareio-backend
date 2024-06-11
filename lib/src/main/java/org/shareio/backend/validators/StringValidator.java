@@ -6,8 +6,9 @@ import org.shareio.backend.exceptions.ValidationException;
 import java.util.Objects;
 
 public class StringValidator {
-    
+
     private static final String NON_LETTER_STRING = "String contains non letter characters";
+
     public static void validateStringNotEmpty(String string) throws ValidationException {
         if (Objects.isNull(string) || string.isBlank() || string.isEmpty())
             throw new ValidationException("String is empty");
@@ -77,7 +78,7 @@ public class StringValidator {
         if (!Const.EMAIL_REGEX.matcher(email).find())
             throw new ValidationException("Invalid email");
     }
-    
+
     private StringValidator() {
         throw new IllegalArgumentException("Utility class");
     }
