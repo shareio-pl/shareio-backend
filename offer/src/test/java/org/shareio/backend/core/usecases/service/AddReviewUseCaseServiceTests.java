@@ -1,19 +1,17 @@
 package org.shareio.backend.core.usecases.service;
 
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.shareio.backend.core.model.OfferSnapshot;
 import org.shareio.backend.core.model.OfferValidator;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
-import org.shareio.backend.core.usecases.port.dto.OfferReserveDto;
-import org.shareio.backend.core.usecases.port.dto.RemoveResponseDto;
+import org.shareio.backend.core.usecases.port.dto.OfferReviewDto;
 import org.shareio.backend.core.usecases.port.out.GetOfferDaoInterface;
-import org.shareio.backend.core.usecases.port.out.RemoveOfferCommandInterface;
-import org.shareio.backend.core.usecases.port.out.RemoveReviewCommandInterface;
+import org.shareio.backend.core.usecases.port.out.UpdateOfferSaveReviewCommandInterface;
 import org.shareio.backend.exceptions.MultipleValidationException;
 
 import java.time.LocalDateTime;
@@ -21,23 +19,26 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
-public class RemoveOfferUseCaseServiceTests {
+
+class AddReviewUseCaseServiceTests {
     AutoCloseable test_autoCloseable;
 
     @Mock
     GetOfferDaoInterface test_getOfferDaoInterface;
     @Mock
-    RemoveOfferCommandInterface test_removeOfferCommandInterface;
-    @Mock
-    RemoveReviewCommandInterface test_removeReviewCommandInterface;
+    UpdateOfferSaveReviewCommandInterface test_updateOfferSaveReviewCommandInterface;
+    @InjectMocks
+    AddReviewUseCaseService test_addReviewUseCaseService;
     @Mock
     OfferGetDto test_offerGetDto;
     @Mock
-    RemoveResponseDto test_removeResponseDto;
-    @InjectMocks
-    RemoveOfferUseCaseService test_removeOfferUseCaseService;
+    OfferReviewDto test_offerReviewDto;
+    @Captor
+    ArgumentCaptor<OfferSnapshot> test_offerSnapshotCaptor;
 
     String testName = "John";
     String testSurname = "Doe";
@@ -77,60 +78,73 @@ public class RemoveOfferUseCaseServiceTests {
     }
 
     @Test
-    void get_no_offer_for_id_and_thrown_no_such_element_exception() {
+    void get_invalid_offer_from_db_and_throw_NoSuchElementException() {
         testOfferId = UUID.randomUUID();
-        testPhotoId = UUID.randomUUID();
-        testAddressId = UUID.randomUUID();
-        testOwnerId = UUID.randomUUID();
-        testOwnerPhotoId = UUID.randomUUID();
-        testReceiverId = UUID.randomUUID();
-        testReviewId = UUID.randomUUID();
+        Mockito.when(test_offerReviewDto.offerId()).thenReturn(testOfferId);
+        Mockito.when(test_getOfferDaoInterface.getOfferDto(testOfferId)).thenReturn(Optional.of(test_offerGetDto));
 
-        test_offerGetDto = new OfferGetDto(
-                testOfferId,
-                testDate,
-                Status.FINISHED.toString(),
-                testAddressId,
-                testCountry,
-                testRegion,
-                testCity,
-                testStreet,
-                testHouseNumber,
-                testFlatNumber,
-                testPostCode,
-                testLatitude,
-                testLongitude,
-                testTitle,
-                testCondition,
-                testCategory,
-                testDescription,
-                testPhotoId,
-                testOwnerId,
-                testName,
-                testSurname,
-                testOwnerPhotoId,
-                null,
-                null,
-                testReviewId,
-                testReviewValue,
-                testDate
-        );
-        test_removeResponseDto = new RemoveResponseDto();
+        try (MockedStatic<OfferValidator> utilities = Mockito.mockStatic(OfferValidator.class)) {
+            utilities.when(() -> OfferValidator.validateOffer(test_offerGetDto))
+                    .thenThrow(MultipleValidationException.class);
+            Assertions.assertThrows(MultipleValidationException.class,
+                    () -> test_addReviewUseCaseService.addReview(test_offerReviewDto));
 
-        UUID randomUUID = UUID.randomUUID();
-        when(test_getOfferDaoInterface.getOfferDto(randomUUID)).thenThrow(NoSuchElementException.class);
-        Assertions.assertThrows(NoSuchElementException.class, () -> test_removeOfferUseCaseService.removeOffer(randomUUID, test_removeResponseDto));
+        }
     }
 
     @Test
-    void get_offer_for_id_with_review_and_remove_it() {
+    void get_valid_offer_from_db_with_status_not_Finished_and_throw_NoSuchElementException() {
         testOfferId = UUID.randomUUID();
-        testPhotoId = UUID.randomUUID();
         testAddressId = UUID.randomUUID();
+        testPhotoId = UUID.randomUUID();
         testOwnerId = UUID.randomUUID();
         testOwnerPhotoId = UUID.randomUUID();
-        testReceiverId = UUID.randomUUID();
+
+        test_offerGetDto = new OfferGetDto(
+                testOfferId,
+                testDate,
+                Status.CANCELED.toString(),
+                testAddressId,
+                testCountry,
+                testRegion,
+                testCity,
+                testStreet,
+                testHouseNumber,
+                testFlatNumber,
+                testPostCode,
+                testLatitude,
+                testLongitude,
+                testTitle,
+                testCondition,
+                testCategory,
+                testDescription,
+                testPhotoId,
+                testOwnerId,
+                testName,
+                testSurname,
+                testOwnerPhotoId,
+                null,
+                null,
+                null,
+                testReviewValue,
+                testDate
+        );
+        Mockito.when(test_offerReviewDto.offerId()).thenReturn(testOfferId);
+        Mockito.when(test_getOfferDaoInterface.getOfferDto(testOfferId)).thenReturn(Optional.of(test_offerGetDto));
+
+        Assertions.assertThrows(NoSuchElementException.class,
+                () -> test_addReviewUseCaseService.addReview(test_offerReviewDto));
+    }
+
+    @Test
+    void get_valid_offer_from_db_with_status_Finished_and_succeed() {
+        testOfferId = UUID.randomUUID();
+        testAddressId = UUID.randomUUID();
+        testPhotoId = UUID.randomUUID();
+        testOwnerId = UUID.randomUUID();
+        testOwnerPhotoId = UUID.randomUUID();
         testReviewId = UUID.randomUUID();
+        testReceiverId = UUID.randomUUID();
 
         test_offerGetDto = new OfferGetDto(
                 testOfferId,
@@ -155,20 +169,23 @@ public class RemoveOfferUseCaseServiceTests {
                 testName,
                 testSurname,
                 testOwnerPhotoId,
+                testReceiverId,
+                testDate,
                 null,
                 null,
-                testReviewId,
-                testReviewValue,
                 testDate
         );
-        test_removeResponseDto = new RemoveResponseDto();
+        Mockito.when(test_offerReviewDto.offerId()).thenReturn(testOfferId);
+        Mockito.when(test_offerReviewDto.reviewValue()).thenReturn(testReviewValue);
+        Mockito.when(test_getOfferDaoInterface.getOfferDto(testOfferId)).thenReturn(Optional.of(test_offerGetDto));
 
-        when(test_getOfferDaoInterface.getOfferDto(testOfferId)).thenReturn(Optional.of(test_offerGetDto));
+        UUID reviewId = Assertions.assertDoesNotThrow(
+                () -> test_addReviewUseCaseService.addReview(test_offerReviewDto));
+        verify(test_updateOfferSaveReviewCommandInterface, times(1)).updateOfferAddReview(any());
+        verify(test_updateOfferSaveReviewCommandInterface).updateOfferAddReview(test_offerSnapshotCaptor.capture());
 
-        Assertions.assertEquals(test_removeResponseDto, test_removeOfferUseCaseService.removeOffer(testOfferId, test_removeResponseDto));
-        verify(test_removeReviewCommandInterface, times(1)).removeReview(any());
-        verify(test_removeOfferCommandInterface, times(1)).removeOffer(any());
-        Assertions.assertEquals(1, test_removeResponseDto.getDeletedReviewCount());
-        Assertions.assertEquals(1, test_removeResponseDto.getDeletedOfferCount());
+        OfferSnapshot offerSnapshotCaptorValue = test_offerSnapshotCaptor.getValue();
+        Assertions.assertEquals(testReviewValue, offerSnapshotCaptorValue.reviewSnapshot().value());
+        Assertions.assertNotNull(reviewId);
     }
 }

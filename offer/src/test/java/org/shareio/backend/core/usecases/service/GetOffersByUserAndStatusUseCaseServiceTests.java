@@ -8,26 +8,27 @@ import org.mockito.*;
 import org.shareio.backend.core.model.OfferValidator;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
-import org.shareio.backend.core.usecases.port.out.GetOffersByNameDaoInterface;
+import org.shareio.backend.core.usecases.port.out.GetOffersByUserDaoInterface;
 import org.shareio.backend.exceptions.MultipleValidationException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
-public class GetOffersByNameUseCaseServiceTests {
+public class GetOffersByUserAndStatusUseCaseServiceTests {
     AutoCloseable test_autoCloseable;
 
     @Mock
-    GetOffersByNameDaoInterface test_getOffersByNameDaoInterface;
+    GetOffersByUserDaoInterface test_getOffersByUserDaoInterface;
     @Mock
     OfferGetDto test_offerGetDto1;
     @Mock
     OfferGetDto test_offerGetDto2;
     @InjectMocks
-    GetOffersByNameUseCaseService test_getOffersByNameUseCaseService;
+    GetOffersByUserAndStatusUseCaseService test_getOffersByUserAndStatusUseCaseService;
 
     String testName = "John";
     String testSurname = "Doe";
@@ -53,7 +54,8 @@ public class GetOffersByNameUseCaseServiceTests {
     UUID testOfferId2 = null;
     UUID testPhotoId = null;
     UUID testAddressId = null;
-    UUID testOwnerId = null;
+    UUID testOwnerId1 = null;
+    UUID testOwnerId2 = null;
     UUID testOwnerPhotoId = null;
 
     @BeforeEach
@@ -67,12 +69,14 @@ public class GetOffersByNameUseCaseServiceTests {
     }
 
     @Test
-    void get_invalid_offer_with_matching_name_and_return_empty_list() {
+    void get_one_invalid_offer_matching_criteria_and_throw_no_such_element_exception() {
         try (MockedStatic<OfferValidator> utilities = Mockito.mockStatic(OfferValidator.class)) {
             testOfferId1 = UUID.randomUUID();
+            testOfferId2 = UUID.randomUUID();
             testPhotoId = UUID.randomUUID();
             testAddressId = UUID.randomUUID();
-            testOwnerId = UUID.randomUUID();
+            testOwnerId1 = UUID.randomUUID();
+            testOwnerId2 = UUID.randomUUID();
             testOwnerPhotoId = UUID.randomUUID();
 
             test_offerGetDto1 = new OfferGetDto(
@@ -94,7 +98,37 @@ public class GetOffersByNameUseCaseServiceTests {
                     testCategory,
                     testDescription,
                     testPhotoId,
-                    testOwnerId,
+                    testOwnerId1,
+                    testName,
+                    testSurname,
+                    testOwnerPhotoId,
+                    null,
+                    null,
+                    null,
+                    testReviewValue,
+                    testDate
+            );
+
+            test_offerGetDto2 = new OfferGetDto(
+                    testOfferId2,
+                    testDate,
+                    Status.CREATED.toString(),
+                    testAddressId,
+                    testCountry,
+                    testRegion,
+                    testCity,
+                    testStreet,
+                    testHouseNumber,
+                    testFlatNumber,
+                    testPostCode,
+                    testLatitude,
+                    testLongitude,
+                    testTitle2,
+                    testCondition,
+                    testCategory,
+                    testDescription,
+                    testPhotoId,
+                    testOwnerId2,
                     testName,
                     testSurname,
                     testOwnerPhotoId,
@@ -106,18 +140,21 @@ public class GetOffersByNameUseCaseServiceTests {
             );
 
             utilities.when(() -> OfferValidator.validateOffer(test_offerGetDto1)).thenThrow(MultipleValidationException.class);
-            when(test_getOffersByNameDaoInterface.getOffersByName(testTitle1)).thenReturn(List.of(test_offerGetDto1));
-            Assertions.assertEquals(0, test_getOffersByNameUseCaseService.getOfferResponseDtoListByName(testTitle1).size());
+            when(test_getOffersByUserDaoInterface.getOffersByUser(testOwnerId1)).thenReturn(List.of(test_offerGetDto1));
+            Assertions.assertThrows(NoSuchElementException.class, () ->
+                    test_getOffersByUserAndStatusUseCaseService.getOfferResponseDtoListByUser(testOwnerId1, Status.CREATED)
+            );
         }
     }
 
     @Test
-    void get_no_offers_with_matching_name_and_return_empty_list() {
+    void get_no_offers_with_matching_id_and_throw_no_such_element_exception() {
         testOfferId1 = UUID.randomUUID();
         testOfferId2 = UUID.randomUUID();
         testPhotoId = UUID.randomUUID();
         testAddressId = UUID.randomUUID();
-        testOwnerId = UUID.randomUUID();
+        testOwnerId1 = UUID.randomUUID();
+        testOwnerId2 = UUID.randomUUID();
         testOwnerPhotoId = UUID.randomUUID();
 
         test_offerGetDto1 = new OfferGetDto(
@@ -139,7 +176,7 @@ public class GetOffersByNameUseCaseServiceTests {
                 testCategory,
                 testDescription,
                 testPhotoId,
-                testOwnerId,
+                testOwnerId1,
                 testName,
                 testSurname,
                 testOwnerPhotoId,
@@ -169,7 +206,7 @@ public class GetOffersByNameUseCaseServiceTests {
                 testCategory,
                 testDescription,
                 testPhotoId,
-                testOwnerId,
+                testOwnerId2,
                 testName,
                 testSurname,
                 testOwnerPhotoId,
@@ -180,23 +217,25 @@ public class GetOffersByNameUseCaseServiceTests {
                 testDate
         );
 
-        when(test_getOffersByNameDaoInterface.getOffersByName("test")).thenReturn(List.of());
-        Assertions.assertEquals(0, test_getOffersByNameUseCaseService.getOfferResponseDtoListByName(testTitle1).size());
+        UUID randomUUID = UUID.randomUUID();
+        when(test_getOffersByUserDaoInterface.getOffersByUser(randomUUID)).thenReturn(List.of());
+        Assertions.assertThrows(NoSuchElementException.class, () -> test_getOffersByUserAndStatusUseCaseService.getOfferResponseDtoListByUser(randomUUID, Status.CREATED));
     }
 
     @Test
-    void get_one_offer_with_matching_name_but_not_CREATED_and_return_empty_list() {
+    void get_offer_with_matching_id_but_not_matching_status_and_return_empty_list() {
         testOfferId1 = UUID.randomUUID();
         testOfferId2 = UUID.randomUUID();
         testPhotoId = UUID.randomUUID();
         testAddressId = UUID.randomUUID();
-        testOwnerId = UUID.randomUUID();
+        testOwnerId1 = UUID.randomUUID();
+        testOwnerId2 = UUID.randomUUID();
         testOwnerPhotoId = UUID.randomUUID();
 
         test_offerGetDto1 = new OfferGetDto(
                 testOfferId1,
                 testDate,
-                Status.CANCELED.toString(),
+                Status.CREATED.toString(),
                 testAddressId,
                 testCountry,
                 testRegion,
@@ -212,7 +251,7 @@ public class GetOffersByNameUseCaseServiceTests {
                 testCategory,
                 testDescription,
                 testPhotoId,
-                testOwnerId,
+                testOwnerId1,
                 testName,
                 testSurname,
                 testOwnerPhotoId,
@@ -242,7 +281,7 @@ public class GetOffersByNameUseCaseServiceTests {
                 testCategory,
                 testDescription,
                 testPhotoId,
-                testOwnerId,
+                testOwnerId2,
                 testName,
                 testSurname,
                 testOwnerPhotoId,
@@ -253,17 +292,18 @@ public class GetOffersByNameUseCaseServiceTests {
                 testDate
         );
 
-        when(test_getOffersByNameDaoInterface.getOffersByName(testTitle1)).thenReturn(List.of(test_offerGetDto1));
-        Assertions.assertEquals(0, test_getOffersByNameUseCaseService.getOfferResponseDtoListByName(testTitle1).size());
+        when(test_getOffersByUserDaoInterface.getOffersByUser(testOwnerId1)).thenReturn(List.of(test_offerGetDto1));
+        Assertions.assertEquals(0, test_getOffersByUserAndStatusUseCaseService.getOfferResponseDtoListByUser(testOwnerId1, Status.RESERVED).size());
     }
 
     @Test
-    void get_one_offer_with_matching_name_and_return_its_id() {
+    void get_offer_with_matching_id_and_status_and_return_its_id() {
         testOfferId1 = UUID.randomUUID();
         testOfferId2 = UUID.randomUUID();
         testPhotoId = UUID.randomUUID();
         testAddressId = UUID.randomUUID();
-        testOwnerId = UUID.randomUUID();
+        testOwnerId1 = UUID.randomUUID();
+        testOwnerId2 = UUID.randomUUID();
         testOwnerPhotoId = UUID.randomUUID();
 
         test_offerGetDto1 = new OfferGetDto(
@@ -285,7 +325,7 @@ public class GetOffersByNameUseCaseServiceTests {
                 testCategory,
                 testDescription,
                 testPhotoId,
-                testOwnerId,
+                testOwnerId1,
                 testName,
                 testSurname,
                 testOwnerPhotoId,
@@ -315,7 +355,7 @@ public class GetOffersByNameUseCaseServiceTests {
                 testCategory,
                 testDescription,
                 testPhotoId,
-                testOwnerId,
+                testOwnerId2,
                 testName,
                 testSurname,
                 testOwnerPhotoId,
@@ -326,19 +366,17 @@ public class GetOffersByNameUseCaseServiceTests {
                 testDate
         );
 
-        when(test_getOffersByNameDaoInterface.getOffersByName(testTitle1)).thenReturn(List.of(test_offerGetDto1));
-        UUID matchingNameId = Assertions.assertDoesNotThrow(() -> test_getOffersByNameUseCaseService.getOfferResponseDtoListByName(testTitle1).getFirst());
-        Assertions.assertNotNull(matchingNameId);
+        when(test_getOffersByUserDaoInterface.getOffersByUser(testOwnerId1)).thenReturn(List.of(test_offerGetDto1));
+        Assertions.assertNotNull(test_getOffersByUserAndStatusUseCaseService.getOfferResponseDtoListByUser(testOwnerId1, Status.CREATED).getFirst());
     }
 
     @Test
-    void get_two_offers_with_matching_name_and_return_two_ids()
-    {
+    void get_two_offers_with_matching_ids_and_status_and_return_them_both() {
         testOfferId1 = UUID.randomUUID();
         testOfferId2 = UUID.randomUUID();
         testPhotoId = UUID.randomUUID();
         testAddressId = UUID.randomUUID();
-        testOwnerId = UUID.randomUUID();
+        testOwnerId1 = UUID.randomUUID();
         testOwnerPhotoId = UUID.randomUUID();
 
         test_offerGetDto1 = new OfferGetDto(
@@ -360,7 +398,7 @@ public class GetOffersByNameUseCaseServiceTests {
                 testCategory,
                 testDescription,
                 testPhotoId,
-                testOwnerId,
+                testOwnerId1,
                 testName,
                 testSurname,
                 testOwnerPhotoId,
@@ -385,12 +423,12 @@ public class GetOffersByNameUseCaseServiceTests {
                 testPostCode,
                 testLatitude,
                 testLongitude,
-                testTitle1,
+                testTitle2,
                 testCondition,
                 testCategory,
                 testDescription,
                 testPhotoId,
-                testOwnerId,
+                testOwnerId1,
                 testName,
                 testSurname,
                 testOwnerPhotoId,
@@ -401,7 +439,7 @@ public class GetOffersByNameUseCaseServiceTests {
                 testDate
         );
 
-        when(test_getOffersByNameDaoInterface.getOffersByName(testTitle1)).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
-        Assertions.assertEquals(2, test_getOffersByNameUseCaseService.getOfferResponseDtoListByName(testTitle1).size());
+        when(test_getOffersByUserDaoInterface.getOffersByUser(testOwnerId1)).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
+        Assertions.assertEquals(2, test_getOffersByUserAndStatusUseCaseService.getOfferResponseDtoListByUser(testOwnerId1, Status.CREATED).size());
     }
 }

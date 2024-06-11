@@ -58,8 +58,7 @@ public class GetNewestOffersUseCaseService implements GetNewestOffersUseCaseInte
                     return d.toDays() <= Const.OFFER_RESERVATION_DURATION.toDays();
                 })
                 .toList();
-
-        if(offerList.isEmpty() || offerList.size() < Const.MIN_OFFER_LIST_SIZE){
+        if(offerList.size()<Const.MIN_OFFER_LIST_SIZE){
             return backupNewestOfferList
                     .stream()
                     .map(Offer::toSnapshot)

@@ -50,7 +50,7 @@ public class ModifyOfferUseCaseService implements ModifyOfferUseCaseInterface {
             Thread.currentThread().interrupt();
             offer.getAddress().setLocation(new Location(0.0, 0.0));
         }
-        offer.setCondition(Condition.valueOf(offerModifyDto.title()));
+        offer.setCondition(Condition.valueOf(offerModifyDto.condition()));
         offer.setCategory(Category.valueOf(offerModifyDto.category()));
         updateOfferChangeMetadataCommandInterface.updateOfferMetadata(offer.toSnapshot());
     }
