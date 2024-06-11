@@ -4,9 +4,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
+import org.shareio.backend.EnvGetter;
 import org.shareio.backend.core.model.vo.Status;
 import org.shareio.backend.core.usecases.port.dto.OfferGetDto;
 import org.shareio.backend.core.usecases.port.dto.RemoveResponseDto;
@@ -76,243 +75,253 @@ public class RemoveOffersForUserUseCaseServiceTests {
 
     @Test
     void get_no_offers_for_user_and_dont_delete_anything() {
-        testOfferId1 = UUID.randomUUID();
-        testOfferId2 = UUID.randomUUID();
-        testPhotoId = UUID.randomUUID();
-        testAddressId = UUID.randomUUID();
-        testOwnerId1 = UUID.randomUUID();
-        testOwnerId2 = UUID.randomUUID();
-        testOwnerPhotoId = UUID.randomUUID();
-        testReviewId = UUID.randomUUID();
+        try (MockedStatic<EnvGetter> envGetter = Mockito.mockStatic(EnvGetter.class)) {
+            testOfferId1 = UUID.randomUUID();
+            testOfferId2 = UUID.randomUUID();
+            testPhotoId = UUID.randomUUID();
+            testAddressId = UUID.randomUUID();
+            testOwnerId1 = UUID.randomUUID();
+            testOwnerId2 = UUID.randomUUID();
+            testOwnerPhotoId = UUID.randomUUID();
+            testReviewId = UUID.randomUUID();
 
-        test_offerGetDto1 = new OfferGetDto(
-                testOfferId1,
-                testDate,
-                Status.FINISHED.toString(),
-                testAddressId,
-                testCountry,
-                testRegion,
-                testCity,
-                testStreet,
-                testHouseNumber,
-                testFlatNumber,
-                testPostCode,
-                testLatitude,
-                testLongitude,
-                testTitle1,
-                testCondition,
-                testCategory,
-                testDescription,
-                testPhotoId,
-                testOwnerId1,
-                testName,
-                testSurname,
-                testOwnerPhotoId,
-                null,
-                null,
-                testReviewId,
-                testReviewValue,
-                testDate
-        );
+            test_offerGetDto1 = new OfferGetDto(
+                    testOfferId1,
+                    testDate,
+                    Status.FINISHED.toString(),
+                    testAddressId,
+                    testCountry,
+                    testRegion,
+                    testCity,
+                    testStreet,
+                    testHouseNumber,
+                    testFlatNumber,
+                    testPostCode,
+                    testLatitude,
+                    testLongitude,
+                    testTitle1,
+                    testCondition,
+                    testCategory,
+                    testDescription,
+                    testPhotoId,
+                    testOwnerId1,
+                    testName,
+                    testSurname,
+                    testOwnerPhotoId,
+                    null,
+                    null,
+                    testReviewId,
+                    testReviewValue,
+                    testDate
+            );
 
-        test_offerGetDto2 = new OfferGetDto(
-                testOfferId2,
-                testDate,
-                Status.CREATED.toString(),
-                testAddressId,
-                testCountry,
-                testRegion,
-                testCity,
-                testStreet,
-                testHouseNumber,
-                testFlatNumber,
-                testPostCode,
-                testLatitude,
-                testLongitude,
-                testTitle2,
-                testCondition,
-                testCategory,
-                testDescription,
-                testPhotoId,
-                testOwnerId2,
-                testName,
-                testSurname,
-                testOwnerPhotoId,
-                null,
-                null,
-                null,
-                testReviewValue,
-                testDate
-        );
-        test_removeResponseDto = new RemoveResponseDto();
+            test_offerGetDto2 = new OfferGetDto(
+                    testOfferId2,
+                    testDate,
+                    Status.CREATED.toString(),
+                    testAddressId,
+                    testCountry,
+                    testRegion,
+                    testCity,
+                    testStreet,
+                    testHouseNumber,
+                    testFlatNumber,
+                    testPostCode,
+                    testLatitude,
+                    testLongitude,
+                    testTitle2,
+                    testCondition,
+                    testCategory,
+                    testDescription,
+                    testPhotoId,
+                    testOwnerId2,
+                    testName,
+                    testSurname,
+                    testOwnerPhotoId,
+                    null,
+                    null,
+                    null,
+                    testReviewValue,
+                    testDate
+            );
+            test_removeResponseDto = new RemoveResponseDto();
 
-        when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
-        Assertions.assertEquals(test_removeResponseDto, test_removeOffersForUserUseCaseService.removeOffersForUser(UUID.randomUUID(), test_removeResponseDto));
-        verify(test_removeOfferCommandInterface, times(0)).removeOffer(any());
-        Assertions.assertEquals(0, test_removeResponseDto.getDeletedReviewCount());
-        Assertions.assertEquals(0, test_removeResponseDto.getDeletedAddressCount());
-        Assertions.assertEquals(0, test_removeResponseDto.getDeletedOfferCount());
+            when(EnvGetter.getImage()).thenReturn("xD");
+            when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
+            Assertions.assertEquals(test_removeResponseDto, test_removeOffersForUserUseCaseService.removeOffersForUser(UUID.randomUUID(), test_removeResponseDto));
+            verify(test_removeOfferCommandInterface, times(0)).removeOffer(any());
+            Assertions.assertEquals(0, test_removeResponseDto.getDeletedReviewCount());
+            Assertions.assertEquals(0, test_removeResponseDto.getDeletedAddressCount());
+            Assertions.assertEquals(0, test_removeResponseDto.getDeletedOfferCount());
+        }
+
+
     }
 
     @Test
-    void get_one_offer_for_user_with_no_review_and_delete_it()
-    {
-        testOfferId1 = UUID.randomUUID();
-        testOfferId2 = UUID.randomUUID();
-        testPhotoId = UUID.randomUUID();
-        testAddressId = UUID.randomUUID();
-        testOwnerId1 = UUID.randomUUID();
-        testOwnerId2 = UUID.randomUUID();
-        testOwnerPhotoId = UUID.randomUUID();
-        testReviewId = UUID.randomUUID();
+    void get_one_offer_for_user_with_no_review_and_delete_it() {
+        try (MockedStatic<EnvGetter> envGetter = Mockito.mockStatic(EnvGetter.class)) {
+            testOfferId1 = UUID.randomUUID();
+            testOfferId2 = UUID.randomUUID();
+            testPhotoId = UUID.randomUUID();
+            testAddressId = UUID.randomUUID();
+            testOwnerId1 = UUID.randomUUID();
+            testOwnerId2 = UUID.randomUUID();
+            testOwnerPhotoId = UUID.randomUUID();
+            testReviewId = UUID.randomUUID();
 
-        test_offerGetDto1 = new OfferGetDto(
-                testOfferId1,
-                testDate,
-                Status.FINISHED.toString(),
-                testAddressId,
-                testCountry,
-                testRegion,
-                testCity,
-                testStreet,
-                testHouseNumber,
-                testFlatNumber,
-                testPostCode,
-                testLatitude,
-                testLongitude,
-                testTitle1,
-                testCondition,
-                testCategory,
-                testDescription,
-                testPhotoId,
-                testOwnerId1,
-                testName,
-                testSurname,
-                testOwnerPhotoId,
-                null,
-                null,
-                testReviewId,
-                testReviewValue,
-                testDate
-        );
+            test_offerGetDto1 = new OfferGetDto(
+                    testOfferId1,
+                    testDate,
+                    Status.FINISHED.toString(),
+                    testAddressId,
+                    testCountry,
+                    testRegion,
+                    testCity,
+                    testStreet,
+                    testHouseNumber,
+                    testFlatNumber,
+                    testPostCode,
+                    testLatitude,
+                    testLongitude,
+                    testTitle1,
+                    testCondition,
+                    testCategory,
+                    testDescription,
+                    testPhotoId,
+                    testOwnerId1,
+                    testName,
+                    testSurname,
+                    testOwnerPhotoId,
+                    null,
+                    null,
+                    testReviewId,
+                    testReviewValue,
+                    testDate
+            );
 
-        test_offerGetDto2 = new OfferGetDto(
-                testOfferId2,
-                testDate,
-                Status.CREATED.toString(),
-                testAddressId,
-                testCountry,
-                testRegion,
-                testCity,
-                testStreet,
-                testHouseNumber,
-                testFlatNumber,
-                testPostCode,
-                testLatitude,
-                testLongitude,
-                testTitle2,
-                testCondition,
-                testCategory,
-                testDescription,
-                testPhotoId,
-                testOwnerId2,
-                testName,
-                testSurname,
-                testOwnerPhotoId,
-                null,
-                null,
-                null,
-                testReviewValue,
-                testDate
-        );
-        test_removeResponseDto = new RemoveResponseDto();
+            test_offerGetDto2 = new OfferGetDto(
+                    testOfferId2,
+                    testDate,
+                    Status.CREATED.toString(),
+                    testAddressId,
+                    testCountry,
+                    testRegion,
+                    testCity,
+                    testStreet,
+                    testHouseNumber,
+                    testFlatNumber,
+                    testPostCode,
+                    testLatitude,
+                    testLongitude,
+                    testTitle2,
+                    testCondition,
+                    testCategory,
+                    testDescription,
+                    testPhotoId,
+                    testOwnerId2,
+                    testName,
+                    testSurname,
+                    testOwnerPhotoId,
+                    null,
+                    null,
+                    null,
+                    testReviewValue,
+                    testDate
+            );
+            test_removeResponseDto = new RemoveResponseDto();
 
-        when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
-        Assertions.assertEquals(test_removeResponseDto, test_removeOffersForUserUseCaseService.removeOffersForUser(testOwnerId2, test_removeResponseDto));
-        verify(test_removeOfferCommandInterface, times(1)).removeOffer(any());
-        Assertions.assertEquals(0, test_removeResponseDto.getDeletedReviewCount());
-        Assertions.assertEquals(1, test_removeResponseDto.getDeletedAddressCount());
-        Assertions.assertEquals(1, test_removeResponseDto.getDeletedOfferCount());
+            when(EnvGetter.getImage()).thenReturn("xD");
+            when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
+            Assertions.assertEquals(test_removeResponseDto, test_removeOffersForUserUseCaseService.removeOffersForUser(testOwnerId2, test_removeResponseDto));
+            verify(test_removeOfferCommandInterface, times(1)).removeOffer(any());
+            Assertions.assertEquals(0, test_removeResponseDto.getDeletedReviewCount());
+            Assertions.assertEquals(1, test_removeResponseDto.getDeletedAddressCount());
+            Assertions.assertEquals(1, test_removeResponseDto.getDeletedOfferCount());
+        }
     }
 
     @Test
-    void get_one_offer_for_user_with_review_and_delete_it()
-    {
-        testOfferId1 = UUID.randomUUID();
-        testOfferId2 = UUID.randomUUID();
-        testPhotoId = UUID.randomUUID();
-        testAddressId = UUID.randomUUID();
-        testOwnerId1 = UUID.randomUUID();
-        testOwnerId2 = UUID.randomUUID();
-        testOwnerPhotoId = UUID.randomUUID();
-        testReviewId = UUID.randomUUID();
+    void get_one_offer_for_user_with_review_and_delete_it() {
+        try (MockedStatic<EnvGetter> envGetter = Mockito.mockStatic(EnvGetter.class)) {
+            testOfferId1 = UUID.randomUUID();
+            testOfferId2 = UUID.randomUUID();
+            testPhotoId = UUID.randomUUID();
+            testAddressId = UUID.randomUUID();
+            testOwnerId1 = UUID.randomUUID();
+            testOwnerId2 = UUID.randomUUID();
+            testOwnerPhotoId = UUID.randomUUID();
+            testReviewId = UUID.randomUUID();
 
-        test_offerGetDto1 = new OfferGetDto(
-                testOfferId1,
-                testDate,
-                Status.FINISHED.toString(),
-                testAddressId,
-                testCountry,
-                testRegion,
-                testCity,
-                testStreet,
-                testHouseNumber,
-                testFlatNumber,
-                testPostCode,
-                testLatitude,
-                testLongitude,
-                testTitle1,
-                testCondition,
-                testCategory,
-                testDescription,
-                testPhotoId,
-                testOwnerId1,
-                testName,
-                testSurname,
-                testOwnerPhotoId,
-                null,
-                null,
-                testReviewId,
-                testReviewValue,
-                testDate
-        );
+            test_offerGetDto1 = new OfferGetDto(
+                    testOfferId1,
+                    testDate,
+                    Status.FINISHED.toString(),
+                    testAddressId,
+                    testCountry,
+                    testRegion,
+                    testCity,
+                    testStreet,
+                    testHouseNumber,
+                    testFlatNumber,
+                    testPostCode,
+                    testLatitude,
+                    testLongitude,
+                    testTitle1,
+                    testCondition,
+                    testCategory,
+                    testDescription,
+                    testPhotoId,
+                    testOwnerId1,
+                    testName,
+                    testSurname,
+                    testOwnerPhotoId,
+                    null,
+                    null,
+                    testReviewId,
+                    testReviewValue,
+                    testDate
+            );
 
-        test_offerGetDto2 = new OfferGetDto(
-                testOfferId2,
-                testDate,
-                Status.CREATED.toString(),
-                testAddressId,
-                testCountry,
-                testRegion,
-                testCity,
-                testStreet,
-                testHouseNumber,
-                testFlatNumber,
-                testPostCode,
-                testLatitude,
-                testLongitude,
-                testTitle2,
-                testCondition,
-                testCategory,
-                testDescription,
-                testPhotoId,
-                testOwnerId2,
-                testName,
-                testSurname,
-                testOwnerPhotoId,
-                null,
-                null,
-                null,
-                testReviewValue,
-                testDate
-        );
-        test_removeResponseDto = new RemoveResponseDto();
+            test_offerGetDto2 = new OfferGetDto(
+                    testOfferId2,
+                    testDate,
+                    Status.CREATED.toString(),
+                    testAddressId,
+                    testCountry,
+                    testRegion,
+                    testCity,
+                    testStreet,
+                    testHouseNumber,
+                    testFlatNumber,
+                    testPostCode,
+                    testLatitude,
+                    testLongitude,
+                    testTitle2,
+                    testCondition,
+                    testCategory,
+                    testDescription,
+                    testPhotoId,
+                    testOwnerId2,
+                    testName,
+                    testSurname,
+                    testOwnerPhotoId,
+                    null,
+                    null,
+                    null,
+                    testReviewValue,
+                    testDate
+            );
+            test_removeResponseDto = new RemoveResponseDto();
 
-        when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
-        Assertions.assertEquals(test_removeResponseDto, test_removeOffersForUserUseCaseService.removeOffersForUser(testOwnerId1, test_removeResponseDto));
-        verify(test_removeOfferCommandInterface, times(1)).removeOffer(any());
-        Assertions.assertEquals(1, test_removeResponseDto.getDeletedReviewCount());
-        Assertions.assertEquals(1, test_removeResponseDto.getDeletedAddressCount());
-        Assertions.assertEquals(1, test_removeResponseDto.getDeletedOfferCount());
+            when(EnvGetter.getImage()).thenReturn("xD");
+            when(test_getAllOffersDaoInterface.getAllOffers()).thenReturn(List.of(test_offerGetDto1, test_offerGetDto2));
+            Assertions.assertEquals(test_removeResponseDto, test_removeOffersForUserUseCaseService.removeOffersForUser(testOwnerId1, test_removeResponseDto));
+            verify(test_removeOfferCommandInterface, times(1)).removeOffer(any());
+            Assertions.assertEquals(1, test_removeResponseDto.getDeletedReviewCount());
+            Assertions.assertEquals(1, test_removeResponseDto.getDeletedAddressCount());
+            Assertions.assertEquals(1, test_removeResponseDto.getDeletedOfferCount());
+        }
+
     }
 }
