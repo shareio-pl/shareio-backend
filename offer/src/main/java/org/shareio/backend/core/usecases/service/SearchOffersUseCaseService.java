@@ -14,11 +14,15 @@ import org.shareio.backend.core.usecases.port.in.SearchOffersUseCaseInterface;
 import org.shareio.backend.core.usecases.port.out.GetAllOffersDaoInterface;
 import org.shareio.backend.core.usecases.port.out.GetUserProfileDaoInterface;
 import org.shareio.backend.core.usecases.util.DistanceCalculator;
+import org.shareio.backend.exceptions.DescriptionGenerationException;
 import org.shareio.backend.exceptions.MultipleValidationException;
+import org.shareio.backend.external.gpt.SearchImprover;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -82,8 +86,18 @@ public class SearchOffersUseCaseService implements SearchOffersUseCaseInterface 
 
         // FILTER
         if (Objects.nonNull(title) && !title.isBlank()) {
+            SearchImprover improver = new SearchImprover();
+            List<String> potentialWords;
+            try {
+                potentialWords = improver.generatePotentialWords(title).stream().map(String::toUpperCase).collect(Collectors.toCollection(ArrayList::new));
+                potentialWords.add(title.toUpperCase());
+            } catch (IOException | InterruptedException | DescriptionGenerationException e) {
+                potentialWords = List.of(title.toUpperCase());
+            }
+
+            List<String> finalPotentialWords = potentialWords;
             offers = offers.stream()
-                    .filter(offer -> offer.getTitle().toUpperCase().contains(title.toUpperCase())).toList();
+                    .filter(offer -> finalPotentialWords.stream().anyMatch(offer.getTitle().toUpperCase()::contains)).toList();
         }
         if (Objects.nonNull(category) && !category.isEmpty()) {
             offers = offers.stream()
